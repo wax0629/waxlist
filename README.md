@@ -24,19 +24,26 @@ cp .env.example .env.local
 
 当前阶段：
 
-- `/chat` + 服务端会话（`POST /api/chat`、`GET /api/session/:id`）
-- **YouTube Data API** 真检索（配置 `YOUTUBE_API_KEY`）；无 key 自动 mock 降级
-- 下一步：LLM tool calling 提升 plan/rank 质量
+- `/chat` + 服务端会话
+- **自建 Agent 薄编排**（tool calling：`parse_reference` / `search_youtube` / `finalize_shortlist`）
+- **YouTube** 真检索；无 LLM 时规则编排；无 YouTube 时 mock
 
-会话 `session_id` 在 `localStorage`，dev 进程不重启时可刷新恢复。
+会话 `session_id` 在 `localStorage`。
 
-### YouTube Key
-
-获取步骤见 **[docs/youtube-api-setup.md](./docs/youtube-api-setup.md)**，然后：
+### 环境变量
 
 ```bash
 cp .env.example .env.local
-# 编辑 .env.local → YOUTUBE_API_KEY=...
+```
+
+| 变量 | 用途 |
+|------|------|
+| `YOUTUBE_API_KEY` | 真检索（[获取说明](./docs/youtube-api-setup.md)） |
+| `XAI_API_KEY` | LLM tool calling（OpenAI 兼容，默认 xAI） |
+| `LLM_BASE_URL` | 默认 `https://api.x.ai/v1` |
+| `LLM_MODEL` | 模型 ID（如控制台里的 grok 模型名） |
+
+```bash
 npm run dev
 ```
 

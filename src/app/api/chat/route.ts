@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { appendTurn, runTurn } from "@/lib/agent/run-turn";
+import { appendTurn, runAgentTurn } from "@/lib/agent/orchestrator";
 import { getOrCreateSession, saveSession } from "@/lib/session-store";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const session = getOrCreateSession(body.session_id);
 
   try {
-    const result = await runTurn(session, userText, refUrl);
+    const result = await runAgentTurn(session, userText, refUrl);
     appendTurn(session, userText, result);
     saveSession(session);
 

@@ -11,7 +11,7 @@ const WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "你好，我是 Beat Hunter。描述想要的伴奏气质，或粘贴 YouTube 参考曲链接，我会帮你收成可试听短名单。\n\n配置了 YOUTUBE_API_KEY 后走真检索；未配置则自动 mock（见 docs/youtube-api-setup.md）。",
+    "你好，我是 Beat Hunter。描述想要的伴奏气质，或粘贴 YouTube 参考曲链接，我会帮你收成可试听短名单。\n\n已接 Agent tool-calling（需 XAI_API_KEY）+ YouTube 检索（需 YOUTUBE_API_KEY）；缺 key 会自动降级。",
   created_at: new Date().toISOString(),
 };
 

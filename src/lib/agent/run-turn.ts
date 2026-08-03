@@ -168,10 +168,11 @@ async function enrichReference(
 }
 
 /**
- * Agent turn: plan queries → YouTube search → rank/explain (heuristic).
+ * Heuristic path: plan queries → YouTube search → rank/explain (no LLM tools).
  * Falls back to mock if no key or API errors.
+ * Prefer `runAgentTurn` from orchestrator when LLM is available.
  */
-export async function runTurn(
+export async function runHeuristicTurn(
   session: Session,
   message: string,
   refUrl?: string,
