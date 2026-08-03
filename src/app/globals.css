@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0b12;
-  --foreground: #ededed;
+  --background: #07070c;
+  --foreground: #f4f4f5;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #a78bfa;
+  --accent-strong: #8b5cf6;
 }
 
 @theme inline {
@@ -18,7 +23,6 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* soft radial glow — Suno-ish atmosphere without copying */
 body::before {
   content: "";
   pointer-events: none;
@@ -26,7 +30,8 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.25), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(59, 130, 246, 0.08), transparent),
-    #0b0b12;
+    radial-gradient(ellipse 90% 55% at 50% -25%, rgba(139, 92, 246, 0.28), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(236, 72, 153, 0.08), transparent 50%),
+    radial-gradient(ellipse 45% 35% at 0% 80%, rgba(59, 130, 246, 0.07), transparent 45%),
+    #07070c;
 }

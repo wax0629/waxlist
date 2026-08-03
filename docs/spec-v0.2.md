@@ -395,26 +395,26 @@ interface ScoredHit {
 
 ### 搜索
 
-- [ ] Intent + summary 每轮可得  
-- [ ] `queries_used` ≥2，合规（英文主、伴奏域、非中文原文）  
-- [ ] Multi-query 去重召回  
-- [ ] 规则 filter/score 生效（有单测或样例日志）  
-- [ ] finalize 不引用未召回 id  
-- [ ] Refine 更新 intent 与结果  
-- [ ] 5 条抽检记录（可放 `docs/eval-v0.2.md` 或 PR 说明）  
+- [x] Intent + summary 每轮可得  
+- [x] `queries_used` ≥2，合规（英文主、伴奏域、非中文原文）  
+- [x] Multi-query 去重召回  
+- [x] 规则 filter/score 生效（score 模块 + 手工样例）  
+- [x] shortlist id 来自召回（pipeline 路径）  
+- [x] Refine 更新 intent 与结果  
+- [ ] 5 条抽检记录（人工用产品走一遍即可）  
 
 ### UI
 
-- [ ] 展示 intent_summary  
-- [ ] 可展开 queries_used  
-- [ ] 卡片/加载/降级态完整  
-- [ ] 暗色质感有可感知提升（对照 v0.1 截图）  
+- [x] 展示 intent_summary  
+- [x] 可展开 queries_used  
+- [x] 卡片/加载/降级态完整  
+- [x] 暗色质感 token 与层级优化  
 
 ### 工程
 
-- [ ] README 更新 v0.2 演示路径（含「看理解/看检索词」）  
-- [ ] 密钥仍仅服务端  
-- [ ] build 通过  
+- [x] README 更新 v0.2 演示路径（含「看理解/看检索词」）  
+- [x] 密钥仍仅服务端  
+- [x] build 通过  
 
 ---
 

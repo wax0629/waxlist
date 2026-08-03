@@ -30,6 +30,9 @@ export async function POST(req: Request) {
 
   const userText = message || `参考：${refUrl}`;
   const session = getOrCreateSession(body.session_id);
+  const wantDebug =
+    process.env.NODE_ENV !== "production" ||
+    new URL(req.url).searchParams.get("debug") === "1";
 
   try {
     const result = await runAgentTurn(session, userText, refUrl);
@@ -42,6 +45,10 @@ export async function POST(req: Request) {
       candidates: result.candidates,
       status: result.status,
       warnings: result.warnings,
+      intent: result.intent,
+      intent_summary: result.intent_summary,
+      queries_used: result.queries_used,
+      ...(wantDebug && result.debug ? { debug: result.debug } : {}),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "服务错误";

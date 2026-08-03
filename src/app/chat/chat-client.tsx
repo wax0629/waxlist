@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BeatCard } from "@/components/beat-card";
+import { SearchMeta } from "@/components/search-meta";
 import { SiteHeader } from "@/components/site-header";
-import type { BeatCandidate, ChatMessage } from "@/lib/types";
+import type { BeatCandidate, ChatMessage, SearchIntent } from "@/lib/types";
 
 const SESSION_KEY = "beat-hunter-session-id";
 
@@ -12,7 +13,7 @@ const WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "你好，我是 Beat Hunter。用自然语言描述想要的伴奏，或粘贴 YouTube 参考曲链接，我会收成可试听短名单。\n\n试试：「适合女声的慢热 R&B，鼓别太抢」",
+    "你好，我是 Beat Hunter。用自然语言描述想要的伴奏，或粘贴 YouTube 参考曲链接。\n\n我会先理解需求，再生成多路伴奏域检索词并筛选短名单——不是简单套一层 YouTube 搜索。",
   created_at: new Date().toISOString(),
 };
 
@@ -22,12 +23,22 @@ const SUGGESTIONS = [
   "再快一点，旋律再抓耳一些",
 ];
 
+const LOADING_HINTS = [
+  "理解需求…",
+  "生成伴奏域检索词…",
+  "多路检索 YouTube…",
+  "过滤排序短名单…",
+];
+
 interface ChatApiResponse {
   session_id: string;
   assistant_message: string;
   candidates: BeatCandidate[];
   status: string;
   warnings?: string[];
+  intent?: SearchIntent;
+  intent_summary?: string;
+  queries_used?: string[];
   error?: string;
 }
 
@@ -37,6 +48,7 @@ export function ChatClient() {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingHint, setLoadingHint] = useState(LOADING_HINTS[0]);
   const [error, setError] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [lastStatus, setLastStatus] = useState<string | null>(null);
@@ -47,6 +59,17 @@ export function ChatClient() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (!loading) return;
+    let i = 0;
+    setLoadingHint(LOADING_HINTS[0]);
+    const t = setInterval(() => {
+      i = (i + 1) % LOADING_HINTS.length;
+      setLoadingHint(LOADING_HINTS[i]);
+    }, 1600);
+    return () => clearInterval(t);
+  }, [loading]);
 
   const restoreSession = useCallback(async () => {
     try {
@@ -73,7 +96,7 @@ export function ChatClient() {
         setMessages([WELCOME, ...data.messages]);
       }
     } catch {
-      // ignore restore errors
+      // ignore
     } finally {
       setRestoring(false);
     }
@@ -133,6 +156,9 @@ export function ChatClient() {
           content: `${data.assistant_message}${warn}`,
           created_at: new Date().toISOString(),
           candidates: data.candidates ?? [],
+          intent_summary: data.intent_summary,
+          queries_used: data.queries_used,
+          intent: data.intent,
         };
 
         setMessages((prev) => [...prev, assistantMsg]);
@@ -157,7 +183,6 @@ export function ChatClient() {
     [sessionId],
   );
 
-  // Deep-link: /chat?ref_url=...
   useEffect(() => {
     if (restoring || refBootstrapped.current) return;
     const refUrl = searchParams.get("ref_url") || searchParams.get("ref");
@@ -182,49 +207,50 @@ export function ChatClient() {
     setInput("");
   }
 
-  const showSuggestions =
-    messages.length <= 1 && !loading && !restoring;
+  const showSuggestions = messages.length <= 1 && !loading && !restoring;
 
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-[#0b0b12] text-zinc-100">
+    <div className="flex min-h-full flex-1 flex-col text-zinc-100">
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-4 pt-6 md:px-6">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-5 pt-5 md:px-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
             {lastStatus ? (
               <span
                 className={
                   lastStatus === "ok"
-                    ? "rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300/90"
+                    ? "rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-emerald-300/90"
                     : lastStatus === "degraded"
-                      ? "rounded-full bg-amber-500/15 px-2 py-0.5 text-amber-200/90"
-                      : "rounded-full bg-red-500/15 px-2 py-0.5 text-red-300/90"
+                      ? "rounded-full bg-amber-500/15 px-2.5 py-0.5 text-amber-200/90"
+                      : "rounded-full bg-red-500/15 px-2.5 py-0.5 text-red-300/90"
                 }
               >
                 {lastStatus === "ok"
-                  ? "Agent 正常"
+                  ? "检索正常"
                   : lastStatus === "degraded"
                     ? "降级模式"
                     : "出错"}
               </span>
             ) : (
-              <span className="text-zinc-600">找伴奏</span>
+              <span className="text-zinc-600">找伴奏 · v0.2 策略检索</span>
             )}
             {sessionId ? (
-              <span className="text-zinc-600">会话 {sessionId.slice(0, 8)}…</span>
+              <span className="text-zinc-600">
+                会话 {sessionId.slice(0, 8)}…
+              </span>
             ) : null}
           </div>
           <button
             type="button"
             onClick={newChat}
-            className="text-[11px] text-zinc-400 underline-offset-2 hover:text-zinc-200 hover:underline"
+            className="text-[11px] text-zinc-500 transition hover:text-zinc-200"
           >
             新会话
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-6 overflow-y-auto">
+        <div className="flex flex-1 flex-col gap-7 overflow-y-auto pb-2">
           {restoring && (
             <p className="text-xs text-zinc-500">恢复会话…</p>
           )}
@@ -238,15 +264,19 @@ export function ChatClient() {
               <div
                 className={
                   m.role === "user"
-                    ? "max-w-[85%] rounded-2xl rounded-br-md bg-violet-600/90 px-4 py-2.5 text-sm text-white shadow-lg shadow-violet-900/30"
-                    : "max-w-[95%] space-y-3"
+                    ? "max-w-[85%] rounded-2xl rounded-br-md bg-violet-600/85 px-4 py-2.5 text-sm text-white shadow-lg shadow-violet-950/40"
+                    : "max-w-[95%] space-y-2.5"
                 }
               >
                 {m.role === "assistant" ? (
                   <>
-                    <div className="rounded-2xl rounded-bl-md border border-white/10 bg-white/5 px-4 py-2.5 text-sm leading-relaxed text-zinc-200 whitespace-pre-wrap backdrop-blur-md">
+                    <div className="rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm leading-relaxed text-zinc-200 whitespace-pre-wrap backdrop-blur-md">
                       {m.content}
                     </div>
+                    <SearchMeta
+                      intentSummary={m.intent_summary}
+                      queriesUsed={m.queries_used}
+                    />
                     {m.candidates && m.candidates.length > 0 && (
                       <div className="grid gap-3 sm:grid-cols-2">
                         {m.candidates.map((b, i) => (
@@ -269,7 +299,7 @@ export function ChatClient() {
                   type="button"
                   disabled={loading}
                   onClick={() => void sendMessage(s)}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-left text-xs text-zinc-300 transition hover:border-violet-400/40 hover:bg-white/10"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-left text-xs text-zinc-300 transition hover:border-violet-400/35 hover:bg-white/[0.08]"
                 >
                   {s}
                 </button>
@@ -277,11 +307,9 @@ export function ChatClient() {
             </div>
           )}
           {loading && (
-            <div className="space-y-1">
-              <p className="text-xs text-zinc-500 animate-pulse">
-                正在猎取伴奏（Agent + 检索可能需要十几秒）…
-              </p>
-            </div>
+            <p className="text-xs text-violet-300/70 animate-pulse">
+              {loadingHint}
+            </p>
           )}
           {error && <p className="text-xs text-red-400/90">{error}</p>}
           <div ref={bottomRef} />
@@ -289,7 +317,7 @@ export function ChatClient() {
 
         <form
           onSubmit={onSend}
-          className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-2 shadow-xl shadow-black/40 backdrop-blur-md"
+          className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-2 shadow-2xl shadow-black/50 backdrop-blur-xl"
         >
           <div className="flex items-end gap-2">
             <textarea
@@ -297,7 +325,7 @@ export function ChatClient() {
               onChange={(e) => setInput(e.target.value)}
               rows={2}
               placeholder="描述气质，或粘贴参考曲链接…"
-              className="min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
+              className="min-h-[52px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -308,12 +336,12 @@ export function ChatClient() {
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="mb-1 shrink-0 rounded-xl bg-violet-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-40"
+              className="mb-1 shrink-0 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-violet-900/30 transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? "…" : "发送"}
             </button>
           </div>
-          <p className="px-3 pb-1 text-[11px] text-zinc-500">
+          <p className="px-3 pb-1.5 text-[11px] text-zinc-600">
             结果仅供试听参考，商用请以源站授权为准。
           </p>
         </form>

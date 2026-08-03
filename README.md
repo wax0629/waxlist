@@ -22,13 +22,11 @@ npm run dev
 cp .env.example .env.local
 ```
 
-当前阶段：
+当前阶段（**v0.2 搜索机制**）：
 
-- `/chat` + 服务端会话
-- **自建 Agent 薄编排**（tool calling：`parse_reference` / `search_youtube` / `finalize_shortlist`）
-- **YouTube** 真检索；无 LLM 时规则编排；无 YouTube 时 mock
-
-会话 `session_id` 在 `localStorage`。
+- Intent 理解 → 多角度伴奏域 query → YouTube 多路召回 → 过滤打分 → 短名单  
+- UI 展示「我的理解」+ 可展开「本轮检索词」  
+- 无 YouTube Key 时 mock 降级；会话 `session_id` 在 `localStorage`
 
 ### 环境变量
 
@@ -47,14 +45,13 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### 演示三条路径
+### 演示三条路径（v0.2）
 
-1. **描述：** `适合女声的慢热 R&B，鼓别太抢` → 点开 YouTube 卡片  
-2. **参考：** 粘贴任意 YouTube 成品/伴奏链接，或打开  
-   `/chat?ref_url=https://www.youtube.com/watch?v=VIDEO_ID`  
-3. **Refine：** 同会话继续 `再快一点` / `鼓再轻一点`  
+1. **描述：** `适合女声的慢热 R&B，鼓别太抢` → 看 **我的理解** + 展开 **检索词** → 点开卡片  
+2. **参考：** 粘贴 YouTube 链接，或 `/chat?ref_url=https://www.youtube.com/watch?v=VIDEO_ID`  
+3. **Refine：** `再快一点` / `鼓再轻一点` → 理解与检索词/列表变化  
 
-也可点输入框上方的快捷建议。
+快捷建议 chip 可一点发送。
 
 ## 站点结构
 

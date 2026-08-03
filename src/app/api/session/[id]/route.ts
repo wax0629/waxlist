@@ -19,6 +19,9 @@ export async function GET(
     messages: session.messages,
     last_shortlist: session.last_shortlist,
     constraints: session.constraints,
+    last_intent: session.last_intent,
+    last_queries_used: session.last_queries_used,
+    last_intent_summary: session.last_intent_summary,
     created_at: session.created_at,
     updated_at: session.updated_at,
   });
