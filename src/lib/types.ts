@@ -15,6 +15,15 @@ export interface BeatCandidate {
   match_tags?: string[];
 }
 
+/** Domestic rap artist hit → style bridge for retrieval (not YT name search). */
+export interface ArtistRef {
+  id: string;
+  name_zh: string;
+  name_en: string;
+  style_en: string[];
+  queries: string[];
+}
+
 /** v0.2 SearchIntent — same shape as session constraints (merged). */
 export interface SearchIntent {
   style?: string[];
@@ -24,6 +33,8 @@ export interface SearchIntent {
   avoid?: string[];
   purpose?: string;
   free_text?: string;
+  /** Mapped CN rap artists mentioned in user text */
+  artist_refs?: ArtistRef[];
   reference?: {
     url?: string;
     title?: string;

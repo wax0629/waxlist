@@ -1,0 +1,513 @@
+{
+  "_meta": {
+    "purpose": "国内说唱歌手 → 风格/检索短语映射（不直接搜中文艺人名）",
+    "audience": "说唱歌手找 type beat",
+    "rule": "queries 必须是英文伴奏域；name 仅用于识别用户提及"
+  },
+  "artists": [
+    {
+      "id": "pharaoh",
+      "name_zh": "法老",
+      "name_en": "Pharaoh",
+      "aliases": ["法老", "pharaoh", "法老pharaoh"],
+      "styles": ["underground", "boom bap", "trap"],
+      "mood": ["dark", "aggressive"],
+      "style_en": ["chinese underground", "boom bap", "dark hip hop"],
+      "queries": [
+        "chinese underground type beat dark",
+        "dark boom bap type beat",
+        "chinese hip hop type beat hard"
+      ]
+    },
+    {
+      "id": "keyl",
+      "name_zh": "刘聪",
+      "name_en": "KEY.L",
+      "aliases": ["刘聪", "key.l", "keyl", "key l", "c-block 刘聪", "cblock 刘聪"],
+      "styles": ["trap", "underground"],
+      "mood": ["warm", "dark"],
+      "style_en": ["southern trap", "melodic trap", "chinese trap"],
+      "queries": [
+        "melodic trap type beat",
+        "southern trap type beat chill",
+        "chinese trap type beat"
+      ]
+    },
+    {
+      "id": "masiwei",
+      "name_zh": "马思唯",
+      "name_en": "Masiwei",
+      "aliases": ["马思唯", "masiwei", "ma si wei", "higher brothers 马思唯"],
+      "styles": ["trap", "cloud rap"],
+      "mood": ["warm"],
+      "style_en": ["chinese trap", "cloud rap", "melodic trap"],
+      "queries": [
+        "chinese trap type beat",
+        "melodic cloud rap type beat",
+        "trap type beat melodic 808"
+      ]
+    },
+    {
+      "id": "knowknow",
+      "name_zh": "那吾克热",
+      "name_en": "KnowKnow",
+      "aliases": ["那吾克热", "knowknow", "know know", "nawukere"],
+      "styles": ["trap", "cloud rap"],
+      "mood": ["warm", "dreamy"],
+      "style_en": ["melodic trap", "cloud rap", "chill trap"],
+      "queries": [
+        "melodic trap type beat chill",
+        "cloud rap type beat",
+        "soft 808 melodic type beat"
+      ]
+    },
+    {
+      "id": "gai",
+      "name_zh": "GAI",
+      "name_en": "GAI",
+      "aliases": ["gai", "周延", "gai周延", "gai 周延"],
+      "styles": ["trap", "underground"],
+      "mood": ["aggressive", "dark"],
+      "style_en": ["aggressive trap", "hard trap", "chinese trap"],
+      "queries": [
+        "hard trap type beat aggressive",
+        "dark trap type beat 808",
+        "chinese trap type beat hard"
+      ]
+    },
+    {
+      "id": "air",
+      "name_zh": "艾热",
+      "name_en": "AIR",
+      "aliases": ["艾热", "air 艾热", "air ayri", "ayran"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["aggressive"],
+      "style_en": ["boom bap", "battle rap", "conscious hip hop"],
+      "queries": [
+        "boom bap type beat hard",
+        "battle rap type beat",
+        "old school hip hop type beat"
+      ]
+    },
+    {
+      "id": "jonyj",
+      "name_zh": "Jony J",
+      "name_en": "Jony J",
+      "aliases": ["jony j", "jonyj", "薛俊严"],
+      "styles": ["trap", "r&b", "trap soul"],
+      "mood": ["warm", "dark"],
+      "style_en": ["melodic rap", "chill trap", "rnb rap"],
+      "queries": [
+        "melodic trap type beat chill",
+        "rnb type beat male vocal soft",
+        "chill trap soul type beat"
+      ]
+    },
+    {
+      "id": "tizzyt",
+      "name_zh": "Tizzy T",
+      "name_en": "Tizzy T",
+      "aliases": ["tizzy t", "tizzyt"],
+      "styles": ["trap"],
+      "mood": ["warm"],
+      "style_en": ["melodic trap", "pop trap", "chinese trap"],
+      "queries": [
+        "melodic trap type beat",
+        "pop trap type beat",
+        "chinese trap type beat melodic"
+      ]
+    },
+    {
+      "id": "vinida",
+      "name_zh": "万妮达",
+      "name_en": "Vinida",
+      "aliases": ["万妮达", "vinida", "vinida wanyana"],
+      "styles": ["trap", "r&b"],
+      "mood": ["aggressive", "warm"],
+      "style_en": ["female trap", "melodic trap", "latin trap"],
+      "queries": [
+        "female rap type beat trap",
+        "melodic trap type beat female",
+        "hard trap type beat"
+      ]
+    },
+    {
+      "id": "vava",
+      "name_zh": "VaVa",
+      "name_en": "VaVa",
+      "aliases": ["vava", "毛衍七", "vava毛衍七"],
+      "styles": ["trap"],
+      "mood": ["aggressive", "dark"],
+      "style_en": ["female trap", "hard trap", "chinese trap"],
+      "queries": [
+        "female trap type beat hard",
+        "dark trap type beat",
+        "trap type beat aggressive female"
+      ]
+    },
+    {
+      "id": "watchme",
+      "name_zh": "王齐铭",
+      "name_en": "WatchMe",
+      "aliases": ["王齐铭", "watchme", "watch me", "wqm"],
+      "styles": ["trap", "drill"],
+      "mood": ["dark", "aggressive"],
+      "style_en": ["dark trap", "drill", "hard trap"],
+      "queries": [
+        "dark trap type beat",
+        "drill type beat",
+        "hard 808 trap type beat"
+      ]
+    },
+    {
+      "id": "kungfupen",
+      "name_zh": "功夫胖",
+      "name_en": "Kung Fu-Pen",
+      "aliases": ["功夫胖", "kung fu pen", "kungfu pen", "kungfupen", "kfp"],
+      "styles": ["boom bap", "lofi"],
+      "mood": ["warm", "dreamy"],
+      "style_en": ["jazz hop", "boom bap", "lofi hip hop"],
+      "queries": [
+        "jazz hop type beat",
+        "boom bap type beat chill",
+        "lofi hip hop type beat"
+      ]
+    },
+    {
+      "id": "xiedi",
+      "name_zh": "谢帝",
+      "name_en": "Xie Di",
+      "aliases": ["谢帝", "xiedi", "xie di"],
+      "styles": ["trap", "underground"],
+      "mood": ["aggressive"],
+      "style_en": ["trap", "bounce", "party rap"],
+      "queries": [
+        "trap type beat bouncy",
+        "party trap type beat",
+        "chinese trap type beat"
+      ]
+    },
+    {
+      "id": "manshuk",
+      "name_zh": "满舒克",
+      "name_en": "Man Shu Ke",
+      "aliases": ["满舒克", "manshuk", "man shu ke"],
+      "styles": ["trap"],
+      "mood": ["warm", "aggressive"],
+      "style_en": ["party trap", "club trap", "melodic trap"],
+      "queries": [
+        "party trap type beat",
+        "club trap type beat",
+        "bouncy trap type beat"
+      ]
+    },
+    {
+      "id": "huangxu",
+      "name_zh": "黄旭",
+      "name_en": "Psy.P",
+      "aliases": ["黄旭", "psy.p", "psyp", "psy p"],
+      "styles": ["trap", "cloud rap"],
+      "mood": ["dark", "dreamy"],
+      "style_en": ["psychedelic trap", "cloud rap", "melodic trap"],
+      "queries": [
+        "psychedelic trap type beat",
+        "cloud rap type beat dark",
+        "melodic trap type beat atmospheric"
+      ]
+    },
+    {
+      "id": "dingfei",
+      "name_zh": "丁飞",
+      "name_en": "D.F",
+      "aliases": ["丁飞", "d.f", "df 丁飞"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["warm"],
+      "style_en": ["old school boom bap", "classic hip hop"],
+      "queries": [
+        "old school boom bap type beat",
+        "classic hip hop type beat",
+        "90s boom bap type beat"
+      ]
+    },
+    {
+      "id": "sunbayi",
+      "name_zh": "孙八一",
+      "name_en": "Sun Bayi",
+      "aliases": ["孙八一", "sun bayi"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["warm"],
+      "style_en": ["boom bap", "storytelling rap", "old school"],
+      "queries": [
+        "boom bap type beat storytelling",
+        "old school hip hop type beat",
+        "jazzy boom bap type beat"
+      ]
+    },
+    {
+      "id": "fox",
+      "name_zh": "福克斯",
+      "name_en": "Fox",
+      "aliases": ["福克斯", "fox 福克斯"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["aggressive", "warm"],
+      "style_en": ["punchline boom bap", "battle rap"],
+      "queries": [
+        "boom bap type beat hard",
+        "punchline rap type beat",
+        "battle rap type beat"
+      ]
+    },
+    {
+      "id": "huizi",
+      "name_zh": "辉子",
+      "name_en": "Huizi",
+      "aliases": ["辉子", "huizi"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["warm", "dark"],
+      "style_en": ["storytelling boom bap", "emotional hip hop"],
+      "queries": [
+        "emotional boom bap type beat",
+        "storytelling hip hop type beat",
+        "chill boom bap type beat"
+      ]
+    },
+    {
+      "id": "keyng",
+      "name_zh": "杨和苏",
+      "name_en": "KeyNG",
+      "aliases": ["杨和苏", "keyng", "key ng"],
+      "styles": ["trap", "rage"],
+      "mood": ["aggressive", "dark"],
+      "style_en": ["rock rap", "rage", "aggressive trap"],
+      "queries": [
+        "rage type beat",
+        "rock rap type beat",
+        "aggressive trap type beat guitar"
+      ]
+    },
+    {
+      "id": "spitty",
+      "name_zh": "盛宇",
+      "name_en": "Spitty",
+      "aliases": ["盛宇", "spitty", "spitty 盛宇"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["aggressive"],
+      "style_en": ["battle rap", "freestyle boom bap"],
+      "queries": [
+        "battle rap type beat fast",
+        "boom bap type beat hard drums",
+        "freestyle hip hop type beat"
+      ]
+    },
+    {
+      "id": "bridge",
+      "name_zh": "布瑞吉",
+      "name_en": "Bridge",
+      "aliases": ["布瑞吉", "bridge 布瑞吉"],
+      "styles": ["trap", "trap soul"],
+      "mood": ["dark", "warm"],
+      "style_en": ["melodic trap", "emo rap", "trap soul"],
+      "queries": [
+        "emo rap type beat",
+        "melodic trap type beat sad",
+        "trap soul type beat"
+      ]
+    },
+    {
+      "id": "wangyitai",
+      "name_zh": "王以太",
+      "name_en": "Wang Yitai",
+      "aliases": ["王以太", "wang yitai", "yitai"],
+      "styles": ["trap", "hip hop"],
+      "mood": ["warm", "dark"],
+      "style_en": ["melodic rap", "storytelling trap", "chill hip hop"],
+      "queries": [
+        "melodic hip hop type beat",
+        "storytelling rap type beat",
+        "chill trap type beat"
+      ]
+    },
+    {
+      "id": "nineone",
+      "name_zh": "乃万",
+      "name_en": "NINEONE",
+      "aliases": ["乃万", "nineone", "nine one", "9one"],
+      "styles": ["trap", "r&b", "rage"],
+      "mood": ["dark", "aggressive"],
+      "style_en": ["female trap", "alt rnb", "rage"],
+      "queries": [
+        "female trap type beat dark",
+        "alt rnb type beat",
+        "rage type beat female"
+      ]
+    },
+    {
+      "id": "aifujieni",
+      "name_zh": "艾福杰尼",
+      "name_en": "After Journey",
+      "aliases": ["艾福杰尼", "after journey", "afjn"],
+      "styles": ["trap", "r&b"],
+      "mood": ["warm", "dreamy"],
+      "style_en": ["melodic rap", "world trap", "chill rap"],
+      "queries": [
+        "melodic trap type beat ethnic",
+        "world music trap type beat",
+        "chill melodic rap type beat"
+      ]
+    },
+    {
+      "id": "eso",
+      "name_zh": "瘦子",
+      "name_en": "E.so",
+      "aliases": ["瘦子", "e.so", "eso", "瘦子eso", "soft lipa 瘦子"],
+      "styles": ["boom bap", "hip hop", "lofi"],
+      "mood": ["warm", "dreamy"],
+      "style_en": ["chill boom bap", "taiwan hip hop", "lofi rap"],
+      "queries": [
+        "chill boom bap type beat",
+        "lofi hip hop type beat",
+        "smooth rap type beat"
+      ]
+    },
+    {
+      "id": "hotdog",
+      "name_zh": "热狗",
+      "name_en": "MC HotDog",
+      "aliases": ["热狗", "mc hotdog", "hotdog", "姚中仁"],
+      "styles": ["boom bap", "hip hop"],
+      "mood": ["warm", "aggressive"],
+      "style_en": ["old school hip hop", "boom bap", "taiwan rap"],
+      "queries": [
+        "old school hip hop type beat",
+        "boom bap type beat classic",
+        "90s rap type beat"
+      ]
+    },
+    {
+      "id": "mj116",
+      "name_zh": "顽童",
+      "name_en": "MJ116",
+      "aliases": ["顽童", "mj116", "mj 116", "顽童mj116"],
+      "styles": ["hip hop", "trap", "boom bap"],
+      "mood": ["warm", "aggressive"],
+      "style_en": ["taiwan hip hop", "party rap", "trap"],
+      "queries": [
+        "party hip hop type beat",
+        "taiwan hip hop type beat",
+        "bouncy rap type beat"
+      ]
+    },
+    {
+      "id": "ice",
+      "name_zh": "ICE",
+      "name_en": "ICE",
+      "aliases": ["ice张坤", "张坤 ice", "rapper ice"],
+      "styles": ["trap"],
+      "mood": ["dark", "aggressive"],
+      "style_en": ["dark trap", "hard trap"],
+      "queries": [
+        "dark trap type beat",
+        "hard trap type beat 808",
+        "aggressive trap type beat"
+      ]
+    },
+    {
+      "id": "lijialong",
+      "name_zh": "李佳隆",
+      "name_en": "Li Jialong",
+      "aliases": ["李佳隆", "li jialong", "jialong"],
+      "styles": ["trap", "hip hop"],
+      "mood": ["warm"],
+      "style_en": ["melodic trap", "pop rap", "chinese hip hop"],
+      "queries": [
+        "melodic trap type beat",
+        "pop rap type beat",
+        "chinese hip hop type beat"
+      ]
+    },
+    {
+      "id": "paikete",
+      "name_zh": "派克特",
+      "name_en": "Pact",
+      "aliases": ["派克特", "pact", "paikete"],
+      "styles": ["hip hop", "boom bap"],
+      "mood": ["warm"],
+      "style_en": ["playful rap", "boom bap", "quirky hip hop"],
+      "queries": [
+        "playful boom bap type beat",
+        "quirky hip hop type beat",
+        "fun rap type beat"
+      ]
+    },
+    {
+      "id": "xiaoqinglong",
+      "name_zh": "小青龙",
+      "name_en": "Xiao Qinglong",
+      "aliases": ["小青龙", "xiao qinglong"],
+      "styles": ["trap", "underground"],
+      "mood": ["aggressive", "warm"],
+      "style_en": ["southern trap", "bounce", "dialect rap energy"],
+      "queries": [
+        "bouncy trap type beat",
+        "southern trap type beat",
+        "hard trap type beat bounce"
+      ]
+    },
+    {
+      "id": "zaoan",
+      "name_zh": "早安",
+      "name_en": "Zao An",
+      "aliases": ["早安", "zao an", "zaoan rap"],
+      "styles": ["trap"],
+      "mood": ["aggressive", "dark"],
+      "style_en": ["trap", "hard drums", "street rap"],
+      "queries": [
+        "hard trap type beat",
+        "street trap type beat",
+        "aggressive 808 type beat"
+      ]
+    },
+    {
+      "id": "higherbrothers",
+      "name_zh": "Higher Brothers",
+      "name_en": "Higher Brothers",
+      "aliases": ["higher brothers", "海尔兄弟说唱", "higherbros"],
+      "styles": ["trap", "cloud rap"],
+      "mood": ["warm", "dreamy"],
+      "style_en": ["chinese trap", "cloud rap", "asian trap"],
+      "queries": [
+        "chinese trap type beat",
+        "asian trap type beat",
+        "cloud rap type beat melodic"
+      ]
+    },
+    {
+      "id": "ddgr",
+      "name_zh": "邓典果",
+      "name_en": "DDGR",
+      "aliases": ["邓典果", "ddgr", "dian guo"],
+      "styles": ["underground", "trap"],
+      "mood": ["dark"],
+      "style_en": ["chinese underground", "dark trap", "melodic underground"],
+      "queries": [
+        "chinese underground type beat",
+        "dark melodic trap type beat",
+        "underground rap type beat"
+      ]
+    },
+    {
+      "id": "tanke",
+      "name_zh": "弹壳",
+      "name_en": "T.K",
+      "aliases": ["弹壳", "t.k弹壳", "tk 弹壳"],
+      "styles": ["trap", "rage", "phonk"],
+      "mood": ["aggressive", "dark"],
+      "style_en": ["electronic trap", "phonk", "rage"],
+      "queries": [
+        "phonk type beat",
+        "electronic trap type beat",
+        "rage type beat distorted"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import type { SearchIntent } from "@/lib/types";
+import { artistQueries } from "./artists";
 import { freeTextKeywords } from "./intent";
 import { producerQueries } from "./producers";
 
@@ -23,15 +24,22 @@ function ensureBeatSuffix(q: string): string {
 export function planQueries(intent: SearchIntent): string[] {
   const styles = (intent.style ?? []).map(styleToEnglish);
   const freeKw = freeTextKeywords(intent.free_text ?? "");
+  const artistEn = (intent.artist_refs ?? [])
+    .flatMap((a) => a.style_en)
+    .filter(Boolean);
+  const artistTopic = artistEn[0] ?? null;
 
-  // Core topic: style first, else free keywords, else generic (NOT r&b)
+  // Core topic: style → artist style bridge → free keywords → generic (NOT r&b)
   const styleCore =
     styles[0] ||
+    artistTopic ||
     freeKw.split(" ")[0] ||
     null;
   const styleJoin = styles.length
     ? styles.join(" ")
-    : freeKw || "melodic";
+    : artistEn.length
+      ? artistEn.slice(0, 2).join(" ")
+      : freeKw || "melodic";
 
   const tempoBits: string[] = [];
   if (intent.tempo === "slow") tempoBits.push("slow", "chill");
@@ -101,18 +109,26 @@ export function planQueries(intent: SearchIntent): string[] {
     );
   }
 
-  // Angle 4: style expansion / producer prior (soft, 1 slot preferred)
+  // Angle 4: CN rap artist bridge / producer / style expansion
+  const artQs = artistQueries(intent);
   const expanded = expandStyleQueries(intent);
   const prodQs = producerQueries(intent, topic);
   const q4 = ensureBeatSuffix(
-    prodQs[0] ||
+    artQs[0] ||
+      prodQs[0] ||
       expanded[0] ||
       [topic, tempoBits[0] ?? "", "type beat"].filter(Boolean).join(" "),
   );
 
-  const raw = [q1, q2, q3, q4, ...prodQs.slice(1), ...expanded.slice(0, 1)].map(
-    (q) => q.replace(/\s+/g, " ").trim().toLowerCase(),
-  );
+  const raw = [
+    q1,
+    q2,
+    q3,
+    q4,
+    ...artQs.slice(1),
+    ...prodQs.slice(0, 1),
+    ...expanded.slice(0, 1),
+  ].map((q) => q.replace(/\s+/g, " ").trim().toLowerCase());
 
   const out: string[] = [];
   for (const q of raw) {

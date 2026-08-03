@@ -42,6 +42,21 @@ const cases = [
     expectStyle: 'drill',
     queryAny: ['drill'],
   },
+  {
+    id: 'E6',
+    input: '想要法老那种感觉的伴奏',
+    expectArtist: '法老',
+    expectStyleAny: ['underground', 'boom bap', 'trap'],
+    queryAny: ['type beat'],
+    forbidQuery: ['法老'],
+  },
+  {
+    id: 'E7',
+    input: '像刘聪 慢一点',
+    expectArtist: '刘聪',
+    expectStyleAny: ['trap'],
+    queryAny: ['trap', 'type beat'],
+  },
 ];
 
 let failed = 0;
@@ -49,24 +64,35 @@ for (const c of cases) {
   const intent = mergeIntent({}, c.input);
   const qs = planQueries(intent).map((q) => q.toLowerCase());
   const styles = intent.style || [];
-  const okStyle = styles.includes(c.expectStyle);
+  const okStyle = c.expectStyle
+    ? styles.includes(c.expectStyle)
+    : c.expectStyleAny
+      ? c.expectStyleAny.some((s) => styles.includes(s))
+      : true;
+  const okArtist = c.expectArtist
+    ? (intent.artist_refs || []).some(
+        (a) => a.name_zh === c.expectArtist || a.name_en === c.expectArtist,
+      )
+    : true;
   const okQuery = (c.queryAny || []).every((tok) =>
     qs.some((q) => q.includes(tok)),
   );
   const bad =
     c.forbidQuery &&
-    c.forbidQuery.some((tok) => qs.every((q) => q.includes(tok)));
+    c.forbidQuery.some((tok) => qs.some((q) => q.includes(tok)));
   // E2: no query should be pure rnb spam — at least one non-rnb core
   const e2Bad =
     c.id === 'E2' && qs.every((q) => q.includes('rnb') && !q.includes('underground') && !q.includes('udg'));
 
-  const pass = okStyle && okQuery && !bad && !e2Bad;
+  const pass = okStyle && okArtist && okQuery && !bad && !e2Bad;
   if (!pass) failed++;
   console.log(
     (pass ? 'PASS' : 'FAIL'),
     c.id,
     'styles=',
     styles,
+    'artists=',
+    (intent.artist_refs || []).map((a) => a.name_zh),
     'queries=',
     qs,
   );

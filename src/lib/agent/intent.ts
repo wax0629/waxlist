@@ -1,4 +1,5 @@
 import type { SearchIntent } from "@/lib/types";
+import { applyArtistMatches } from "./artists";
 
 export function extractUrl(text: string): string | undefined {
   const m = text.match(/https?:\/\/[^\s]+/i);
@@ -162,6 +163,9 @@ export function buildActiveLabels(intent: SearchIntent): string[] {
   }
   if (intent.avoid?.includes("heavy drums")) labels.push("鼓靠后");
   if (intent.avoid?.includes("heavy 808")) labels.push("少重 808");
+  for (const a of intent.artist_refs ?? []) {
+    labels.push(`像${a.name_zh || a.name_en}`);
+  }
   return labels;
 }
 
@@ -186,6 +190,7 @@ export function mergeIntent(
     tempo: refine ? prev.tempo : undefined,
     purpose: refine ? prev.purpose : undefined,
     reference: refine ? prev.reference : undefined,
+    artist_refs: refine ? prev.artist_refs : undefined,
   };
 
   const url = refUrl || extractUrl(message);
@@ -282,7 +287,8 @@ export function mergeIntent(
   next.mood = uniq(next.mood ?? []);
   next.avoid = uniq(next.avoid ?? []);
 
-  return next;
+  // Domestic rap artists → style bridge (not Chinese-name YT search)
+  return applyArtistMatches(next, message);
 }
 
 /** Chinese one-liner for UI trust. */
@@ -321,6 +327,22 @@ export function summarizeIntent(intent: SearchIntent): string {
   if (intent.avoid?.includes("heavy drums")) parts.push("鼓点靠后/别太抢");
   if (intent.avoid?.includes("heavy 808")) parts.push("少重 808");
 
+  if (intent.artist_refs?.length) {
+    const names = intent.artist_refs
+      .map((a) => a.name_zh || a.name_en)
+      .slice(0, 2)
+      .join("、");
+    const tags = intent.artist_refs
+      .flatMap((a) => a.style_en)
+      .slice(0, 3)
+      .join("/");
+    parts.push(
+      tags
+        ? `参考气质「${names}」→ ${tags}`
+        : `参考气质「${names}」`,
+    );
+  }
+
   if (intent.reference?.title) {
     parts.push(`参考「${intent.reference.title.slice(0, 36)}」`);
   } else if (intent.reference?.url) {
@@ -328,7 +350,7 @@ export function summarizeIntent(intent: SearchIntent): string {
   }
 
   // Surface free keywords when no structured style
-  if (!intent.style?.length && intent.free_text) {
+  if (!intent.style?.length && !intent.artist_refs?.length && intent.free_text) {
     const kw = freeTextKeywords(intent.free_text);
     if (kw) parts.push(`关键词「${kw}」`);
   }
