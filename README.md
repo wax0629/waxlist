@@ -22,7 +22,12 @@ npm run dev
 cp .env.example .env.local
 ```
 
-当前阶段：`/chat` 为 **UI 骨架 + mock 卡片**；Agent / YouTube 按 [spec-v0.1](./docs/spec-v0.1.md) 后续接入。
+当前阶段：
+
+- `/chat` 暗色 UI + **服务端会话**（`POST /api/chat`、`GET /api/session/:id`）
+- shortlist 仍为 **mock**（约束会随 refine 微调）；下一步接 YouTube + LLM
+
+会话 `session_id` 存在浏览器 `localStorage`，开发服务器不重启时可刷新恢复。
 
 ## 站点结构
 

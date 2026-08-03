@@ -1,56 +1,137 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BeatCard } from "@/components/beat-card";
 import { SiteHeader } from "@/components/site-header";
-import { MOCK_BEATS } from "@/lib/mock-beats";
 import type { BeatCandidate, ChatMessage } from "@/lib/types";
 
-function uid() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
+const SESSION_KEY = "beat-hunter-session-id";
 
 const WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "你好，我是 Beat Hunter。描述想要的伴奏气质，或粘贴参考曲链接，我会帮你收成可试听短名单。\n\n（当前为 UI 骨架：发送后返回演示卡片，Agent / YouTube 尚未接入。）",
+    "你好，我是 Beat Hunter。描述想要的伴奏气质，或粘贴参考曲链接，我会帮你收成可试听短名单。\n\n当前已接通服务端会话 API；结果仍为 mock，下一步接 YouTube 真源。",
   created_at: new Date().toISOString(),
 };
 
+interface ChatApiResponse {
+  session_id: string;
+  assistant_message: string;
+  candidates: BeatCandidate[];
+  status: string;
+  warnings?: string[];
+  error?: string;
+}
+
 export default function ChatPage() {
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(true);
+
+  const restoreSession = useCallback(async () => {
+    try {
+      const stored =
+        typeof window !== "undefined"
+          ? localStorage.getItem(SESSION_KEY)
+          : null;
+      if (!stored) {
+        setRestoring(false);
+        return;
+      }
+      const res = await fetch(`/api/session/${stored}`);
+      if (!res.ok) {
+        localStorage.removeItem(SESSION_KEY);
+        setRestoring(false);
+        return;
+      }
+      const data = (await res.json()) as {
+        id: string;
+        messages: ChatMessage[];
+      };
+      setSessionId(data.id);
+      if (data.messages?.length) {
+        setMessages([WELCOME, ...data.messages]);
+      }
+    } catch {
+      // ignore restore errors
+    } finally {
+      setRestoring(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void restoreSession();
+  }, [restoreSession]);
 
   async function onSend(e?: React.FormEvent | React.KeyboardEvent) {
     e?.preventDefault();
     const text = input.trim();
     if (!text || loading) return;
 
-    const userMsg: ChatMessage = {
-      id: uid(),
+    const optimisticUser: ChatMessage = {
+      id: `local-${Date.now()}`,
       role: "user",
       content: text,
       created_at: new Date().toISOString(),
     };
 
     setInput("");
+    setError(null);
     setLoading(true);
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, optimisticUser]);
 
-    // v0.1 骨架：本地 mock；后续替换为 POST /api/chat
-    await new Promise((r) => setTimeout(r, 600));
-    const candidates: BeatCandidate[] = MOCK_BEATS;
-    const assistantMsg: ChatMessage = {
-      id: uid(),
-      role: "assistant",
-      content: "这是演示短名单（mock）。接入 API 后将换成真实 YouTube 结果。",
-      created_at: new Date().toISOString(),
-      candidates,
-    };
-    setMessages((prev) => [...prev, assistantMsg]);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: text,
+        }),
+      });
+      const data = (await res.json()) as ChatApiResponse;
+      if (!res.ok) {
+        throw new Error(data.error || `请求失败 (${res.status})`);
+      }
+
+      setSessionId(data.session_id);
+      localStorage.setItem(SESSION_KEY, data.session_id);
+
+      const warn =
+        data.warnings && data.warnings.length
+          ? `\n\n（${data.warnings.join(" ")}）`
+          : "";
+
+      const assistantMsg: ChatMessage = {
+        id: `asst-${Date.now()}`,
+        role: "assistant",
+        content: `${data.assistant_message}${warn}`,
+        created_at: new Date().toISOString(),
+        candidates: data.candidates ?? [],
+      };
+
+      // Replace optimistic user+pending with server-aligned pair:
+      // keep optimistic user text; append assistant only
+      setMessages((prev) => [...prev, assistantMsg]);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "网络错误";
+      setError(msg);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `err-${Date.now()}`,
+          role: "assistant",
+          content: `出了点问题：${msg}。请稍后再试。`,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -59,6 +140,9 @@ export default function ChatPage() {
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-4 pt-6 md:px-6">
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto">
+          {restoring && (
+            <p className="text-xs text-zinc-500">恢复会话…</p>
+          )}
           {messages.map((m) => (
             <div
               key={m.id}
@@ -95,6 +179,9 @@ export default function ChatPage() {
           {loading && (
             <p className="text-xs text-zinc-500 animate-pulse">正在猎取伴奏…</p>
           )}
+          {error && (
+            <p className="text-xs text-red-400/90">{error}</p>
+          )}
         </div>
 
         <form
@@ -125,6 +212,11 @@ export default function ChatPage() {
           </div>
           <p className="px-3 pb-1 text-[11px] text-zinc-500">
             结果仅供试听参考，商用请以源站授权为准。
+            {sessionId ? (
+              <span className="ml-2 text-zinc-600">
+                会话 {sessionId.slice(0, 8)}…
+              </span>
+            ) : null}
           </p>
         </form>
       </main>
