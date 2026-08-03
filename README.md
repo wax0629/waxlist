@@ -69,6 +69,7 @@ npm run dev
 |------|------|
 | [协作流程](./docs/process.md) | 文档分层、何时写 spec、想法如何进开发 |
 | [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
+| [搜索机制笔记](./docs/search-strategy.md) | 需求→检索词→短名单，与裸搜 YouTube 的差异 |
 | [思路整理图](./docs/thinking-map.md) | 已定结论、v0.1 切口 |
 | [技术与实现决策](./docs/tech-decisions.md) | 前端/Agent/数据源选型 |
 | [v0.1 可开发规格](./docs/spec-v0.1.md) | 用户故事、API、验收 |
@@ -90,6 +91,6 @@ npm run dev
 
 ## 建议下一步
 
-1. 后续想法写入 [ideas-backlog](./docs/ideas-backlog.md)  
-2. 从 backlog 勾选后写 `spec-v0.2` 再开工  
+1. **P0 搜索机制**（见 [search-strategy](./docs/search-strategy.md)）+ **P1 UI 优化** → 写 `spec-v0.2` 后开工  
+2. 更多想法继续记 [ideas-backlog](./docs/ideas-backlog.md)  
 3. 可选：流式输出、部署 Demo、`/explore` 占位  
