@@ -25,7 +25,7 @@ export function BeatCard({
         delay: Math.min(index, 6) * 0.04,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group relative flex min-h-[168px] flex-col overflow-hidden rounded-2xl border border-white/14 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-white/28 sm:min-h-[180px]"
+      className="group relative flex aspect-[3/4] w-full flex-col overflow-hidden rounded-2xl border border-white/14 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-white/28"
     >
       <div className="absolute inset-0">
         {beat.thumbnail ? (
@@ -51,7 +51,7 @@ export function BeatCard({
         </span>
       </div>
 
-      <div className="relative z-10 mt-auto space-y-1 p-3 pt-10">
+      <div className="relative z-10 mt-auto space-y-1 p-3 pt-16">
         <p className="truncate text-[10px] font-medium tracking-wide text-white/55">
           {beat.channel_title || "未知频道"}
         </p>
