@@ -298,7 +298,7 @@ export function ChatClient() {
                 <button
                   type="button"
                   onClick={newChat}
-                  className="rounded-full border border-white/15 bg-white/[0.08] px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_12px_rgba(0,0,0,0.2)] transition hover:border-white/25 hover:bg-white/[0.14] hover:text-white"
+                  className="rounded-full border border-white/15 bg-transparent px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:border-white/30 hover:text-white"
                 >
                   + 新会话
                 </button>
@@ -324,7 +324,7 @@ export function ChatClient() {
                 </div>
               ) : (
                 <div key={t.id} className="space-y-2.5">
-                  <div className="glass-panel rounded-2xl rounded-bl-md px-3.5 py-3 text-[13.5px] leading-relaxed text-white/85">
+                  <div className="glass-frame rounded-2xl rounded-bl-md px-3.5 py-3 text-[13.5px] leading-relaxed text-white/85">
                     {t.content}
                   </div>
                   <SearchMeta

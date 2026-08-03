@@ -25,7 +25,7 @@ export function BeatCard({
         delay: Math.min(index, 6) * 0.04,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group relative flex min-h-[168px] flex-col overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/22 hover:bg-white/[0.07] sm:min-h-[180px]"
+      className="group relative flex min-h-[168px] flex-col overflow-hidden rounded-2xl border border-white/14 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-white/28 sm:min-h-[180px]"
     >
       <div className="absolute inset-0">
         {beat.thumbnail ? (

@@ -29,12 +29,10 @@ export function ChatHero({
         </h1>
       </div>
 
+      {/* Touri feature cards: pure transparent + border only */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {STEPS.map((s) => (
-          <div
-            key={s.n}
-            className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 backdrop-blur-[10px] transition hover:bg-white/[0.08]"
-          >
+          <div key={s.n} className="glass-frame p-5 transition hover:border-white/22">
             <div className="mb-3 text-xl opacity-80">{s.icon}</div>
             <h3 className="m-0 text-[13px] font-semibold text-white">{s.t}</h3>
             <p className="mt-1.5 text-[11px] leading-relaxed text-white/50">
@@ -55,7 +53,7 @@ export function ChatHero({
               type="button"
               disabled={disabled}
               onClick={() => onPick(s)}
-              className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-left text-[13px] font-medium text-white/75 transition hover:border-white/20 hover:bg-white/10 hover:text-white disabled:opacity-50"
+              className="rounded-full border border-white/12 bg-transparent px-4 py-2.5 text-left text-[13px] font-medium text-white/75 transition hover:border-white/25 hover:text-white disabled:opacity-50"
             >
               {s}
             </button>
