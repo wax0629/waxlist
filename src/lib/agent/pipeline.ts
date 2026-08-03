@@ -15,7 +15,7 @@ import {
   type YtSearchHit,
 } from "@/lib/youtube";
 import { extractUrl, mergeIntent, summarizeIntent } from "./intent";
-import { planQueries } from "./plan-queries";
+import { planQueriesSmart } from "./plan-queries-llm";
 import { refineReasonsWithLlm } from "./rank-llm";
 import { filterAndScore, templateReason } from "./score";
 
@@ -143,9 +143,11 @@ export async function runPipelineTurn(
   let intent = mergeIntent(session.constraints ?? {}, message, url);
   intent = await enrichReference(intent, warnings);
 
-  const queries_used = planQueries(intent);
+  const queryPlan = await planQueriesSmart(intent);
+  const queries_used = queryPlan.queries;
   const intent_summary = summarizeIntent(intent);
   const refineCount = session.messages.filter((m) => m.role === "user").length;
+  if (queryPlan.warning) warnings.push(queryPlan.warning);
 
   const finish = (
     partial: Omit<RunTurnResult, "debug"> & {
@@ -159,6 +161,7 @@ export async function runPipelineTurn(
       status: partial.status,
       duration_ms,
       styles: intent.style,
+      query_source: queryPlan.source,
       queries: queries_used,
       recall: extra?.recall ?? 0,
       filtered: extra?.filtered ?? 0,

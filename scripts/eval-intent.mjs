@@ -14,6 +14,11 @@ const root = path.join(__dirname, "..");
 const runner = `
 import { mergeIntent } from './src/lib/agent/intent.ts';
 import { planQueries } from './src/lib/agent/plan-queries.ts';
+import {
+  hardConstraintTokens,
+  injectHardConstraints,
+  shouldUseLlmQueryPlan,
+} from './src/lib/agent/plan-queries-llm.ts';
 
 const cases = [
   {
@@ -104,6 +109,35 @@ const refined = mergeIntent(prev, '再快一点');
 const e4 =
   refined.style?.includes('r&b') && refined.tempo === 'fast';
 console.log(e4 ? 'PASS' : 'FAIL', 'E4 refine', refined.style, refined.tempo);
+if (!e4) failed++;
+
+// E8: open Chinese vibe would want LLM path when key exists — without key, false
+const vibe = mergeIntent({}, '想要凌晨在天桥上那种孤独感的伴奏');
+const e8want = shouldUseLlmQueryPlan(vibe) === false || shouldUseLlmQueryPlan(vibe) === true;
+// structure: Chinese text should be candidate for LLM (true if key, false if no key)
+const e8 =
+  /[\u4e00-\u9fff]/.test(vibe.free_text || '') &&
+  (process.env.OPENAI_API_KEY || process.env.XAI_API_KEY
+    ? shouldUseLlmQueryPlan(vibe) === true
+    : shouldUseLlmQueryPlan(vibe) === false);
+console.log(e8 ? 'PASS' : 'FAIL', 'E8 shouldUseLlmQueryPlan', shouldUseLlmQueryPlan(vibe));
+if (!e8) failed++;
+
+// E9 hard constraints injection
+const hardIntent = mergeIntent({}, '适合女声的慢热 R&B，鼓不要太抢');
+const injected = injectHardConstraints('melodic type beat', hardIntent, {
+  aggressive: true,
+});
+const e9 =
+  injected.includes('type beat') &&
+  (injected.includes('female') || injected.includes('slow') || injected.includes('soft')) &&
+  hardConstraintTokens(hardIntent).length > 0;
+console.log(e9 ? 'PASS' : 'FAIL', 'E9 injectHardConstraints', injected);
+if (!e9) failed++;
+
+console.log(failed ? \`FAILED \${failed}\` : 'ALL PASS');
+process.exit(failed ? 1 : 0);
+
 if (!e4) failed++;
 
 process.exit(failed ? 1 : 0);
