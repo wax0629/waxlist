@@ -327,6 +327,8 @@ export function ChatClient() {
               placeholder="描述气质，或粘贴参考曲链接…"
               className="min-h-[52px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
               onKeyDown={(e) => {
+                // IME 组字中（中文/日文等）回车是「上屏」，不要发送
+                if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   void onSend(e);
