@@ -18,8 +18,6 @@ export function ChatHero({
   return (
     <section className="flex h-full flex-col justify-center gap-10 py-6 lg:py-10">
       <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-        <div className="touri-sphere mb-6 shrink-0" aria-hidden />
-
         <h1 className="max-w-md text-[22px] font-normal leading-relaxed text-white/80 sm:text-2xl">
           准备好找到{" "}
           <strong className="font-bold text-white">能开口唱的伴奏</strong>

@@ -321,10 +321,10 @@ export function ChatClient() {
           </div>
         </header>
 
-        {/* Two liquid-glass panes under nav — ~6:4 */}
+        {/* Two liquid-glass panes under nav — ~52:48 (right a bit wider) */}
         <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
           {/* LEFT: chat glass card */}
-          <section className="liquid-glass flex min-h-0 min-w-0 flex-1 flex-col lg:flex-[3]">
+          <section className="liquid-glass flex min-h-0 min-w-0 flex-1 flex-col lg:flex-[11]">
             {!isFresh ? (
               <div className="flex shrink-0 items-center justify-end border-b border-white/[0.08] px-3.5 py-2.5 sm:px-4">
                 <button
@@ -470,8 +470,8 @@ export function ChatClient() {
           </form>
           </section>
 
-          {/* RIGHT: discover glass card — ~40% */}
-          <aside className="liquid-glass hidden min-h-0 min-w-0 flex-col lg:flex lg:flex-[2]">
+          {/* RIGHT: discover glass card — ~48% */}
+          <aside className="liquid-glass hidden min-h-0 min-w-0 flex-col lg:flex lg:flex-[10]">
             <div className="flex items-end justify-between gap-3 border-b border-white/[0.08] px-4 py-3.5">
               <div>
                 <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
@@ -528,10 +528,6 @@ export function ChatClient() {
                 </div>
               ) : (
                 <div className="flex h-full min-h-[280px] flex-col items-center justify-center px-6 text-center">
-                  <div
-                    className="touri-sphere mb-4 scale-90 opacity-90"
-                    aria-hidden
-                  />
                   <p className="font-display text-[1rem] font-semibold text-white/90">
                     等待短名单
                   </p>
