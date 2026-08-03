@@ -92,8 +92,8 @@ npm run dev
 
 ## 建议下一步
 
-目标是**完整正式产品**，不是玩具 Demo。见 [product-maturity](./docs/product-maturity.md)。
+目标是**完整正式产品**。当前阶段：**Phase 1 只做 Agent 找伴奏**（地下精选后置认真做）。
 
-1. 写并执行 **Phase 1 Beta** 规格（检索可信、制作人先验、UI 成品质感、会话持久化、部署）  
-2. 想法入 [ideas-backlog](./docs/ideas-backlog.md)，升格进阶段再做  
-3. Phase 2 账号/收藏/多源 → Phase 3 地下精选  
+1. 按 [Phase 1 Agent Beta 规格](./docs/spec-phase1-agent-beta.md) 实现  
+2. 地图见 [product-flows](./docs/product-flows.md) · [product-maturity](./docs/product-maturity.md)  
+3. 之后：Phase 2 账号/资产 → Phase 3 **地下精选（重点模块）**  
