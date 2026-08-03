@@ -66,7 +66,12 @@ body {
   letter-spacing: -0.03em;
 }
 
-/* ——— Touri interwoven aurora mesh ——— */
+/*
+  ——— Touri diagonal aurora (斜向高亮极光) ———
+  Reference product shot: elongated diagonal light ribbons
+  (not round blobs) — warm bronze → magenta → deep purple,
+  soft outer blur + thinner brighter cores for 高亮.
+*/
 .aurora-bg {
   position: fixed;
   inset: 0;
@@ -76,75 +81,212 @@ body {
   pointer-events: none;
 }
 
-.aurora-blob {
+/* Soft full-scene atmosphere under the ribbons */
+.aurora-atmosphere {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.75;
-  animation: touri-pulse 10s infinite alternate ease-in-out;
-  will-change: transform, opacity;
-}
-
-/* Bronze/Orange from top left */
-.blob-1 {
-  top: -20%;
-  left: -10%;
-  width: 70vw;
-  height: 60vh;
-  background: #a94f28;
-  transform: rotate(15deg);
-}
-
-/* Pink/Magenta middle */
-.blob-2 {
-  top: 20%;
-  left: 20%;
-  width: 60vw;
-  height: 30vh;
-  background: #9e3166;
-  transform: rotate(-25deg);
-  opacity: 0.6;
-  animation-delay: -3s;
-}
-
-/* Deep purple bottom right */
-.blob-3 {
-  bottom: -20%;
-  right: -10%;
-  width: 60vw;
-  height: 70vh;
-  background: #3b1c63;
-  animation-delay: -6s;
-}
-
-/* Extra soft mesh like clone */
-.blob-mesh {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-  filter: blur(60px);
-  opacity: 1;
-  animation: none;
+  inset: -10%;
   background:
-    radial-gradient(circle at 15% 50%, rgba(173, 73, 44, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(88, 44, 115, 0.4) 0%, transparent 40%),
-    radial-gradient(circle at 50% 100%, rgba(13, 10, 20, 0.8) 0%, transparent 60%);
+    radial-gradient(
+      ellipse 55% 70% at 12% 40%,
+      rgba(169, 79, 40, 0.55) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 88% 28%,
+      rgba(59, 28, 99, 0.55) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 50% 100%,
+      rgba(13, 10, 20, 0.9) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 40% 40% at 55% 45%,
+      rgba(158, 49, 102, 0.25) 0%,
+      transparent 60%
+    );
+  filter: blur(40px);
 }
 
-@keyframes touri-pulse {
+/*
+  Ribbon geometry: very wide × thin band, rotated via --rot.
+  Animation only shifts/opacifies; rotation stays on the variable.
+*/
+.aurora-ribbon {
+  --rot: -28deg;
+  --blur: 72px;
+  --op: 0.85;
+  position: absolute;
+  left: -35%;
+  width: 170%;
+  height: 36vh;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0) rotate(var(--rot));
+  filter: blur(var(--blur));
+  opacity: var(--op);
+  will-change: transform, opacity;
+  animation: aurora-drift 14s infinite alternate ease-in-out;
+}
+
+/* —— Band 1: warm bronze / copper (top-left → mid) —— */
+.ribbon-1 {
+  --rot: -28deg;
+  --blur: 72px;
+  --op: 0.95;
+  top: -5%;
+  height: 42vh;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(169, 79, 40, 0.15) 12%,
+    rgba(196, 90, 48, 0.85) 35%,
+    rgba(232, 140, 80, 0.7) 48%,
+    rgba(169, 79, 40, 0.55) 62%,
+    transparent 85%
+  );
+}
+
+/* Brighter thinner core (高亮) on band 1 */
+.ribbon-1-core {
+  --rot: -28deg;
+  --blur: 32px;
+  --op: 0.8;
+  top: 8%;
+  height: 12vh;
+  animation-delay: -1s;
+  animation-duration: 11s;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(255, 170, 100, 0.4) 30%,
+    rgba(255, 200, 150, 0.65) 45%,
+    rgba(232, 120, 70, 0.35) 60%,
+    transparent 80%
+  );
+}
+
+/* —— Band 2: magenta / rose (middle diagonal) —— */
+.ribbon-2 {
+  --rot: -32deg;
+  --blur: 80px;
+  --op: 0.82;
+  top: 28%;
+  height: 36vh;
+  animation-delay: -4s;
+  animation-duration: 16s;
+  background: linear-gradient(
+    90deg,
+    transparent 8%,
+    rgba(158, 49, 102, 0.25) 22%,
+    rgba(200, 70, 130, 0.75) 42%,
+    rgba(255, 107, 158, 0.55) 55%,
+    rgba(155, 81, 224, 0.4) 70%,
+    transparent 90%
+  );
+}
+
+.ribbon-2-core {
+  --rot: -32deg;
+  --blur: 26px;
+  --op: 0.72;
+  top: 36%;
+  height: 9vh;
+  animation-delay: -5s;
+  animation-duration: 12s;
+  background: linear-gradient(
+    90deg,
+    transparent 15%,
+    rgba(255, 140, 180, 0.45) 40%,
+    rgba(255, 170, 210, 0.55) 50%,
+    rgba(200, 100, 200, 0.3) 65%,
+    transparent 85%
+  );
+}
+
+/* —— Band 3: deep purple (lower-right slant) —— */
+.ribbon-3 {
+  --rot: -22deg;
+  --blur: 90px;
+  --op: 0.9;
+  top: 52%;
+  height: 48vh;
+  animation-delay: -7s;
+  animation-duration: 18s;
+  background: linear-gradient(
+    90deg,
+    transparent 20%,
+    rgba(59, 28, 99, 0.35) 40%,
+    rgba(88, 44, 130, 0.75) 55%,
+    rgba(120, 60, 160, 0.55) 70%,
+    rgba(59, 28, 99, 0.3) 85%,
+    transparent 100%
+  );
+}
+
+/* —— Band 4: secondary copper slash (upper, steeper) —— */
+.ribbon-4 {
+  --rot: -38deg;
+  --blur: 64px;
+  --op: 0.72;
+  top: -18%;
+  height: 28vh;
+  animation-delay: -2s;
+  animation-duration: 13s;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(173, 73, 44, 0.4) 20%,
+    rgba(210, 100, 55, 0.65) 40%,
+    rgba(158, 49, 102, 0.35) 65%,
+    transparent 90%
+  );
+}
+
+/* —— Band 5: cool violet edge (right side slash) —— */
+.ribbon-5 {
+  --rot: -18deg;
+  --blur: 100px;
+  --op: 0.65;
+  top: 10%;
+  left: 10%;
+  height: 55vh;
+  animation-delay: -9s;
+  animation-duration: 20s;
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    rgba(88, 44, 115, 0.2) 50%,
+    rgba(100, 50, 160, 0.55) 68%,
+    rgba(70, 40, 120, 0.35) 82%,
+    transparent 100%
+  );
+}
+
+/* Keep edges darker so ribbons feel like light through glass */
+.aurora-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 45%, transparent 30%, #050505 95%),
+    linear-gradient(180deg, transparent 0%, rgba(5, 5, 5, 0.35) 100%);
+  pointer-events: none;
+}
+
+@keyframes aurora-drift {
   0% {
-    opacity: 0.55;
-    transform: scale(1) translate(0, 0);
+    opacity: calc(var(--op) * 0.82);
+    transform: translate3d(0, 0, 0) rotate(var(--rot)) scale(1);
   }
   100% {
-    opacity: 0.85;
-    transform: scale(1.05) translate(20px, 10px);
+    opacity: var(--op);
+    transform: translate3d(22px, -12px, 0) rotate(var(--rot)) scale(1.04);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora-blob {
+  .aurora-ribbon {
     animation: none;
   }
 }

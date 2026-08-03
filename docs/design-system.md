@@ -25,14 +25,21 @@ Phase 1 UI **以这两份 HTML 为准**，不再用晚霞琥珀 / 冷海军蓝�
 | Surface soft | `rgba(255,255,255,0.03)` | 轻表面 / feature card |
 | Input inner | `#121212` | 渐变描边输入壳内层 |
 
-### Mesh 叠加（clone）
+### 斜向高亮极光（产品图复刻）
 
-```css
-radial-gradient(circle at 15% 50%, rgba(173, 73, 44, 0.4) 0%, transparent 40%),
-radial-gradient(circle at 85% 30%, rgba(88, 44, 115, 0.4) 0%, transparent 40%),
-radial-gradient(circle at 50% 100%, rgba(13, 10, 20, 0.8) 0%, transparent 60%);
-/* + blur(60px) */
-```
+不是圆 blob，而是 **宽×薄的色带**，旋转约 `-18°～-38°`：
+
+| 层 | 色 | 角度 | 作用 |
+|----|----|------|------|
+| atmosphere | 暖橙 / 紫径向 | — | 大范围底气 |
+| ribbon-1 + core | `#A94F28` 铜橙 + 更亮 core | −28° | 主高亮斜带 |
+| ribbon-2 + core | 品红 / 粉 | −32° | 中段交织 |
+| ribbon-3 | `#3B1C63` 深紫 | −22° | 右下锚点 |
+| ribbon-4 / 5 | 次铜斜带 / 冷紫 | −38° / −18° | 层次 |
+| vignette | 暗角 | — | 边缘收进黑底 |
+
+实现：`layout.tsx` 结构 + `globals.css` `.aurora-ribbon`  
+关键：`linear-gradient(90deg, transparent → color → transparent)` + 大 `blur` + 更薄、更亮的 core 层。
 
 ---
 

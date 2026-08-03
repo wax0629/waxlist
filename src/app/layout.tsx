@@ -42,12 +42,17 @@ export default function RootLayout({
             "var(--font-sans), var(--font-cjk), Inter, 'Noto Sans SC', system-ui, sans-serif",
         }}
       >
-        {/* Touri aurora mesh */}
+        {/* Touri diagonal aurora — slanted highlight ribbons */}
         <div className="aurora-bg" aria-hidden>
-          <div className="aurora-blob blob-mesh" />
-          <div className="aurora-blob blob-1" />
-          <div className="aurora-blob blob-2" />
-          <div className="aurora-blob blob-3" />
+          <div className="aurora-atmosphere" />
+          <div className="aurora-ribbon ribbon-4" />
+          <div className="aurora-ribbon ribbon-1" />
+          <div className="aurora-ribbon ribbon-1-core" />
+          <div className="aurora-ribbon ribbon-2" />
+          <div className="aurora-ribbon ribbon-2-core" />
+          <div className="aurora-ribbon ribbon-3" />
+          <div className="aurora-ribbon ribbon-5" />
+          <div className="aurora-vignette" />
         </div>
         {children}
       </body>
