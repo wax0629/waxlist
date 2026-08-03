@@ -213,20 +213,20 @@ export function ChatClient() {
   const showSuggestions = messages.length <= 1 && !loading && !restoring;
 
   return (
-    <div className="flex min-h-full flex-1 flex-col text-zinc-100">
+    <div className="flex min-h-dvh flex-1 flex-col text-zinc-100">
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-5 pt-5 md:px-6">
-        <div className="mb-4 flex items-center justify-between gap-2">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-6 pt-4 md:px-6">
+        <div className="mb-3 flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2 text-[11px]">
             {lastStatus ? (
               <span
                 className={
                   lastStatus === "ok"
-                    ? "rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-emerald-300/90"
+                    ? "rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-300/90 ring-1 ring-emerald-500/20"
                     : lastStatus === "degraded"
-                      ? "rounded-full bg-amber-500/15 px-2.5 py-0.5 text-amber-200/90"
-                      : "rounded-full bg-red-500/15 px-2.5 py-0.5 text-red-300/90"
+                      ? "rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-200/90 ring-1 ring-amber-500/20"
+                      : "rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-300/90 ring-1 ring-red-500/20"
                 }
               >
                 {lastStatus === "ok"
@@ -236,24 +236,24 @@ export function ChatClient() {
                     : "出错"}
               </span>
             ) : (
-              <span className="text-zinc-600">找伴奏 · v0.2 策略检索</span>
+              <span className="text-zinc-600">策略检索 · 伴奏短名单</span>
             )}
             {sessionId ? (
-              <span className="text-zinc-600">
-                会话 {sessionId.slice(0, 8)}…
+              <span className="hidden text-zinc-600 sm:inline">
+                {sessionId.slice(0, 8)}…
               </span>
             ) : null}
           </div>
           <button
             type="button"
             onClick={newChat}
-            className="text-[11px] text-zinc-500 transition hover:text-zinc-200"
+            className="rounded-lg px-2 py-1 text-[11px] text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200"
           >
             新会话
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-7 overflow-y-auto pb-2">
+        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-3">
           {restoring && (
             <p className="text-xs text-zinc-500">恢复会话…</p>
           )}
@@ -267,13 +267,13 @@ export function ChatClient() {
               <div
                 className={
                   m.role === "user"
-                    ? "max-w-[85%] rounded-2xl rounded-br-md bg-violet-600/85 px-4 py-2.5 text-sm text-white shadow-lg shadow-violet-950/40"
-                    : "max-w-[95%] space-y-2.5"
+                    ? "max-w-[min(85%,28rem)] rounded-2xl rounded-br-md bg-gradient-to-br from-violet-500 to-violet-700 px-4 py-2.5 text-[13px] leading-relaxed text-white shadow-lg shadow-violet-950/50"
+                    : "w-full max-w-[95%] space-y-2.5"
                 }
               >
                 {m.role === "assistant" ? (
                   <>
-                    <div className="rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm leading-relaxed text-zinc-200 whitespace-pre-wrap backdrop-blur-md">
+                    <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.035] px-4 py-3 text-[13px] leading-relaxed text-zinc-200 whitespace-pre-wrap shadow-lg shadow-black/20 backdrop-blur-md">
                       {m.content}
                     </div>
                     <SearchMeta
@@ -295,34 +295,43 @@ export function ChatClient() {
             </div>
           ))}
           {showSuggestions && (
-            <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  disabled={loading}
-                  onClick={() => void sendMessage(s)}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-left text-xs text-zinc-300 transition hover:border-violet-400/35 hover:bg-white/[0.08]"
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="space-y-2">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+                试试这样问
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => void sendMessage(s)}
+                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-left text-[12px] text-zinc-400 transition hover:border-violet-400/30 hover:bg-violet-500/10 hover:text-zinc-200"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {loading && (
-            <p className="text-xs text-violet-300/70 animate-pulse">
-              {loadingHint}
-            </p>
+            <div className="flex items-center gap-2 text-xs text-violet-300/80">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400/40" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400/80" />
+              </span>
+              <span className="animate-pulse">{loadingHint}</span>
+            </div>
           )}
           {error && (
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              <p className="text-red-400/90">{error}</p>
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs">
+              <p className="text-red-300/90">{error}</p>
               {lastFailedText ? (
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => void sendMessage(lastFailedText)}
-                  className="rounded-lg border border-red-400/30 px-2.5 py-1 text-red-200/90 transition hover:bg-red-500/10"
+                  className="rounded-lg bg-red-500/15 px-2.5 py-1 font-medium text-red-200/90 transition hover:bg-red-500/25"
                 >
                   重试上一条
                 </button>
@@ -334,7 +343,7 @@ export function ChatClient() {
 
         <form
           onSubmit={onSend}
-          className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-2 shadow-2xl shadow-black/50 backdrop-blur-xl"
+          className="sticky bottom-0 mt-auto rounded-2xl border border-white/[0.08] bg-[#0c0c12]/85 p-2 shadow-2xl shadow-black/60 ring-1 ring-white/[0.04] backdrop-blur-xl"
         >
           <div className="flex items-end gap-2">
             <textarea
@@ -342,9 +351,8 @@ export function ChatClient() {
               onChange={(e) => setInput(e.target.value)}
               rows={2}
               placeholder="描述气质，或粘贴参考曲链接…"
-              className="min-h-[52px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
+              className="min-h-[52px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[13px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
               onKeyDown={(e) => {
-                // IME 组字中（中文/日文等）回车是「上屏」，不要发送
                 if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -355,13 +363,13 @@ export function ChatClient() {
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="mb-1 shrink-0 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-violet-900/30 transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-40"
+              className="mb-1 shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-5 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-violet-950/50 transition hover:from-violet-300 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-35"
             >
               {loading ? "…" : "发送"}
             </button>
           </div>
-          <p className="px-3 pb-1.5 text-[11px] text-zinc-600">
-            结果仅供试听参考，商用请以源站授权为准。
+          <p className="px-3 pb-1 text-[10px] leading-relaxed text-zinc-600">
+            结果仅供试听参考，商用请以源站授权为准。Enter 发送 · Shift+Enter 换行
           </p>
         </form>
       </main>

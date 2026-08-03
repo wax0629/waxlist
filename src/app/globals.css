@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07070c;
-  --foreground: #f4f4f5;
-  --surface: rgba(255, 255, 255, 0.04);
-  --surface-2: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.1);
-  --accent: #a78bfa;
+  --background: #050508;
+  --foreground: #fafafa;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(167, 139, 250, 0.35);
+  --accent: #c4b5fd;
   --accent-strong: #8b5cf6;
+  --muted: #71717a;
 }
 
 @theme inline {
@@ -17,12 +19,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+html {
+  height: 100%;
 }
 
+body {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Suno-ish layered atmosphere */
 body::before {
   content: "";
   pointer-events: none;
@@ -30,8 +39,35 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 90% 55% at 50% -25%, rgba(139, 92, 246, 0.28), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(236, 72, 153, 0.08), transparent 50%),
-    radial-gradient(ellipse 45% 35% at 0% 80%, rgba(59, 130, 246, 0.07), transparent 45%),
-    #07070c;
+    radial-gradient(ellipse 100% 70% at 50% -30%, rgba(124, 58, 237, 0.32), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 95% 15%, rgba(236, 72, 153, 0.1), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 5% 75%, rgba(56, 189, 248, 0.06), transparent 45%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(15, 15, 25, 0.9), transparent 50%),
+    #050508;
+}
+
+/* subtle grain */
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
 }
