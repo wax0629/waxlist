@@ -35,6 +35,10 @@ export interface YtSearchHit {
   description?: string;
 }
 
+/** Process-local short cache — saves quota on refine / retries. */
+const searchCache = new Map<string, { at: number; hits: YtSearchHit[] }>();
+const SEARCH_TTL_MS = 10 * 60 * 1000;
+
 export async function searchYouTube(
   query: string,
   maxResults = 8,
@@ -42,6 +46,12 @@ export async function searchYouTube(
   const key = process.env.YOUTUBE_API_KEY?.trim();
   if (!key) {
     throw new Error("YOUTUBE_API_KEY 未配置");
+  }
+
+  const cacheKey = `${query}\0${maxResults}`;
+  const cached = searchCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < SEARCH_TTL_MS) {
+    return cached.hits;
   }
 
   const params = new URLSearchParams({
@@ -88,6 +98,12 @@ export async function searchYouTube(
         item.snippet?.thumbnails?.medium?.url ??
         item.snippet?.thumbnails?.default?.url,
     });
+  }
+  searchCache.set(cacheKey, { at: Date.now(), hits });
+  // Bound memory
+  if (searchCache.size > 80) {
+    const oldest = [...searchCache.entries()].sort((a, b) => a[1].at - b[1].at);
+    for (const [k] of oldest.slice(0, 20)) searchCache.delete(k);
   }
   return hits;
 }

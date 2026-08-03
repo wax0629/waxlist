@@ -47,6 +47,7 @@ type Turn =
       candidates?: BeatCandidate[];
       intent_summary?: string;
       queries_used?: string[];
+      intent?: SearchIntent;
       empty?: boolean;
     };
 
@@ -67,6 +68,7 @@ function toTurns(messages: ChatMessage[]): Turn[] {
         candidates: m.candidates,
         intent_summary: m.intent_summary,
         queries_used: m.queries_used,
+        intent: m.intent,
         empty: empty || undefined,
       });
     }
@@ -200,6 +202,7 @@ export function ChatClient() {
             candidates,
             intent_summary: data.intent_summary,
             queries_used: data.queries_used,
+            intent: data.intent,
             empty: candidates.length === 0,
           },
         ]);
@@ -362,6 +365,9 @@ export function ChatClient() {
                   <SearchMeta
                     intentSummary={t.intent_summary}
                     queriesUsed={t.queries_used}
+                    intent={t.intent}
+                    disabled={loading}
+                    onRefine={(msg) => void sendMessage(msg)}
                   />
                   {t.candidates && t.candidates.length > 0 ? (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">

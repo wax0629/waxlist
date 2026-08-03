@@ -12,10 +12,157 @@ function uniq(arr: string[]): string[] {
 /** Refine / constraint update vs brand-new request. */
 export function isRefineMessage(message: string): boolean {
   const t = message.trim();
-  if (t.length > 48) return false;
-  return /再|更|稍|别|不要|少点|多点|还要|继续|换一|快点|慢点|轻一点|重一点|加快|放慢|鼓|808/.test(
+  if (t.length > 64) return false;
+  return /再|更|稍|别|不要|少点|多点|还要|继续|换一|快点|慢点|轻一点|重一点|加快|放慢|鼓|808|偏|向|女声|男声|慢热|中速|暗一点|暖一点|换一批|再来几/.test(
     t,
   );
+}
+
+/** Clickable refine chips for UI (A2.3 点选修正理解). */
+export type IntentActionChip = {
+  id: string;
+  label: string;
+  /** Short refine message sent as user turn */
+  message: string;
+};
+
+const STYLE_LABEL: Record<string, string> = {
+  underground: "地下/UDG",
+  "r&b": "R&B",
+  "hip hop": "说唱",
+  "trap soul": "Trap Soul",
+  trap: "Trap",
+  drill: "Drill",
+  "boom bap": "Boom Bap",
+  lofi: "Lo-fi",
+  pop: "Pop",
+  hyperpop: "Hyperpop",
+  afrobeats: "Afrobeats",
+  phonk: "Phonk",
+  "cloud rap": "Cloud Rap",
+  "jersey club": "Jersey Club",
+  plugg: "Plugg",
+  rage: "Rage",
+};
+
+/**
+ * Build refine action chips from current intent.
+ * Always includes a few common adjusts + style pivots.
+ */
+export function buildRefineChips(intent: SearchIntent): IntentActionChip[] {
+  const chips: IntentActionChip[] = [];
+  const styles = new Set((intent.style ?? []).map((s) => s.toLowerCase()));
+
+  // Tempo
+  if (intent.tempo !== "slow") {
+    chips.push({
+      id: "tempo-slow",
+      label: "再慢一点",
+      message: "再慢热一点",
+    });
+  }
+  if (intent.tempo !== "fast") {
+    chips.push({
+      id: "tempo-fast",
+      label: "再快一点",
+      message: "再快一点",
+    });
+  }
+  if (intent.tempo !== "mid") {
+    chips.push({
+      id: "tempo-mid",
+      label: "中速",
+      message: "中速一点",
+    });
+  }
+
+  // Vocal
+  if (intent.vocal !== "female") {
+    chips.push({
+      id: "vocal-f",
+      label: "女声向",
+      message: "更偏女声",
+    });
+  }
+  if (intent.vocal !== "male") {
+    chips.push({
+      id: "vocal-m",
+      label: "男声向",
+      message: "更偏男声",
+    });
+  }
+
+  // Mood / avoid
+  if (!intent.mood?.includes("dark")) {
+    chips.push({
+      id: "mood-dark",
+      label: "再暗一点",
+      message: "再暗一点",
+    });
+  }
+  if (!intent.mood?.includes("warm")) {
+    chips.push({
+      id: "mood-warm",
+      label: "再暖一点",
+      message: "再暖一点",
+    });
+  }
+  if (!intent.avoid?.includes("heavy drums")) {
+    chips.push({
+      id: "avoid-drums",
+      label: "鼓轻一点",
+      message: "鼓别太抢",
+    });
+  }
+
+  // Style pivots (only if not already active)
+  const stylePivots: Array<[string, string, string]> = [
+    ["underground", "偏地下", "更偏 underground udg"],
+    ["r&b", "偏 R&B", "更偏 r&b"],
+    ["trap", "偏 Trap", "更偏 trap"],
+    ["trap soul", "Trap Soul", "更偏 trap soul"],
+    ["drill", "Drill", "更偏 drill"],
+    ["lofi", "Lo-fi", "更偏 lofi"],
+  ];
+  for (const [key, label, message] of stylePivots) {
+    if (!styles.has(key)) {
+      chips.push({ id: `style-${key}`, label, message });
+    }
+  }
+
+  chips.push({
+    id: "more",
+    label: "换一批",
+    message: "再来几个类似的",
+  });
+
+  // Cap for UI density
+  return chips.slice(0, 10);
+}
+
+/** Display chips for active understanding (non-click actions). */
+export function buildActiveLabels(intent: SearchIntent): string[] {
+  const labels: string[] = [];
+  if (intent.vocal === "female") labels.push("女声向");
+  if (intent.vocal === "male") labels.push("男声向");
+  if (intent.tempo === "slow") labels.push("慢热");
+  if (intent.tempo === "fast") labels.push("偏快");
+  if (intent.tempo === "mid") labels.push("中速");
+  for (const s of intent.style ?? []) {
+    labels.push(STYLE_LABEL[s] ?? s);
+  }
+  for (const m of intent.mood ?? []) {
+    const map: Record<string, string> = {
+      dark: "偏暗",
+      warm: "偏暖",
+      dreamy: "飘渺",
+      aggressive: "偏硬",
+    };
+    labels.push(map[m] ?? m);
+  }
+  if (intent.avoid?.includes("heavy drums")) labels.push("鼓靠后");
+  if (intent.avoid?.includes("heavy 808")) labels.push("少重 808");
+  return labels;
 }
 
 /**
