@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { appendTurn, runMockTurn } from "@/lib/agent/mock-run";
+import { appendTurn, runTurn } from "@/lib/agent/run-turn";
 import { getOrCreateSession, saveSession } from "@/lib/session-store";
 
 export const runtime = "nodejs";
@@ -30,15 +30,21 @@ export async function POST(req: Request) {
 
   const userText = message || `参考：${refUrl}`;
   const session = getOrCreateSession(body.session_id);
-  const result = runMockTurn(session, userText, refUrl);
-  appendTurn(session, userText, result);
-  saveSession(session);
 
-  return NextResponse.json({
-    session_id: session.id,
-    assistant_message: result.assistant_message,
-    candidates: result.candidates,
-    status: result.status,
-    warnings: result.warnings,
-  });
+  try {
+    const result = await runTurn(session, userText, refUrl);
+    appendTurn(session, userText, result);
+    saveSession(session);
+
+    return NextResponse.json({
+      session_id: session.id,
+      assistant_message: result.assistant_message,
+      candidates: result.candidates,
+      status: result.status,
+      warnings: result.warnings,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "服务错误";
+    return NextResponse.json({ error: msg }, { status: 502 });
+  }
 }

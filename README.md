@@ -24,10 +24,21 @@ cp .env.example .env.local
 
 当前阶段：
 
-- `/chat` 暗色 UI + **服务端会话**（`POST /api/chat`、`GET /api/session/:id`）
-- shortlist 仍为 **mock**（约束会随 refine 微调）；下一步接 YouTube + LLM
+- `/chat` + 服务端会话（`POST /api/chat`、`GET /api/session/:id`）
+- **YouTube Data API** 真检索（配置 `YOUTUBE_API_KEY`）；无 key 自动 mock 降级
+- 下一步：LLM tool calling 提升 plan/rank 质量
 
-会话 `session_id` 存在浏览器 `localStorage`，开发服务器不重启时可刷新恢复。
+会话 `session_id` 在 `localStorage`，dev 进程不重启时可刷新恢复。
+
+### YouTube Key
+
+获取步骤见 **[docs/youtube-api-setup.md](./docs/youtube-api-setup.md)**，然后：
+
+```bash
+cp .env.example .env.local
+# 编辑 .env.local → YOUTUBE_API_KEY=...
+npm run dev
+```
 
 ## 站点结构
 
