@@ -318,65 +318,94 @@ body {
 
 /*
   Pure transparent pane — NO fill, NO blur.
-  Border was weak because: 1px + ~14% white over bright aurora = low contrast.
-  Fix: 1.5px gradient stroke (brighter corners) + outer ring + inset specular.
+
+  BUG (why interiors went milky again):
+  `background: transparent padding-box, gradient border-box` does NOT
+  mask the gradient to the rim only. The border-box layer still paints
+  the FULL rect behind the transparent padding-box, so the whole pane
+  filled with semi-white gradient. Looks like frosted glass again.
+
+  FIX: solid transparent fill + real border, OR gradient ring on
+  ::before with mask-composite:exclude (rim only).
 */
 .liquid-glass {
   position: relative;
   overflow: hidden;
   border-radius: 22px;
-  background:
-    transparent padding-box,
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(255, 255, 255, 0.32) 28%,
-      rgba(255, 255, 255, 0.16) 55%,
-      rgba(255, 255, 255, 0.42) 100%
-    )
-      border-box;
-  border: 1.5px solid transparent;
+  background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  /* solid bright border — always rim-only, never fills interior */
+  border: 1.5px solid rgba(255, 255, 255, 0.38);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 1px 0 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 1px 0 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
   color: rgba(255, 255, 255, 0.95);
 }
 
-.liquid-glass::before,
+/* Gradient specular only on the rim (mask punches out the center) */
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    rgba(255, 255, 255, 0.08) 60%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
 .liquid-glass::after {
-  content: none !important;
+  content: none;
   display: none;
 }
 
-/* Inner mini cards / chips — clearer border-only frames */
-.glass-frame {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 16px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
+.liquid-glass > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* Legacy glass utils — transparent frames, stronger stroke */
+/* Inner mini cards / chips — solid border only, no fill */
+.glass-frame {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: none !important;
+}
+
+/* Legacy glass utils — transparent frames, solid stroke */
 .glass,
 .glass-strong,
 .glass-panel {
   position: relative;
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* Circular user orb — top-right, glass rim for future profile */
+/* Circular user orb — transparent center, bright ring only */
 .user-orb {
+  position: relative;
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -384,18 +413,10 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background:
-    transparent padding-box,
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.65) 0%,
-      rgba(255, 255, 255, 0.18) 45%,
-      rgba(255, 255, 255, 0.4) 100%
-    )
-      border-box;
-  border: 1.5px solid transparent;
+  background: transparent !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
     0 4px 16px rgba(0, 0, 0, 0.25);
   color: rgba(255, 255, 255, 0.85);
   transition:
@@ -404,8 +425,9 @@ body {
     transform 0.2s;
 }
 .user-orb:hover {
+  border-color: rgba(255, 255, 255, 0.65);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
     0 6px 20px rgba(155, 81, 224, 0.25);
   transform: scale(1.04);
   color: #fff;
