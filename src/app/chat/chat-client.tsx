@@ -270,40 +270,40 @@ export function ChatClient() {
               </span>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            {lastStatus ? (
-              <span
-                className={
-                  lastStatus === "ok"
-                    ? "rounded-full bg-emerald-400/15 px-2.5 py-1 text-[11px] font-medium text-emerald-200 ring-1 ring-emerald-300/20"
-                    : lastStatus === "degraded"
-                      ? "rounded-full bg-amber-400/15 px-2.5 py-1 text-[11px] font-medium text-amber-100 ring-1 ring-amber-300/20"
-                      : "rounded-full bg-rose-400/15 px-2.5 py-1 text-[11px] font-medium text-rose-100 ring-1 ring-rose-300/20"
-                }
-              >
-                {lastStatus === "ok"
-                  ? "就绪"
+          {lastStatus ? (
+            <span
+              className={
+                lastStatus === "ok"
+                  ? "rounded-full bg-emerald-400/15 px-2.5 py-1 text-[11px] font-medium text-emerald-200 ring-1 ring-emerald-300/20"
                   : lastStatus === "degraded"
-                    ? "降级"
-                    : "错误"}
-              </span>
-            ) : null}
-            {!isFresh ? (
-              <button
-                type="button"
-                onClick={newChat}
-                className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[12px] text-white/70 transition hover:bg-white/10 hover:text-white"
-              >
-                新会话
-              </button>
-            ) : null}
-          </div>
+                    ? "rounded-full bg-amber-400/15 px-2.5 py-1 text-[11px] font-medium text-amber-100 ring-1 ring-amber-300/20"
+                    : "rounded-full bg-rose-400/15 px-2.5 py-1 text-[11px] font-medium text-rose-100 ring-1 ring-rose-300/20"
+              }
+            >
+              {lastStatus === "ok"
+                ? "就绪"
+                : lastStatus === "degraded"
+                  ? "降级"
+                  : "错误"}
+            </span>
+          ) : null}
         </header>
 
         {/* Two liquid-glass panes under nav — ~6:4 */}
         <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
           {/* LEFT: chat glass card */}
           <section className="liquid-glass flex min-h-0 min-w-0 flex-1 flex-col lg:flex-[3]">
+            {!isFresh ? (
+              <div className="flex shrink-0 items-center justify-end border-b border-white/[0.08] px-3.5 py-2.5 sm:px-4">
+                <button
+                  type="button"
+                  onClick={newChat}
+                  className="rounded-full border border-white/15 bg-white/[0.08] px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_12px_rgba(0,0,0,0.2)] transition hover:border-white/25 hover:bg-white/[0.14] hover:text-white"
+                >
+                  + 新会话
+                </button>
+              </div>
+            ) : null}
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
             {restoring && <p className="text-xs text-white/40">恢复会话…</p>}
 
