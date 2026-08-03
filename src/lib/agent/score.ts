@@ -1,5 +1,6 @@
 import type { SearchIntent } from "@/lib/types";
 import type { YtSearchHit } from "@/lib/youtube";
+import { producerBoost } from "./producers";
 
 export interface ScoredHit extends YtSearchHit {
   score: number;
@@ -11,7 +12,7 @@ const BEAT_POS =
 const BEAT_STRONG = /\btype\s*beat\b|\binstrumental\b/i;
 
 const NEG =
-  /\b(tutorial|how\s*to|reaction|full\s*album|live\s*concert|live\s*performance|lyrics\s*video|karaoke|cover\s*lesson|reacts?)\b/i;
+  /\b(tutorial|how\s*to|reaction|full\s*album|live\s*concert|live\s*performance|lyrics\s*video|karaoke|cover\s*lesson|reacts?|mix\s*202\d|hours?\s*of|compilation|best\s*of)\b/i;
 
 /**
  * Score YouTube hits for instrumental/type-beat suitability (spec-v0.2 §6.4).
@@ -41,8 +42,17 @@ export function filterAndScore(
     }
 
     if (NEG.test(title) && !BEAT_STRONG.test(title)) {
-      score -= 4;
-      reasons.push("教程/合集/live 向降权");
+      score -= 5;
+      reasons.push("教程/合集/mix/live 向降权");
+    } else if (NEG.test(title) && BEAT_STRONG.test(title)) {
+      score -= 1.5;
+      reasons.push("合集向但含 beat 信号，轻降权");
+    }
+
+    const pb = producerBoost(title, channel, intent);
+    if (pb.boost > 0) {
+      score += pb.boost;
+      reasons.push(`制作人先验命中 ${pb.hit}`);
     }
 
     // Intent overlap

@@ -52,6 +52,7 @@ export function ChatClient() {
   const [error, setError] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [lastStatus, setLastStatus] = useState<string | null>(null);
+  const [lastFailedText, setLastFailedText] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const refBootstrapped = useRef(false);
   const loadingRef = useRef(false);
@@ -122,6 +123,7 @@ export function ChatClient() {
 
       setInput("");
       setError(null);
+      setLastFailedText(null);
       setLoading(true);
       loadingRef.current = true;
       setMessages((prev) => [...prev, optimisticUser]);
@@ -165,13 +167,14 @@ export function ChatClient() {
       } catch (err) {
         const msg = err instanceof Error ? err.message : "网络错误";
         setError(msg);
+        setLastFailedText(displayText);
         setLastStatus("error");
         setMessages((prev) => [
           ...prev,
           {
             id: `err-${Date.now()}`,
             role: "assistant",
-            content: `出了点问题：${msg}。请稍后再试。`,
+            content: `出了点问题：${msg}。可点下方重试。`,
             created_at: new Date().toISOString(),
           },
         ]);
@@ -311,7 +314,21 @@ export function ChatClient() {
               {loadingHint}
             </p>
           )}
-          {error && <p className="text-xs text-red-400/90">{error}</p>}
+          {error && (
+            <div className="flex flex-wrap items-center gap-3 text-xs">
+              <p className="text-red-400/90">{error}</p>
+              {lastFailedText ? (
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => void sendMessage(lastFailedText)}
+                  className="rounded-lg border border-red-400/30 px-2.5 py-1 text-red-200/90 transition hover:bg-red-500/10"
+                >
+                  重试上一条
+                </button>
+              ) : null}
+            </div>
+          )}
           <div ref={bottomRef} />
         </div>
 

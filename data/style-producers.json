@@ -1,0 +1,36 @@
+{
+  "r&b": {
+    "labels": ["r&b", "rnb"],
+    "producers": [
+      { "name": "Chris Miles", "aliases": ["chris miles", "chrismiles"], "boost": 2 },
+      { "name": "Elijah Merritt", "aliases": ["elijah merritt"], "boost": 1.5 },
+      { "name": "Young Fall", "aliases": ["young fall"], "boost": 1.5 }
+    ]
+  },
+  "trap": {
+    "labels": ["trap"],
+    "producers": [
+      { "name": "MXRGX", "aliases": ["mxrgx"], "boost": 1.5 },
+      { "name": "Samurai Beats", "aliases": ["samurai"], "boost": 1.5 }
+    ]
+  },
+  "underground": {
+    "labels": ["underground", "udg"],
+    "producers": [
+      { "name": "Graves", "aliases": ["graves type beat"], "boost": 1.5 },
+      { "name": "Darko", "aliases": ["darko type beat"], "boost": 1.5 }
+    ]
+  },
+  "drill": {
+    "labels": ["drill"],
+    "producers": [
+      { "name": "AXL Beats", "aliases": ["axl beats", "axl"], "boost": 1.5 }
+    ]
+  },
+  "lofi": {
+    "labels": ["lofi", "lo-fi"],
+    "producers": [
+      { "name": "jinsang", "aliases": ["jinsang"], "boost": 1.5 }
+    ]
+  }
+}

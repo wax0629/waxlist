@@ -1,5 +1,6 @@
 import type { SearchIntent } from "@/lib/types";
 import { freeTextKeywords } from "./intent";
+import { producerQueries } from "./producers";
 
 const BEAT_SUFFIXES = ["type beat", "instrumental", "beat"] as const;
 
@@ -50,10 +51,18 @@ export function planQueries(intent: SearchIntent): string[] {
   if (intent.avoid?.includes("heavy 808")) softBits.push("soft 808");
 
   const topic = styleCore ?? "hip hop";
+  // Avoid duplicating freeKw when it equals style core (e.g. "trap soul")
+  const freeExtra =
+    freeKw &&
+    freeKw !== topic &&
+    !topic.includes(freeKw) &&
+    !freeKw.includes(topic)
+      ? freeKw
+      : null;
 
   // Angle 1: main topic + constraints
   const q1 = ensureBeatSuffix(
-    [tempoBits[0], topic, vocalBits[0], softBits[0], freeKw || null]
+    [tempoBits[0], topic, vocalBits[0], softBits[0], freeExtra]
       .filter(Boolean)
       .join(" "),
   );
@@ -92,15 +101,17 @@ export function planQueries(intent: SearchIntent): string[] {
     );
   }
 
-  // Angle 4: style expansion for underground etc.
+  // Angle 4: style expansion / producer prior (soft, 1 slot preferred)
   const expanded = expandStyleQueries(intent);
+  const prodQs = producerQueries(intent, topic);
   const q4 = ensureBeatSuffix(
-    expanded[0] ??
+    prodQs[0] ||
+      expanded[0] ||
       [topic, tempoBits[0] ?? "", "type beat"].filter(Boolean).join(" "),
   );
 
-  const raw = [q1, q2, q3, q4, ...expanded.slice(1)].map((q) =>
-    q.replace(/\s+/g, " ").trim().toLowerCase(),
+  const raw = [q1, q2, q3, q4, ...prodQs.slice(1), ...expanded.slice(0, 1)].map(
+    (q) => q.replace(/\s+/g, " ").trim().toLowerCase(),
   );
 
   const out: string[] = [];

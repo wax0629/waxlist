@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { appendTurn, runAgentTurn } from "@/lib/agent/orchestrator";
+import { logEvent } from "@/lib/logger";
+import { clientKeyFromRequest, rateLimit } from "@/lib/rate-limit";
 import { getOrCreateSession, saveSession } from "@/lib/session-store";
 
 export const runtime = "nodejs";
@@ -11,6 +13,23 @@ interface ChatBody {
 }
 
 export async function POST(req: Request) {
+  const ip = clientKeyFromRequest(req);
+  const rl = rateLimit({
+    key: `chat:${ip}`,
+    limit: Number(process.env.RATE_LIMIT_PER_MIN || 20),
+    windowMs: 60_000,
+  });
+  if (!rl.ok) {
+    logEvent("rate_limited", { ip }, "warn");
+    return NextResponse.json(
+      { error: "请求过于频繁，请稍后再试" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) },
+      },
+    );
+  }
+
   let body: ChatBody;
   try {
     body = (await req.json()) as ChatBody;
@@ -52,6 +71,7 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "服务错误";
+    logEvent("chat_error", { error: msg, ip }, "error");
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 }

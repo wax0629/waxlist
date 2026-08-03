@@ -1,4 +1,5 @@
 import { createId } from "@/lib/id";
+import { logEvent } from "@/lib/logger";
 import { MOCK_BEATS } from "@/lib/mock-beats";
 import type {
   BeatCandidate,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/youtube";
 import { extractUrl, mergeIntent, summarizeIntent } from "./intent";
 import { planQueries } from "./plan-queries";
+import { refineReasonsWithLlm } from "./rank-llm";
 import { filterAndScore, templateReason } from "./score";
 
 export interface RunTurnResult {
@@ -26,7 +28,21 @@ export interface RunTurnResult {
   intent: SearchIntent;
   intent_summary: string;
   queries_used: string[];
-  debug?: { recall_count: number; after_filter_count: number };
+  debug?: {
+    recall_count: number;
+    after_filter_count: number;
+    duration_ms: number;
+    llm_reason: boolean;
+  };
+}
+
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
 }
 
 async function enrichReference(
@@ -37,7 +53,7 @@ async function enrichReference(
   if (!url) return intent;
 
   if (!/youtube\.com|youtu\.be/i.test(url)) {
-    warnings.push("非 YouTube 链接已作补充描述（v0.2 仅深解析 YouTube）。");
+    warnings.push("非 YouTube 链接已作补充描述（仅深解析 YouTube）。");
     return intent;
   }
   if (!hasYouTubeKey()) {
@@ -61,7 +77,7 @@ async function enrichReference(
       ...intent,
       reference: {
         url,
-        title: sn.title,
+        title: decodeEntities(sn.title),
         hints: [
           sn.title,
           ...sn.description
@@ -104,7 +120,7 @@ function scoredToCandidates(
 ): BeatCandidate[] {
   return scored.slice(0, limit).map((h) => ({
     id: `yt:${h.videoId}`,
-    title: h.title,
+    title: decodeEntities(h.title),
     source: "youtube" as const,
     url: `https://www.youtube.com/watch?v=${h.videoId}`,
     reason: templateReason(h, intent),
@@ -116,14 +132,12 @@ function scoredToCandidates(
   }));
 }
 
-/**
- * v0.2 fixed pipeline: Intent → QueryPlan → multi-search → score → shortlist.
- */
 export async function runPipelineTurn(
   session: Session,
   message: string,
   refUrl?: string,
 ): Promise<RunTurnResult> {
+  const t0 = Date.now();
   const warnings: string[] = [];
   const url = refUrl || extractUrl(message);
   let intent = mergeIntent(session.constraints ?? {}, message, url);
@@ -133,9 +147,39 @@ export async function runPipelineTurn(
   const intent_summary = summarizeIntent(intent);
   const refineCount = session.messages.filter((m) => m.role === "user").length;
 
+  const finish = (
+    partial: Omit<RunTurnResult, "debug"> & {
+      debug?: RunTurnResult["debug"];
+    },
+    extra?: { recall?: number; filtered?: number; llm?: boolean },
+  ): RunTurnResult => {
+    const duration_ms = Date.now() - t0;
+    logEvent("pipeline_turn", {
+      session_id: session.id,
+      status: partial.status,
+      duration_ms,
+      styles: intent.style,
+      queries: queries_used,
+      recall: extra?.recall ?? 0,
+      filtered: extra?.filtered ?? 0,
+      llm_reason: extra?.llm ?? false,
+      candidate_n: partial.candidates.length,
+      warnings: partial.warnings,
+    });
+    return {
+      ...partial,
+      debug: {
+        recall_count: extra?.recall ?? 0,
+        after_filter_count: extra?.filtered ?? 0,
+        duration_ms,
+        llm_reason: extra?.llm ?? false,
+      },
+    };
+  };
+
   if (!hasYouTubeKey()) {
     warnings.push("未配置 YOUTUBE_API_KEY，使用 mock 短名单。");
-    return {
+    return finish({
       assistant_message: composeAssistant({
         mode: "mock",
         intent_summary,
@@ -148,8 +192,7 @@ export async function runPipelineTurn(
       intent,
       intent_summary,
       queries_used,
-      debug: { recall_count: 0, after_filter_count: 0 },
-    };
+    });
   }
 
   try {
@@ -159,7 +202,6 @@ export async function runPipelineTurn(
       allHits.push(...hits);
     }
 
-    // dedupe by videoId keeping first
     const seen = new Set<string>();
     const unique: YtSearchHit[] = [];
     for (const h of allHits) {
@@ -169,7 +211,6 @@ export async function runPipelineTurn(
     }
 
     let scored = filterAndScore(unique, intent);
-    // If filter emptied, fall back to unscored order
     if (scored.length === 0 && unique.length > 0) {
       warnings.push("过滤过严，已放宽为原始召回排序。");
       scored = unique.map((h) => ({
@@ -179,49 +220,62 @@ export async function runPipelineTurn(
       }));
     }
 
-    const candidates = scoredToCandidates(scored, intent, 5);
+    let candidates = scoredToCandidates(scored, intent, 5);
     if (candidates.length === 0) {
       warnings.push("YouTube 无可用结果，回退 mock。");
-      return {
+      return finish(
+        {
+          assistant_message: composeAssistant({
+            mode: "mock",
+            intent_summary,
+            refineCount,
+          }),
+          candidates: mockCandidates(intent, refineCount),
+          status: "degraded",
+          warnings,
+          constraints: intent,
+          intent,
+          intent_summary,
+          queries_used,
+        },
+        { recall: unique.length, filtered: 0 },
+      );
+    }
+
+    const ranked = await refineReasonsWithLlm(
+      candidates,
+      intent,
+      intent_summary,
+    );
+    candidates = ranked.candidates;
+    if (ranked.warning) warnings.push(ranked.warning);
+
+    return finish(
+      {
         assistant_message: composeAssistant({
-          mode: "mock",
+          mode: "youtube",
           intent_summary,
           refineCount,
+          hasRef: Boolean(intent.reference?.title || intent.reference?.url),
         }),
-        candidates: mockCandidates(intent, refineCount),
-        status: "degraded",
+        candidates,
+        status: warnings.length ? "degraded" : "ok",
         warnings,
         constraints: intent,
         intent,
         intent_summary,
         queries_used,
-        debug: { recall_count: unique.length, after_filter_count: 0 },
-      };
-    }
-
-    return {
-      assistant_message: composeAssistant({
-        mode: "youtube",
-        intent_summary,
-        refineCount,
-        hasRef: Boolean(intent.reference?.title || intent.reference?.url),
-      }),
-      candidates,
-      status: warnings.length ? "degraded" : "ok",
-      warnings,
-      constraints: intent,
-      intent,
-      intent_summary,
-      queries_used,
-      debug: {
-        recall_count: unique.length,
-        after_filter_count: scored.length,
       },
-    };
+      {
+        recall: unique.length,
+        filtered: scored.length,
+        llm: ranked.usedLlm,
+      },
+    );
   } catch (err) {
     const msg = err instanceof Error ? err.message : "YouTube 失败";
     warnings.push(`检索降级：${msg}`);
-    return {
+    return finish({
       assistant_message: composeAssistant({
         mode: "mock",
         intent_summary,
@@ -234,8 +288,7 @@ export async function runPipelineTurn(
       intent,
       intent_summary,
       queries_used,
-      debug: { recall_count: 0, after_filter_count: 0 },
-    };
+    });
   }
 }
 

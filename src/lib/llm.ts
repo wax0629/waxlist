@@ -47,6 +47,42 @@ export interface LlmChatResult {
   finish_reason?: string;
 }
 
+/** Plain chat completion (no tools) — for rank/reason. */
+export async function chatText(opts: {
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
+  temperature?: number;
+  max_tokens?: number;
+}): Promise<string> {
+  const { apiKey, baseURL, model } = llmConfig();
+  if (!apiKey) {
+    throw new Error("未配置 XAI_API_KEY / OPENAI_API_KEY");
+  }
+
+  const res = await fetch(`${baseURL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: opts.messages,
+      temperature: opts.temperature ?? 0.3,
+      max_tokens: opts.max_tokens ?? 800,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`LLM error (${res.status}): ${text.slice(0, 400)}`);
+  }
+
+  const data = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  return data.choices?.[0]?.message?.content?.trim() ?? "";
+}
+
 export async function chatWithTools(opts: {
   messages: LlmMessage[];
   tools: LlmToolDef[];

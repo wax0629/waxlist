@@ -20,11 +20,17 @@ export function SiteHeader() {
         </Link>
         <span
           className="cursor-not-allowed rounded-lg px-3 py-1.5 text-zinc-500"
-          title="二期"
+          title="后置认真建设，不在当前 Beta"
         >
           地下精选
-          <span className="ml-1 text-[10px] text-zinc-600">即将推出</span>
+          <span className="ml-1 text-[10px] text-zinc-600">稍后</span>
         </span>
+        <Link
+          href="/about"
+          className="rounded-lg px-3 py-1.5 text-zinc-400 transition hover:text-zinc-200"
+        >
+          关于
+        </Link>
       </nav>
     </header>
   );
