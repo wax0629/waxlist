@@ -255,8 +255,8 @@ export function ChatClient() {
       <AppRail onNewChat={newChat} showNewChat={!isFresh} />
 
       <div className="flex min-w-0 flex-1 flex-col lg:flex-row">
-        {/* CENTER: AI chat — larger share of width */}
-        <section className="glass flex min-h-0 min-w-0 flex-1 flex-col rounded-none border-y-0 border-l-0 lg:min-w-0 lg:flex-[1.55]">
+        {/* CENTER: AI chat — ~60% width */}
+        <section className="glass flex min-h-0 min-w-0 flex-1 flex-col rounded-none border-y-0 border-l-0 lg:min-w-0 lg:flex-[3]">
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
             <div>
               <p className="font-display text-[14px] font-semibold text-white">
@@ -436,8 +436,8 @@ export function ChatClient() {
           </form>
         </section>
 
-        {/* RIGHT: results — two-up card grid */}
-        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:w-[min(42vw,520px)] lg:max-w-[520px] lg:flex-none xl:w-[min(40vw,560px)] xl:max-w-[560px]">
+        {/* RIGHT: results — ~40% width, two-up card grid */}
+        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:flex-[2]">
           <div className="relative flex items-end justify-between gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3.5 backdrop-blur-xl">
             <div>
               <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
