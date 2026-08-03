@@ -70,6 +70,15 @@
 
 > 把后续想法直接贴在下面，不必排好序。
 
+### 地下发行页视觉参考（Collect UI）
+- **状态：** inbox（视觉方向已定，功能后置）  
+- **大概版本：** Phase 3（地下精选认真做时）  
+- **一句话：** `/explore` 视觉与交互气质参考 Collect UI 该条 inspiration。  
+- **链接：** https://collectui.com/designs/ui-interaction-ui-design-inspiration/486780dd-83d9-4845-82d9-617599a4c2fa  
+- **为什么：** 用户明确「地下发行页可以做成这样」；与 Agent 页分离、可认真打磨。  
+- **备注：** 详见 [design-refs-explore.md](./design-refs-explore.md)；不进 Phase 1；学层次/交互勿像素抄。  
+- **日期：** 2026-08-03  
+
 ### 风格域顶尖制作人优先检索 / 加权
 - **状态：** candidate（挂在搜索机制扩展）  
 - **大概版本：** v0.2 切片末 或 v0.2.1  

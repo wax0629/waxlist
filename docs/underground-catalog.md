@@ -1,8 +1,10 @@
 # 地下精选模块（中文地下优质发行）
 
 > 所属产品：Beat Hunter  
-> 状态：二期构想（**不进入 v0.1 必做**）  
+> 状态：后置认真建设（**不进入 Phase 1 Agent Beta**）  
 > 形态：与「找伴奏」同站、**独立页面**，非 Agent 主对话技能  
+> **视觉参考：** [design-refs-explore.md](./design-refs-explore.md)  
+>  Collect UI：https://collectui.com/designs/ui-interaction-ui-design-inspiration/486780dd-83d9-4845-82d9-617599a4c2fa
 
 ---
 
