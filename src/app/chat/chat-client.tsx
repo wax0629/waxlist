@@ -251,37 +251,26 @@ export function ChatClient() {
 
   return (
     <div className="flex min-h-dvh flex-1 text-[var(--cream)]">
-      {/* Travel-dashboard style: icon rail + chat + discovery */}
       <AppRail onNewChat={newChat} showNewChat={!isFresh} />
 
-      <div className="flex min-w-0 flex-1 flex-col lg:flex-row">
-        {/* CENTER: AI chat — ~60% width */}
-        <section className="glass flex min-h-0 min-w-0 flex-1 flex-col rounded-none border-y-0 border-l-0 lg:min-w-0 lg:flex-[3]">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
-            <div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-3.5 md:px-5 md:pb-5 md:pt-4">
+        {/* Top nav — outside liquid glass panes */}
+        <header className="mb-3 flex shrink-0 items-center justify-between gap-3 px-0.5 sm:mb-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="md:hidden">
               <p className="font-display text-[14px] font-semibold text-white">
                 Beat Hunter
               </p>
               <p className="text-[10px] text-white/40">找伴奏 · Beta</p>
             </div>
-            {!isFresh ? (
-              <button
-                type="button"
-                onClick={newChat}
-                className="rounded-full px-3 py-1.5 text-[12px] text-white/50"
-              >
-                新会话
-              </button>
-            ) : null}
-          </div>
-
-          <div className="hidden items-center justify-between border-b border-white/[0.06] px-5 py-3.5 md:flex">
-            <div className="touri-pills">
+            <div className="touri-pills max-md:hidden">
               <span className="touri-pill touri-pill-active">✨ AI Chat</span>
               <span className="touri-pill cursor-not-allowed opacity-50">
                 🎵 精选
               </span>
             </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             {lastStatus ? (
               <span
                 className={
@@ -299,8 +288,22 @@ export function ChatClient() {
                     : "错误"}
               </span>
             ) : null}
+            {!isFresh ? (
+              <button
+                type="button"
+                onClick={newChat}
+                className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[12px] text-white/70 transition hover:bg-white/10 hover:text-white"
+              >
+                新会话
+              </button>
+            ) : null}
           </div>
+        </header>
 
+        {/* Two liquid-glass panes under nav — ~6:4 */}
+        <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
+          {/* LEFT: chat glass card */}
+          <section className="liquid-glass flex min-h-0 min-w-0 flex-1 flex-col lg:flex-[3]">
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
             {restoring && <p className="text-xs text-white/40">恢复会话…</p>}
 
@@ -382,9 +385,8 @@ export function ChatClient() {
 
           <form
             onSubmit={onSend}
-            className="border-t border-white/10 bg-black/20 p-3 backdrop-blur-2xl sm:p-4"
+            className="border-t border-white/[0.08] bg-black/10 p-3 sm:p-4"
           >
-            {/* Touri gradient-border input shell */}
             <div className="touri-input-shell">
               <div className="touri-input-inner flex items-end gap-2 px-3 py-2.5 sm:px-4">
                 <textarea
@@ -434,77 +436,81 @@ export function ChatClient() {
               试听参考 · 商用以源站为准
             </p>
           </form>
-        </section>
+          </section>
 
-        {/* RIGHT: results — ~40% width, two-up card grid */}
-        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:flex-[2]">
-          <div className="relative flex items-end justify-between gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3.5 backdrop-blur-xl">
-            <div>
-              <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
-                Discover
-              </p>
-              <h2 className="mt-0.5 font-display text-[1.1rem] font-semibold tracking-tight text-white">
-                伴奏发现
-              </h2>
+          {/* RIGHT: discover glass card — ~40% */}
+          <aside className="liquid-glass hidden min-h-0 min-w-0 flex-col lg:flex lg:flex-[2]">
+            <div className="flex items-end justify-between gap-3 border-b border-white/[0.08] px-4 py-3.5">
+              <div>
+                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
+                  Discover
+                </p>
+                <h2 className="mt-0.5 font-display text-[1.1rem] font-semibold tracking-tight text-white">
+                  伴奏发现
+                </h2>
+              </div>
+              {latestShortlist ? (
+                <span className="glass mb-0.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-medium text-[#ff8fb3]">
+                  {latestShortlist.candidates.length} picks
+                </span>
+              ) : null}
             </div>
-            {latestShortlist ? (
-              <span className="glass mb-0.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-medium text-[#ff8fb3]">
-                {latestShortlist.candidates.length} picks
-              </span>
-            ) : null}
-          </div>
 
-          <div className="relative min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
-            {loading && !latestShortlist ? (
-              <ResultSkeleton label={loadingHint} />
-            ) : latestShortlist ? (
-              <div className="space-y-4">
-                {latestShortlist.intent_summary ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="glass rounded-full px-3 py-1.5 text-[11px] text-white/70">
-                      {latestShortlist.intent_summary}
-                    </span>
+            <div className="min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
+              {loading && !latestShortlist ? (
+                <ResultSkeleton label={loadingHint} />
+              ) : latestShortlist ? (
+                <div className="space-y-4">
+                  {latestShortlist.intent_summary ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="glass rounded-full px-3 py-1.5 text-[11px] text-white/70">
+                        {latestShortlist.intent_summary}
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {latestShortlist.candidates.map((b, i) => (
+                      <BeatCard key={b.id} beat={b} index={i} />
+                    ))}
                   </div>
-                ) : null}
 
-                <div className="grid grid-cols-2 gap-3">
-                  {latestShortlist.candidates.map((b, i) => (
-                    <BeatCard key={b.id} beat={b} index={i} />
-                  ))}
+                  {latestShortlist.queries_used?.length ? (
+                    <div className="pt-1">
+                      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
+                        Search strategy
+                      </p>
+                      <ul className="flex flex-wrap gap-1.5">
+                        {latestShortlist.queries_used.map((q) => (
+                          <li
+                            key={q}
+                            className="glass rounded-full px-2.5 py-1 font-mono text-[10px] text-white/60"
+                            title={q}
+                          >
+                            {q}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
-
-                {latestShortlist.queries_used?.length ? (
-                  <div className="pt-1">
-                    <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
-                      Search strategy
-                    </p>
-                    <ul className="flex flex-wrap gap-1.5">
-                      {latestShortlist.queries_used.map((q) => (
-                        <li
-                          key={q}
-                          className="glass rounded-full px-2.5 py-1 font-mono text-[10px] text-white/60"
-                          title={q}
-                        >
-                          {q}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <div className="glass-panel flex h-full min-h-[280px] flex-col items-center justify-center rounded-2xl px-6 text-center">
-                <div className="touri-sphere mb-4 scale-90 opacity-90" aria-hidden />
-                <p className="font-display text-[1rem] font-semibold text-white/90">
-                  等待短名单
-                </p>
-                <p className="mt-2 max-w-[14rem] text-[12px] leading-relaxed text-white/45">
-                  左侧描述需求后，这里会列出统一样式的可试听结果。
-                </p>
-              </div>
-            )}
-          </div>
-        </aside>
+              ) : (
+                <div className="flex h-full min-h-[280px] flex-col items-center justify-center px-6 text-center">
+                  <div
+                    className="touri-sphere mb-4 scale-90 opacity-90"
+                    aria-hidden
+                  />
+                  <p className="font-display text-[1rem] font-semibold text-white/90">
+                    等待短名单
+                  </p>
+                  <p className="mt-2 max-w-[14rem] text-[12px] leading-relaxed text-white/45">
+                    左侧描述需求后，这里会列出统一样式的可试听结果。
+                  </p>
+                </div>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

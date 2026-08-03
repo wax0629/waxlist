@@ -313,7 +313,51 @@ body {
   }
 }
 
-/* ——— Touri glass — more translucent so aurora shows through ——— */
+/* ——— Liquid glass pane (chat / discover cards) ——— */
+.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.03) 42%,
+      rgba(20, 20, 20, 0.18) 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(28px) saturate(165%);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  box-shadow:
+    0 28px 64px -20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -20px 40px rgba(0, 0, 0, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 28%
+  );
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.liquid-glass > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ——— Touri glass chips / nested surfaces ——— */
 .glass,
 .glass-strong,
 .glass-panel {

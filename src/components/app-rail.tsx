@@ -14,7 +14,7 @@ export function AppRail({
   const onChat = path === "/chat" || path === "/";
 
   return (
-    <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-white/[0.06] bg-black/25 py-4 backdrop-blur-xl md:flex">
+    <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-white/[0.05] bg-transparent py-4 md:flex">
       <Link
         href="/chat"
         className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-[13px] font-bold tracking-tight text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)]"
