@@ -25,7 +25,7 @@ export function BeatCard({
         delay: Math.min(index, 6) * 0.04,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group relative flex min-h-[200px] flex-col overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/22 hover:bg-white/[0.07]"
+      className="group relative flex min-h-[168px] flex-col overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/22 hover:bg-white/[0.07] sm:min-h-[180px]"
     >
       <div className="absolute inset-0">
         {beat.thumbnail ? (
@@ -51,11 +51,11 @@ export function BeatCard({
         </span>
       </div>
 
-      <div className="relative z-10 mt-auto space-y-1 p-3.5 pt-12">
+      <div className="relative z-10 mt-auto space-y-1 p-3 pt-10">
         <p className="truncate text-[10px] font-medium tracking-wide text-white/55">
           {beat.channel_title || "未知频道"}
         </p>
-        <h3 className="line-clamp-2 font-display text-[14px] font-semibold leading-snug tracking-tight text-white">
+        <h3 className="line-clamp-2 font-display text-[13px] font-semibold leading-snug tracking-tight text-white">
           {beat.title}
         </h3>
         <p className="line-clamp-2 text-[11px] leading-relaxed text-white/65">

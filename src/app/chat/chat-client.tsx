@@ -436,8 +436,8 @@ export function ChatClient() {
           </form>
         </section>
 
-        {/* RIGHT: results — narrower share, unified cards */}
-        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:w-[min(36vw,400px)] lg:max-w-[400px] lg:flex-none xl:w-[min(34vw,420px)] xl:max-w-[420px]">
+        {/* RIGHT: results — two-up card grid */}
+        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:w-[min(42vw,520px)] lg:max-w-[520px] lg:flex-none xl:w-[min(40vw,560px)] xl:max-w-[560px]">
           <div className="relative flex items-end justify-between gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3.5 backdrop-blur-xl">
             <div>
               <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
@@ -467,8 +467,7 @@ export function ChatClient() {
                   </div>
                 ) : null}
 
-                {/* Single-column unified cards in the slim results pane */}
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {latestShortlist.candidates.map((b, i) => (
                     <BeatCard key={b.id} beat={b} index={i} />
                   ))}
