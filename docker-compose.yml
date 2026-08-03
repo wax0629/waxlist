@@ -1,0 +1,19 @@
+# Local Postgres for community features (P1).
+# Usage: docker compose up -d
+# Connection: postgresql://beathunter:beathunter@localhost:5432/beathunter
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: beathunter
+      POSTGRES_PASSWORD: beathunter
+      POSTGRES_DB: beathunter
+    volumes:
+      - bh_pg_data:/var/lib/postgresql/data
+
+volumes:
+  bh_pg_data:

@@ -15,7 +15,12 @@ Beat Hunter 帮助**歌手 / 说唱人**用自然语言或参考曲链接，快�
 ```bash
 npm install
 cp .env.example .env.local
-# 编辑 .env.local，填入密钥
+# 编辑 .env.local：AUTH_SECRET、DATABASE_URL、以及可选 YouTube/LLM 密钥
+
+# 社区功能需要本机 Postgres
+npm run db:up
+npm run db:push
+
 npm run dev
 ```
 

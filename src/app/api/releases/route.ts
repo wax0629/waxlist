@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { canModerate } from "@/lib/auth/roles";
+import { parseNeteaseUrl } from "@/lib/netease/parse";
 import { createRelease, listReleases } from "@/lib/releases/store";
 import type { ReleaseSource, ReleaseStatus } from "@/lib/releases/types";
 import { z } from "zod";
 
 export const runtime = "nodejs";
 
-/** Public: list published. Staff can pass status=pending|all */
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const statusParam = url.searchParams.get("status");
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
         : "pending";
   }
 
-  const items = listReleases({
+  const items = await listReleases({
     status,
     source: source || undefined,
   });
@@ -38,8 +38,8 @@ const CreateBody = z.object({
   artists: z.array(z.string()).min(1),
   type: z.enum(["single", "ep", "album", "other"]).optional(),
   netease_id: z.string().optional(),
-  netease_url: z.string().url().optional(),
-  cover_url: z.string().url().optional(),
+  netease_url: z.string().optional(),
+  cover_url: z.string().optional(),
   tags: z.array(z.string()).optional(),
   description: z.string().optional(),
   curatorial_note: z.string().optional(),
@@ -48,7 +48,6 @@ const CreateBody = z.object({
   sort_order: z.number().optional(),
 });
 
-/** Create release — owner/admin for owner source; logged-in user for community pending */
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -72,10 +71,33 @@ export async function POST(req: Request) {
       status = status ?? "published";
     }
 
-    const release = createRelease({
-      ...body,
-      created_by: session.user.id,
+    let netease_id = body.netease_id?.trim() || undefined;
+    let netease_url = body.netease_url?.trim() || undefined;
+    if (netease_url) {
+      const parsed = parseNeteaseUrl(netease_url);
+      if (parsed.id && !netease_id) netease_id = parsed.id;
+      if (parsed.kind === "song" && !body.type) {
+        body.type = "single";
+      }
+    }
+
+    const release = await createRelease({
+      title: body.title,
+      artists: body.artists,
+      type: body.type,
+      netease_id,
+      netease_url,
+      cover_url: body.cover_url?.trim() || undefined,
+      tags: body.tags,
+      description: body.description,
+      curatorial_note: body.curatorial_note,
+      source: body.source,
       status,
+      sort_order: body.sort_order,
+      created_by: session.user.id,
+      links: netease_url
+        ? [{ label: "网易云", url: netease_url }]
+        : [],
     });
     return NextResponse.json({ release }, { status: 201 });
   } catch (err) {

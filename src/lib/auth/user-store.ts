@@ -1,19 +1,12 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "fs";
-import path from "path";
 import bcrypt from "bcryptjs";
 import { createId } from "@/lib/id";
+import { prisma } from "@/lib/db";
 import type { UserRole } from "./roles";
 
 export interface StoredUser {
   id: string;
   email: string;
   name: string;
-  /** bcrypt hash */
   password_hash: string;
   role: UserRole;
   created_at: string;
@@ -22,53 +15,24 @@ export interface StoredUser {
 
 export type PublicUser = Omit<StoredUser, "password_hash">;
 
-const globalForUsers = globalThis as unknown as {
-  __beatHunterUsers?: Map<string, StoredUser>;
-  __beatHunterUsersLoaded?: boolean;
-};
-
-function dataDir(): string {
-  return path.join(process.cwd(), ".data", "auth");
-}
-
-function usersFile(): string {
-  return path.join(dataDir(), "users.json");
-}
-
-function ensureDir() {
-  const dir = dataDir();
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-}
-
-function getMap(): Map<string, StoredUser> {
-  if (!globalForUsers.__beatHunterUsers) {
-    globalForUsers.__beatHunterUsers = new Map();
-  }
-  return globalForUsers.__beatHunterUsers;
-}
-
-function loadAll(): void {
-  if (globalForUsers.__beatHunterUsersLoaded) return;
-  globalForUsers.__beatHunterUsersLoaded = true;
-  const map = getMap();
-  try {
-    const fp = usersFile();
-    if (!existsSync(fp)) return;
-    const list = JSON.parse(readFileSync(fp, "utf8")) as StoredUser[];
-    for (const u of list) map.set(u.id, u);
-  } catch (err) {
-    console.error("user store load failed", err);
-  }
-}
-
-function persist(): void {
-  try {
-    ensureDir();
-    const list = [...getMap().values()];
-    writeFileSync(usersFile(), JSON.stringify(list, null, 2), "utf8");
-  } catch (err) {
-    console.error("user store save failed", err);
-  }
+function toStored(u: {
+  id: string;
+  email: string;
+  name: string;
+  passwordHash: string;
+  role: string;
+  createdAt: Date;
+  updatedAt: Date;
+}): StoredUser {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    password_hash: u.passwordHash,
+    role: u.role as UserRole,
+    created_at: u.createdAt.toISOString(),
+    updated_at: u.updatedAt.toISOString(),
+  };
 }
 
 function toPublic(u: StoredUser): PublicUser {
@@ -76,25 +40,29 @@ function toPublic(u: StoredUser): PublicUser {
   return rest;
 }
 
-export function listUsers(): PublicUser[] {
-  loadAll();
-  return [...getMap().values()].map(toPublic);
+export async function listUsers(): Promise<PublicUser[]> {
+  const rows = await prisma.user.findMany({ orderBy: { createdAt: "asc" } });
+  return rows.map((u) => toPublic(toStored(u)));
 }
 
-export function findUserByEmail(email: string): StoredUser | undefined {
-  loadAll();
-  const key = email.trim().toLowerCase();
-  return [...getMap().values()].find((u) => u.email === key);
+export async function findUserByEmail(
+  email: string,
+): Promise<StoredUser | undefined> {
+  const row = await prisma.user.findUnique({
+    where: { email: email.trim().toLowerCase() },
+  });
+  return row ? toStored(row) : undefined;
 }
 
-export function findUserById(id: string): StoredUser | undefined {
-  loadAll();
-  return getMap().get(id);
+export async function findUserById(
+  id: string,
+): Promise<StoredUser | undefined> {
+  const row = await prisma.user.findUnique({ where: { id } });
+  return row ? toStored(row) : undefined;
 }
 
-export function countUsers(): number {
-  loadAll();
-  return getMap().size;
+export async function countUsers(): Promise<number> {
+  return prisma.user.count();
 }
 
 function ownerEmails(): Set<string> {
@@ -107,9 +75,8 @@ function ownerEmails(): Set<string> {
   );
 }
 
-/** First user ever → owner; or email listed in OWNER_EMAILS → owner; else user */
-function resolveSignupRole(email: string): UserRole {
-  if (countUsers() === 0) return "owner";
+async function resolveSignupRole(email: string): Promise<UserRole> {
+  if ((await countUsers()) === 0) return "owner";
   if (ownerEmails().has(email.trim().toLowerCase())) return "owner";
   return "user";
 }
@@ -120,63 +87,57 @@ export async function createUser(opts: {
   password: string;
   role?: UserRole;
 }): Promise<PublicUser> {
-  loadAll();
   const email = opts.email.trim().toLowerCase();
   if (!email || !opts.password) {
     throw new Error("邮箱与密码必填");
   }
-  if (findUserByEmail(email)) {
+  if (await findUserByEmail(email)) {
     throw new Error("该邮箱已注册");
   }
   if (opts.password.length < 8) {
     throw new Error("密码至少 8 位");
   }
 
-  const now = new Date().toISOString();
-  const user: StoredUser = {
-    id: createId("usr_"),
-    email,
-    name: opts.name.trim() || email.split("@")[0] || "user",
-    password_hash: await bcrypt.hash(opts.password, 10),
-    role: opts.role ?? resolveSignupRole(email),
-    created_at: now,
-    updated_at: now,
-  };
-  getMap().set(user.id, user);
-  persist();
-  return toPublic(user);
+  const role = opts.role ?? (await resolveSignupRole(email));
+  const row = await prisma.user.create({
+    data: {
+      id: createId("usr_"),
+      email,
+      name: opts.name.trim() || email.split("@")[0] || "user",
+      passwordHash: await bcrypt.hash(opts.password, 10),
+      role,
+    },
+  });
+  return toPublic(toStored(row));
 }
 
 export async function verifyPassword(
   email: string,
   password: string,
 ): Promise<PublicUser | null> {
-  const user = findUserByEmail(email);
+  const user = await findUserByEmail(email);
   if (!user) return null;
   const ok = await bcrypt.compare(password, user.password_hash);
   if (!ok) return null;
   return toPublic(user);
 }
 
-export function setUserRole(
+export async function setUserRole(
   userId: string,
   role: UserRole,
   actorRole: UserRole,
-): PublicUser {
-  loadAll();
+): Promise<PublicUser> {
   if (actorRole !== "owner") {
     throw new Error("仅站主可改角色");
   }
-  if (role === "owner" && actorRole !== "owner") {
-    throw new Error("不可提升为站主");
-  }
-  const user = getMap().get(userId);
+  const user = await findUserById(userId);
   if (!user) throw new Error("用户不存在");
   if (user.role === "owner" && role !== "owner") {
     throw new Error("不能降级站主（请先指定新站主）");
   }
-  user.role = role;
-  user.updated_at = new Date().toISOString();
-  persist();
-  return toPublic(user);
+  const row = await prisma.user.update({
+    where: { id: userId },
+    data: { role },
+  });
+  return toPublic(toStored(row));
 }

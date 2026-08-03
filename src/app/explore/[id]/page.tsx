@@ -9,7 +9,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ReleaseDetailPage({ params }: Props) {
   const { id } = await params;
-  const release = getRelease(id);
+  const release = await getRelease(id);
   if (!release || release.status !== "published") notFound();
 
   const netease =
@@ -74,11 +74,6 @@ export default async function ReleaseDetailPage({ params }: Props) {
                 {release.curatorial_note}
               </p>
             ) : null}
-            {release.description ? (
-              <p className="mt-3 text-sm leading-relaxed text-white/50">
-                {release.description}
-              </p>
-            ) : null}
 
             <div className="mt-6 flex flex-wrap gap-2">
               {netease ? (
@@ -102,16 +97,18 @@ export default async function ReleaseDetailPage({ params }: Props) {
                   {l.label}
                 </a>
               ))}
-              <Link
-                href={`/chat?ref_url=${encodeURIComponent(netease || "")}`}
-                className="touri-grad rounded-full px-4 py-2 text-sm font-medium text-white"
-              >
-                当参考找伴奏
-              </Link>
+              {netease ? (
+                <Link
+                  href={`/chat?ref_url=${encodeURIComponent(netease)}`}
+                  className="touri-grad rounded-full px-4 py-2 text-sm font-medium text-white"
+                >
+                  当参考找伴奏
+                </Link>
+              ) : null}
             </div>
 
             <p className="mt-8 text-xs text-white/35">
-              评分与用户推荐理由将在账号与审核能力上线后开放。外链内容版权归原平台与权利人。
+              评分 / 用户再推将陆续开放。外链版权归原平台与权利人。
             </p>
           </div>
         </div>

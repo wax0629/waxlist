@@ -1,0 +1,57 @@
+// Beat Hunter — Postgres schema (local via docker compose)
+// Roles: owner | admin | user
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  /// owner | admin | user
+  role         String   @default("user")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  releases     Release[] @relation("ReleaseCreator")
+
+  @@map("users")
+}
+
+model Release {
+  id              String   @id
+  title           String
+  artists         String[]
+  /// single | ep | album | other
+  type            String   @default("album")
+  neteaseId       String?  @map("netease_id")
+  neteaseUrl      String?  @map("netease_url")
+  coverUrl        String?  @map("cover_url")
+  tags            String[] @default([])
+  description     String?
+  curatorialNote  String?  @map("curatorial_note")
+  /// owner | community
+  source          String
+  /// draft | pending | published | rejected
+  status          String   @default("draft")
+  /// [{ label, url }]
+  links           Json     @default("[]")
+  sortOrder       Int?     @map("sort_order")
+  createdById     String?  @map("created_by")
+  createdBy       User?    @relation("ReleaseCreator", fields: [createdById], references: [id])
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  ratingAvg       Float?   @map("rating_avg")
+  ratingCount     Int      @default(0) @map("rating_count")
+
+  @@unique([neteaseId])
+  @@index([status, source])
+  @@map("releases")
+}

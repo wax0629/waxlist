@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { AppRail } from "@/components/app-rail";
+import { auth } from "@/lib/auth";
 import { listReleases } from "@/lib/releases/store";
+import type { Release } from "@/lib/releases/types";
 
 export const dynamic = "force-dynamic";
 
-export default function ExplorePage() {
-  const items = listReleases({ status: "published" });
+export default async function ExplorePage() {
+  const session = await auth();
+  const isOwner = session?.user?.role === "owner";
+  const items = await listReleases({ status: "published" });
   const owner = items.filter((r) => r.source === "owner");
   const community = items.filter((r) => r.source === "community");
 
@@ -22,37 +26,52 @@ export default function ExplorePage() {
               地下精选
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/50">
-              中文地下发行策展与社区推荐（一期：网易云外链）。可逛、可后续打分；找伴奏仍在对话页。
+              站主爱听与社区推荐（一期网易云外链）。未登录可逛；推荐与打分需登录。
             </p>
           </div>
-          <div className="flex gap-2 text-sm">
-            <Link
-              href="/login"
-              className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 hover:border-white/30 hover:text-white"
-            >
-              登录
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 hover:border-white/30 hover:text-white"
-            >
-              注册
-            </Link>
+          <div className="flex flex-wrap gap-2 text-sm">
+            {isOwner ? (
+              <Link
+                href="/owner/releases"
+                className="touri-grad rounded-full px-3 py-1.5 font-medium text-white"
+              >
+                站主爱听管理
+              </Link>
+            ) : null}
+            {session?.user ? (
+              <span className="rounded-full border border-white/15 px-3 py-1.5 text-white/60">
+                {session.user.name || session.user.email}
+                {session.user.role === "owner"
+                  ? " · 站主"
+                  : session.user.role === "admin"
+                    ? " · 管理"
+                    : ""}
+              </span>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 hover:border-white/30 hover:text-white"
+                >
+                  登录
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-full border border-white/15 px-3 py-1.5 text-white/70 hover:border-white/30 hover:text-white"
+                >
+                  注册
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
-        <Section title="站主爱听" items={owner} empty="站主还没放上爱听，稍后再来。" />
+        <Section title="站主爱听" items={owner} empty="站主还没放上爱听。" />
         <Section
           title="社区推荐"
           items={community}
           empty="还没有通过审核的社区推荐。"
         />
-        {items.length === 0 ? (
-          <p className="mt-10 text-center text-sm text-white/40">
-            暂无已发布发行。站主可登录后通过 API 写入，或替换{" "}
-            <code className="text-white/55">data/releases.seed.json</code>。
-          </p>
-        ) : null}
       </main>
     </div>
   );
@@ -64,7 +83,7 @@ function Section({
   empty,
 }: {
   title: string;
-  items: ReturnType<typeof listReleases>;
+  items: Release[];
   empty: string;
 }) {
   return (
@@ -78,7 +97,7 @@ function Section({
             <li key={r.id}>
               <Link
                 href={`/explore/${r.id}`}
-                className="group block overflow-hidden rounded-2xl border border-white/14 bg-transparent transition hover:border-white/30"
+                className="group block overflow-hidden rounded-2xl border border-white/14 transition hover:border-white/30"
               >
                 <div className="aspect-square bg-white/[0.04]">
                   {r.cover_url ? (
@@ -95,7 +114,7 @@ function Section({
                   )}
                 </div>
                 <div className="space-y-0.5 p-2.5">
-                  <p className="line-clamp-2 text-[13px] font-medium leading-snug text-white">
+                  <p className="line-clamp-2 text-[13px] font-medium leading-snug">
                     {r.title}
                   </p>
                   <p className="truncate text-[11px] text-white/45">

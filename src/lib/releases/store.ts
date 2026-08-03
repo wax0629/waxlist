@@ -1,145 +1,121 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "fs";
-import path from "path";
 import { createId } from "@/lib/id";
-import type { CreateReleaseInput, Release, ReleaseStatus } from "./types";
+import { prisma } from "@/lib/db";
+import type { CreateReleaseInput, Release, ReleaseLink, ReleaseStatus } from "./types";
+import type { Prisma } from "@prisma/client";
 
-const globalForReleases = globalThis as unknown as {
-  __beatHunterReleases?: Map<string, Release>;
-  __beatHunterReleasesLoaded?: boolean;
-};
-
-function dataDir(): string {
-  return path.join(process.cwd(), ".data", "releases");
+function mapRow(r: {
+  id: string;
+  title: string;
+  artists: string[];
+  type: string;
+  neteaseId: string | null;
+  neteaseUrl: string | null;
+  coverUrl: string | null;
+  tags: string[];
+  description: string | null;
+  curatorialNote: string | null;
+  source: string;
+  status: string;
+  links: Prisma.JsonValue;
+  sortOrder: number | null;
+  createdById: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  ratingAvg: number | null;
+  ratingCount: number;
+}): Release {
+  return {
+    id: r.id,
+    title: r.title,
+    artists: r.artists,
+    type: r.type as Release["type"],
+    netease_id: r.neteaseId ?? undefined,
+    netease_url: r.neteaseUrl ?? undefined,
+    cover_url: r.coverUrl ?? undefined,
+    tags: r.tags,
+    description: r.description ?? undefined,
+    curatorial_note: r.curatorialNote ?? undefined,
+    source: r.source as Release["source"],
+    status: r.status as ReleaseStatus,
+    links: (Array.isArray(r.links) ? r.links : []) as unknown as ReleaseLink[],
+    sort_order: r.sortOrder ?? undefined,
+    created_by: r.createdById ?? undefined,
+    created_at: r.createdAt.toISOString(),
+    updated_at: r.updatedAt.toISOString(),
+    rating_avg: r.ratingAvg ?? undefined,
+    rating_count: r.ratingCount,
+  };
 }
 
-function releasesFile(): string {
-  return path.join(dataDir(), "releases.json");
-}
-
-function ensureDir() {
-  const dir = dataDir();
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-}
-
-function getMap(): Map<string, Release> {
-  if (!globalForReleases.__beatHunterReleases) {
-    globalForReleases.__beatHunterReleases = new Map();
-  }
-  return globalForReleases.__beatHunterReleases;
-}
-
-function seedIfEmpty(): void {
-  const map = getMap();
-  if (map.size > 0) return;
-  const seedPath = path.join(process.cwd(), "data", "releases.seed.json");
-  if (!existsSync(seedPath)) return;
-  try {
-    const list = JSON.parse(readFileSync(seedPath, "utf8")) as Release[];
-    for (const r of list) map.set(r.id, r);
-    persist();
-  } catch (err) {
-    console.error("release seed failed", err);
-  }
-}
-
-function loadAll(): void {
-  if (globalForReleases.__beatHunterReleasesLoaded) return;
-  globalForReleases.__beatHunterReleasesLoaded = true;
-  const map = getMap();
-  try {
-    const fp = releasesFile();
-    if (existsSync(fp)) {
-      const list = JSON.parse(readFileSync(fp, "utf8")) as Release[];
-      for (const r of list) map.set(r.id, r);
-    }
-  } catch (err) {
-    console.error("release store load failed", err);
-  }
-  if (map.size === 0) seedIfEmpty();
-}
-
-function persist(): void {
-  try {
-    ensureDir();
-    const list = [...getMap().values()];
-    writeFileSync(releasesFile(), JSON.stringify(list, null, 2), "utf8");
-  } catch (err) {
-    console.error("release store save failed", err);
-  }
-}
-
-export function listReleases(opts?: {
+export async function listReleases(opts?: {
   status?: ReleaseStatus | ReleaseStatus[];
   source?: Release["source"];
-}): Release[] {
-  loadAll();
-  let list = [...getMap().values()];
-  if (opts?.status) {
-    const set = new Set(
-      Array.isArray(opts.status) ? opts.status : [opts.status],
-    );
-    list = list.filter((r) => set.has(r.status));
-  }
-  if (opts?.source) {
-    list = list.filter((r) => r.source === opts.source);
-  }
-  return list.sort((a, b) => {
-    const so = (a.sort_order ?? 9999) - (b.sort_order ?? 9999);
-    if (so !== 0) return so;
-    return b.updated_at.localeCompare(a.updated_at);
+}): Promise<Release[]> {
+  const statusFilter = opts?.status
+    ? Array.isArray(opts.status)
+      ? { in: opts.status }
+      : opts.status
+    : undefined;
+
+  const rows = await prisma.release.findMany({
+    where: {
+      ...(statusFilter ? { status: statusFilter } : {}),
+      ...(opts?.source ? { source: opts.source } : {}),
+    },
+    orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }],
   });
+  return rows.map(mapRow);
 }
 
-export function getRelease(id: string): Release | undefined {
-  loadAll();
-  return getMap().get(id);
+export async function getRelease(id: string): Promise<Release | undefined> {
+  const row = await prisma.release.findUnique({ where: { id } });
+  return row ? mapRow(row) : undefined;
 }
 
-export function findByNeteaseId(neteaseId: string): Release | undefined {
-  loadAll();
-  return [...getMap().values()].find((r) => r.netease_id === neteaseId);
+export async function findByNeteaseId(
+  neteaseId: string,
+): Promise<Release | undefined> {
+  if (!neteaseId) return undefined;
+  const row = await prisma.release.findUnique({
+    where: { neteaseId },
+  });
+  return row ? mapRow(row) : undefined;
 }
 
-export function createRelease(input: CreateReleaseInput): Release {
-  loadAll();
+export async function createRelease(
+  input: CreateReleaseInput,
+): Promise<Release> {
   if (input.netease_id) {
-    const existing = findByNeteaseId(input.netease_id);
+    const existing = await findByNeteaseId(input.netease_id);
     if (existing) {
       throw new Error("该网易云条目已存在");
     }
   }
-  const now = new Date().toISOString();
-  const release: Release = {
-    id: createId("rel_"),
-    title: input.title.trim(),
-    artists: input.artists.map((a) => a.trim()).filter(Boolean),
-    type: input.type ?? "album",
-    netease_id: input.netease_id,
-    netease_url: input.netease_url,
-    cover_url: input.cover_url,
-    tags: input.tags ?? [],
-    description: input.description,
-    curatorial_note: input.curatorial_note,
-    source: input.source,
-    status: input.status ?? "draft",
-    links: input.links ?? [],
-    sort_order: input.sort_order,
-    created_by: input.created_by,
-    created_at: now,
-    updated_at: now,
-  };
-  if (!release.title) throw new Error("标题必填");
-  getMap().set(release.id, release);
-  persist();
-  return release;
+  if (!input.title.trim()) throw new Error("标题必填");
+
+  const row = await prisma.release.create({
+    data: {
+      id: createId("rel_"),
+      title: input.title.trim(),
+      artists: input.artists.map((a) => a.trim()).filter(Boolean),
+      type: input.type ?? "album",
+      neteaseId: input.netease_id || null,
+      neteaseUrl: input.netease_url || null,
+      coverUrl: input.cover_url || null,
+      tags: input.tags ?? [],
+      description: input.description || null,
+      curatorialNote: input.curatorial_note || null,
+      source: input.source,
+      status: input.status ?? "draft",
+      links: (input.links ?? []) as unknown as Prisma.InputJsonValue,
+      sortOrder: input.sort_order ?? null,
+      createdById: input.created_by || null,
+    },
+  });
+  return mapRow(row);
 }
 
-export function updateRelease(
+export async function updateRelease(
   id: string,
   patch: Partial<
     Pick<
@@ -156,25 +132,54 @@ export function updateRelease(
       | "sort_order"
       | "rating_avg"
       | "rating_count"
+      | "netease_url"
+      | "netease_id"
     >
   >,
-): Release {
-  loadAll();
-  const cur = getMap().get(id);
-  if (!cur) throw new Error("发行不存在");
-  const next: Release = {
-    ...cur,
-    ...patch,
-    updated_at: new Date().toISOString(),
-  };
-  getMap().set(id, next);
-  persist();
-  return next;
+): Promise<Release> {
+  const row = await prisma.release.update({
+    where: { id },
+    data: {
+      ...(patch.title !== undefined ? { title: patch.title } : {}),
+      ...(patch.artists !== undefined ? { artists: patch.artists } : {}),
+      ...(patch.type !== undefined ? { type: patch.type } : {}),
+      ...(patch.cover_url !== undefined ? { coverUrl: patch.cover_url || null } : {}),
+      ...(patch.tags !== undefined ? { tags: patch.tags } : {}),
+      ...(patch.description !== undefined
+        ? { description: patch.description || null }
+        : {}),
+      ...(patch.curatorial_note !== undefined
+        ? { curatorialNote: patch.curatorial_note || null }
+        : {}),
+      ...(patch.status !== undefined ? { status: patch.status } : {}),
+      ...(patch.links !== undefined
+        ? { links: patch.links as unknown as Prisma.InputJsonValue }
+        : {}),
+      ...(patch.sort_order !== undefined
+        ? { sortOrder: patch.sort_order ?? null }
+        : {}),
+      ...(patch.rating_avg !== undefined
+        ? { ratingAvg: patch.rating_avg ?? null }
+        : {}),
+      ...(patch.rating_count !== undefined
+        ? { ratingCount: patch.rating_count }
+        : {}),
+      ...(patch.netease_url !== undefined
+        ? { neteaseUrl: patch.netease_url || null }
+        : {}),
+      ...(patch.netease_id !== undefined
+        ? { neteaseId: patch.netease_id || null }
+        : {}),
+    },
+  });
+  return mapRow(row);
 }
 
-export function deleteRelease(id: string): boolean {
-  loadAll();
-  const ok = getMap().delete(id);
-  if (ok) persist();
-  return ok;
+export async function deleteRelease(id: string): Promise<boolean> {
+  try {
+    await prisma.release.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
 }
