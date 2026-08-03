@@ -385,7 +385,7 @@ export function ChatClient() {
 
           <form
             onSubmit={onSend}
-            className="border-t border-white/[0.08] bg-black/10 p-3 sm:p-4"
+            className="border-t border-white/[0.1] bg-transparent p-3 sm:p-4"
           >
             <div className="touri-input-shell">
               <div className="touri-input-inner flex items-end gap-2 px-3 py-2.5 sm:px-4">
