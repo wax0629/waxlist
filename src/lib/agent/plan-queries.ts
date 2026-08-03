@@ -1,4 +1,5 @@
 import type { SearchIntent } from "@/lib/types";
+import { freeTextKeywords } from "./intent";
 
 const BEAT_SUFFIXES = ["type beat", "instrumental", "beat"] as const;
 
@@ -16,12 +17,20 @@ function ensureBeatSuffix(q: string): string {
 
 /**
  * Build 2–4 multi-angle English queries (spec-v0.2 §6.2).
- * Never uses raw Chinese user text as the sole query.
+ * Never defaults unknown intent to r&b.
  */
 export function planQueries(intent: SearchIntent): string[] {
   const styles = (intent.style ?? []).map(styleToEnglish);
-  const styleCore = styles[0] ?? "r&b";
-  const styleJoin = styles.length ? styles.join(" ") : "melodic";
+  const freeKw = freeTextKeywords(intent.free_text ?? "");
+
+  // Core topic: style first, else free keywords, else generic (NOT r&b)
+  const styleCore =
+    styles[0] ||
+    freeKw.split(" ")[0] ||
+    null;
+  const styleJoin = styles.length
+    ? styles.join(" ")
+    : freeKw || "melodic";
 
   const tempoBits: string[] = [];
   if (intent.tempo === "slow") tempoBits.push("slow", "chill");
@@ -35,42 +44,46 @@ export function planQueries(intent: SearchIntent): string[] {
   const moodBits = (intent.mood ?? []).map(moodToEnglish);
 
   const softBits: string[] = [];
-  if (intent.avoid?.includes("heavy drums")) softBits.push("soft drums", "light drums");
+  if (intent.avoid?.includes("heavy drums")) {
+    softBits.push("soft drums", "light drums");
+  }
   if (intent.avoid?.includes("heavy 808")) softBits.push("soft 808");
 
-  // Angle 1: main style + tempo + beat
-  const q1 = ensureBeatSuffix(
-    [tempoBits[0], styleCore, vocalBits[0], softBits[0]].filter(Boolean).join(" "),
-  );
+  const topic = styleCore ?? "hip hop";
 
-  // Angle 2: constraint emphasis
-  const q2 = ensureBeatSuffix(
-    [
-      moodBits[0] ?? (intent.tempo === "slow" ? "late night" : "melodic"),
-      styleJoin,
-      softBits[0] ?? "instrumental",
-      "instrumental",
-    ]
+  // Angle 1: main topic + constraints
+  const q1 = ensureBeatSuffix(
+    [tempoBits[0], topic, vocalBits[0], softBits[0], freeKw || null]
       .filter(Boolean)
       .join(" "),
   );
 
-  // Angle 3: reference or synonym neighborhood
+  // Angle 2: mood / instrumental emphasis
+  const q2 = ensureBeatSuffix(
+    [
+      moodBits[0] ?? (intent.tempo === "slow" ? "late night" : "melodic"),
+      styleJoin,
+      softBits[0] || null,
+    ]
+      .filter(Boolean)
+      .join(" ") + " instrumental",
+  );
+
+  // Angle 3: free keywords raw or reference
   let q3: string;
   if (intent.reference?.title) {
     const refTokens = sanitizeRefTitle(intent.reference.title);
     q3 = ensureBeatSuffix(
-      refTokens ? `${refTokens} type beat` : `${styleCore} type beat free`,
+      refTokens ? `${refTokens} type beat` : `${topic} type beat free`,
     );
-  } else if (intent.reference?.hints?.length) {
-    q3 = ensureBeatSuffix(
-      `${intent.reference.hints.slice(0, 2).join(" ")} type beat`,
-    );
+  } else if (freeKw) {
+    // Keep user tokens prominent (e.g. "udg type beat")
+    q3 = ensureBeatSuffix(`${freeKw} type beat free`);
   } else {
     q3 = ensureBeatSuffix(
       [
         intent.tempo === "fast" ? "hard" : "smooth",
-        styleCore,
+        topic,
         vocalBits[0] ? "vocals" : "",
         "type beat free",
       ]
@@ -79,19 +92,17 @@ export function planQueries(intent: SearchIntent): string[] {
     );
   }
 
-  // Angle 4 optional: purpose-tinged
+  // Angle 4: style expansion for underground etc.
+  const expanded = expandStyleQueries(intent);
   const q4 = ensureBeatSuffix(
-    [styleCore, tempoBits[0] ?? "chill", "type beat", softBits[1] ?? ""].filter(Boolean).join(" "),
+    expanded[0] ??
+      [topic, tempoBits[0] ?? "", "type beat"].filter(Boolean).join(" "),
   );
 
-  const raw = [q1, q2, q3, q4].map((q) =>
-    q
-      .replace(/\s+/g, " ")
-      .trim()
-      .toLowerCase(),
+  const raw = [q1, q2, q3, q4, ...expanded.slice(1)].map((q) =>
+    q.replace(/\s+/g, " ").trim().toLowerCase(),
   );
 
-  // Dedupe + diversity: drop near-duplicates
   const out: string[] = [];
   for (const q of raw) {
     if (!q || out.length >= 4) break;
@@ -100,10 +111,31 @@ export function planQueries(intent: SearchIntent): string[] {
   }
 
   while (out.length < 2) {
-    out.push(ensureBeatSuffix(`${styleCore} type beat instrumental`));
+    out.push(
+      ensureBeatSuffix(
+        freeKw ? `${freeKw} type beat` : `${topic} type beat instrumental`,
+      ),
+    );
   }
 
   return out.slice(0, 4);
+}
+
+function expandStyleQueries(intent: SearchIntent): string[] {
+  const styles = intent.style ?? [];
+  const extra: string[] = [];
+  if (styles.includes("underground")) {
+    extra.push("underground hip hop type beat");
+    extra.push("udg type beat");
+    extra.push("underground rap instrumental");
+  }
+  if (styles.includes("plugg")) {
+    extra.push("pluggnb type beat");
+  }
+  if (styles.includes("rage")) {
+    extra.push("rage type beat carti");
+  }
+  return extra;
 }
 
 function styleToEnglish(s: string): string {
@@ -119,6 +151,12 @@ function styleToEnglish(s: string): string {
     hyperpop: "hyperpop",
     afrobeats: "afrobeats",
     phonk: "phonk",
+    underground: "underground",
+    "hip hop": "hip hop",
+    "cloud rap": "cloud rap",
+    "jersey club": "jersey club",
+    plugg: "plugg",
+    rage: "rage",
   };
   return map[s.toLowerCase()] ?? s;
 }
@@ -153,6 +191,5 @@ function tooSimilar(a: string, b: string): boolean {
   let inter = 0;
   for (const t of ta) if (tb.has(t)) inter++;
   const union = ta.size + tb.size - inter || 1;
-  const jaccard = inter / union;
-  return jaccard >= 0.75;
+  return inter / union >= 0.75;
 }
