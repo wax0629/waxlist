@@ -313,49 +313,43 @@ body {
   }
 }
 
-/* ——— Liquid glass pane — glossy / dimensional ——— */
+/*
+  Liquid glass panes — light, transparent.
+  Color hierarchy comes from the aurora behind; the card only frames it.
+*/
 .liquid-glass {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   border-radius: 24px;
-  /* Fill + dual-tone border (bright top-left → dim bottom-right) */
+  /* Very light frosted fill + clear gradient stroke (描边) */
   background:
     linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0.05) 28%,
-      rgba(18, 14, 28, 0.22) 62%,
-      rgba(12, 10, 20, 0.28) 100%
+      165deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 45%,
+      rgba(255, 255, 255, 0.035) 100%
     )
       padding-box,
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.18) 28%,
-      rgba(255, 255, 255, 0.06) 55%,
-      rgba(255, 255, 255, 0.2) 100%
+      rgba(255, 255, 255, 0.22) 35%,
+      rgba(255, 255, 255, 0.1) 70%,
+      rgba(255, 255, 255, 0.28) 100%
     )
       border-box;
   border: 1px solid transparent;
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
   box-shadow:
-    /* lift off page */
-    0 4px 8px rgba(0, 0, 0, 0.2),
-    0 24px 56px -12px rgba(0, 0, 0, 0.55),
-    0 40px 80px -28px rgba(80, 30, 100, 0.25),
-    /* outer soft rim light */
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    /* inner specular edge */
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.35),
-    inset 1px 0 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 12px rgba(0, 0, 0, 0.28),
-    inset 0 -28px 48px rgba(0, 0, 0, 0.18);
+    0 12px 40px -16px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* Top sheen band */
+/* Soft top rim only — no heavy gloss fill */
 .liquid-glass::before {
   content: "";
   position: absolute;
@@ -363,41 +357,24 @@ body {
   border-radius: inherit;
   pointer-events: none;
   z-index: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.22) 0%,
-      rgba(255, 255, 255, 0.06) 14%,
-      transparent 38%
-    ),
-    radial-gradient(
-      ellipse 90% 55% at 18% 0%,
-      rgba(255, 255, 255, 0.28) 0%,
-      transparent 55%
-    );
-  opacity: 0.95;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 18%
+  );
+  opacity: 0.85;
 }
 
-/* Diagonal gloss streak (光泽) */
+/* Subtle edge ring via inset box; skip heavy diagonal sheen */
 .liquid-glass::after {
   content: "";
   position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 70%;
-  height: 90%;
-  border-radius: 50%;
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
   z-index: 0;
-  background: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.04) 35%,
-    transparent 60%
-  );
-  transform: rotate(-12deg);
-  filter: blur(8px);
-  opacity: 0.75;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  opacity: 1;
 }
 
 .liquid-glass > * {
