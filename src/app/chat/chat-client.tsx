@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AppRail } from "@/components/app-rail";
 import { BeatCard } from "@/components/beat-card";
@@ -270,23 +271,54 @@ export function ChatClient() {
               </span>
             </div>
           </div>
-          {lastStatus ? (
-            <span
-              className={
-                lastStatus === "ok"
-                  ? "rounded-full bg-emerald-400/15 px-2.5 py-1 text-[11px] font-medium text-emerald-200 ring-1 ring-emerald-300/20"
+          <div className="flex shrink-0 items-center gap-2.5">
+            {lastStatus ? (
+              <span
+                className={
+                  lastStatus === "ok"
+                    ? "rounded-full border border-emerald-300/25 bg-transparent px-2.5 py-1 text-[11px] font-medium text-emerald-200"
+                    : lastStatus === "degraded"
+                      ? "rounded-full border border-amber-300/25 bg-transparent px-2.5 py-1 text-[11px] font-medium text-amber-100"
+                      : "rounded-full border border-rose-300/25 bg-transparent px-2.5 py-1 text-[11px] font-medium text-rose-100"
+                }
+              >
+                {lastStatus === "ok"
+                  ? "就绪"
                   : lastStatus === "degraded"
-                    ? "rounded-full bg-amber-400/15 px-2.5 py-1 text-[11px] font-medium text-amber-100 ring-1 ring-amber-300/20"
-                    : "rounded-full bg-rose-400/15 px-2.5 py-1 text-[11px] font-medium text-rose-100 ring-1 ring-rose-300/20"
-              }
+                    ? "降级"
+                    : "错误"}
+              </span>
+            ) : null}
+            {/* Circular glass user card — profile page later */}
+            <Link
+              href="/about"
+              className="user-orb"
+              title="用户（即将上线）"
+              aria-label="用户中心"
             >
-              {lastStatus === "ok"
-                ? "就绪"
-                : lastStatus === "degraded"
-                  ? "降级"
-                  : "错误"}
-            </span>
-          ) : null}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+              >
+                <circle
+                  cx="12"
+                  cy="9"
+                  r="3.2"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                />
+                <path
+                  d="M5.5 19c1.2-3 3.4-4.5 6.5-4.5s5.3 1.5 6.5 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </Link>
+          </div>
         </header>
 
         {/* Two liquid-glass panes under nav — ~6:4 */}
