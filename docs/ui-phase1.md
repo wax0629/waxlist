@@ -1,6 +1,8 @@
-# Phase 1 UI 结构说明（第二轮）
+# Phase 1 UI 结构说明
 
-> 目标：完整产品口径的体验骨架，不只是换色。
+> 目标：完整产品口径的体验骨架，不只是换色。  
+> **Agent 视觉主参考：** [design-refs-agent.md](./design-refs-agent.md)  
+>  （Dribbble AI Travel Assistant Dashboard）
 
 ## 1. 首屏 / 空状态
 

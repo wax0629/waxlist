@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/site-header";
+import { AppRail } from "@/components/app-rail";
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-full flex-1 flex-col text-[var(--cream)]">
-      <SiteHeader />
+    <div className="flex min-h-dvh flex-1 text-[var(--cream)]">
+      <AppRail />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold)]">
           Beta

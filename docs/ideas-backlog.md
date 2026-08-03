@@ -70,6 +70,15 @@
 
 > 把后续想法直接贴在下面，不必排好序。
 
+### Agent 页视觉参考（Dribbble · AI Travel Dashboard）
+- **状态：** planned（主方向，布局按此迭代）  
+- **大概版本：** Phase 1 UI  
+- **一句话：** `/chat` 做成 AI 旅行助理式 **Dashboard**：对话 + 发现卡片区。  
+- **链接：** https://dribbble.com/shots/27052075-AI-Travel-Assistant-UI-Trip-Planning-Destination-Discovery  
+- **为什么：** 用户指定 Agent 页方向；目的地发现 ↔ 伴奏短名单。  
+- **备注：** 详见 [design-refs-agent.md](./design-refs-agent.md)；Dribbble 无源码，只学结构。  
+- **日期：** 2026-08-03  
+
 ### 地下发行页视觉参考（Collect UI）
 - **状态：** inbox（视觉方向已定，功能后置）  
 - **大概版本：** Phase 3（地下精选认真做时）  
