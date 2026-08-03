@@ -418,7 +418,8 @@ Beat Hunter 站点
 | [product-concept.md](./product-concept.md) | 本文：全站构思与方向 |
 | [underground-catalog.md](./underground-catalog.md) | 地下精选模块专篇 |
 | [information-architecture.md](./information-architecture.md) | 路由、导航、跳转约定 |
-| [spec-v0.1.md](./spec-v0.1.md) | v0.1 可开发功能、API、验收 |
+| [spec-v0.1.md](./spec-v0.1.md) | v0.1 已交付基线 |
+| [spec-v0.2.md](./spec-v0.2.md) | v0.2 搜索机制 + UI |
 | `agent-tools.md` / `data-model.md`（可选） | 工具与数据模型细文；规格 §5–7 已够开工 |
 
 本文描述产品构思与方向，不绑定具体框架与模型供应商。
