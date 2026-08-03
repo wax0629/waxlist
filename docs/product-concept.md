@@ -349,10 +349,12 @@ Beat Hunter 站点
 
 | 版本 | 目标 |
 |------|------|
-| **v0.1** | 站点壳 + **`/chat`** Agent 最小闭环：参考链接 + 1 真源 + 卡片 shortlist + 多轮 refine；`/explore` 可仅占位或隐藏 |
-| **v0.2** | 伴奏多源加深、会话收藏与可观测；**`/explore` 只读精选列表**（可选上线） |
-| **v0.3** | 地下打分 + ref 跳转打通；偏好/轻量 eval；公开 Demo |
-| 远期 | **Agent 荐专附加**（可选）；编曲等另评估；地下运营与防刷增强 |
+| **v0.1** | 站点壳 + **`/chat`** Agent 最小闭环（已交付地基） |
+| **v0.2** | Intent/多 query/打分 + 理解与检索词 UI（已交付地基） |
+| **Phase 1 Beta** | **可对外正式 Beta**：检索可信、制作人先验、UI 成品质感、会话持久化、部署上线（见 [product-maturity](./product-maturity.md)） |
+| **Phase 2** | 找 beat 做透：账号、收藏、多源、观测 |
+| **Phase 3** | 地下精选 + 打分 + ref 弱连接 |
+| 远期 | Agent 荐专附加、运营与防刷增强；编曲等另评估 |
 
 ---
 
@@ -414,6 +416,7 @@ Beat Hunter 站点
 | [thinking-map.md](./thinking-map.md) | 思路压缩：已定 / 待决 / v0.1 切口 |
 | [tech-decisions.md](./tech-decisions.md) | 技术选型：前端视觉、Agent、数据源等 |
 | [process.md](./process.md) | 文档分层与协作节奏 |
+| [product-maturity.md](./product-maturity.md) | 完整产品阶段与出口标准 |
 | [ideas-backlog.md](./ideas-backlog.md) | 后续想法池（未承诺开发） |
 | [product-concept.md](./product-concept.md) | 本文：全站构思与方向 |
 | [underground-catalog.md](./underground-catalog.md) | 地下精选模块专篇 |

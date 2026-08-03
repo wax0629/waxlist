@@ -64,6 +64,7 @@ npm run dev
 
 | 文档 | 说明 |
 |------|------|
+| [完整产品成熟度](./docs/product-maturity.md) | **正式产品路线**（非玩具）：阶段与出口标准 |
 | [协作流程](./docs/process.md) | 文档分层、何时写 spec、想法如何进开发 |
 | [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
 | [搜索机制笔记](./docs/search-strategy.md) | 需求→检索词→短名单，与裸搜 YouTube 的差异 |
@@ -89,6 +90,8 @@ npm run dev
 
 ## 建议下一步
 
-1. 按 [spec-v0.2](./docs/spec-v0.2.md) §8 切片实现（先搜索契约，再 UI）  
-2. 更多想法继续记 [ideas-backlog](./docs/ideas-backlog.md)  
-3. 可选后续：流式、部署、`/explore`  
+目标是**完整正式产品**，不是玩具 Demo。见 [product-maturity](./docs/product-maturity.md)。
+
+1. 写并执行 **Phase 1 Beta** 规格（检索可信、制作人先验、UI 成品质感、会话持久化、部署）  
+2. 想法入 [ideas-backlog](./docs/ideas-backlog.md)，升格进阶段再做  
+3. Phase 2 账号/收藏/多源 → Phase 3 地下精选  
