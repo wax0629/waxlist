@@ -18,16 +18,16 @@ export function ChatHero({
   return (
     <section className="flex h-full flex-col justify-center gap-10 py-6 lg:py-12">
       <div className="max-w-xl space-y-5">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line-strong)] bg-[var(--ink-elevated)] px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-[var(--gold-soft)]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--gold)] shadow-[0_0_10px_rgba(212,165,116,0.9)]" />
+        <div className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-sky-100/90">
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-cyan-300 to-violet-300 shadow-[0_0_12px_rgba(165,180,252,0.9)]" />
           Beat Hunter · 找伴奏 Beta
         </div>
-        <h1 className="font-display text-[2rem] font-semibold leading-[1.12] tracking-tight text-[var(--cream)] sm:text-4xl lg:text-[2.85rem]">
+        <h1 className="font-display text-[2rem] font-semibold leading-[1.12] tracking-tight text-white sm:text-4xl lg:text-[2.85rem]">
           用一句话，
           <br />
           <span className="gold-gradient-text">猎到能唱的伴奏</span>
         </h1>
-        <p className="max-w-lg text-[15px] leading-[1.7] text-[var(--cream-muted)]">
+        <p className="max-w-lg text-[15px] leading-[1.7] text-white/55">
           先理解你的需求，再生成伴奏域检索策略并收成短名单——不是套一层 YouTube
           搜索框。
         </p>
@@ -35,17 +35,12 @@ export function ChatHero({
 
       <ol className="grid gap-3 sm:grid-cols-3 lg:max-w-3xl">
         {STEPS.map((s) => (
-          <li
-            key={s.n}
-            className="rounded-2xl border border-[var(--line)] bg-[var(--ink-elevated)]/80 p-4 shadow-[0_1px_0_rgba(243,238,230,0.04)_inset]"
-          >
-            <span className="font-mono text-[11px] text-[var(--gold)]/80">
-              {s.n}
-            </span>
-            <p className="mt-2 font-display text-[15px] font-semibold tracking-tight text-[var(--cream-soft)]">
+          <li key={s.n} className="glass-panel rounded-2xl p-4">
+            <span className="font-mono text-[11px] text-sky-200/70">{s.n}</span>
+            <p className="mt-2 font-display text-[15px] font-semibold tracking-tight text-white/95">
               {s.t}
             </p>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-[var(--cream-muted)]">
+            <p className="mt-1.5 text-[12px] leading-relaxed text-white/50">
               {s.d}
             </p>
           </li>
@@ -53,7 +48,7 @@ export function ChatHero({
       </ol>
 
       <div className="space-y-3">
-        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--cream-faint)]">
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white/35">
           Start here
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -63,7 +58,7 @@ export function ChatHero({
               type="button"
               disabled={disabled}
               onClick={() => onPick(s)}
-              className="rounded-2xl border border-[var(--line-strong)] bg-[var(--ink-elevated)] px-4 py-3 text-left text-[13px] text-[var(--cream-soft)] transition hover:border-[rgba(212,165,116,0.35)] hover:bg-[var(--gold-dim)] hover:text-[var(--cream)] disabled:opacity-50 sm:rounded-full sm:py-2.5"
+              className="glass rounded-2xl px-4 py-3 text-left text-[13px] text-white/80 transition hover:border-white/25 hover:bg-white/10 hover:text-white disabled:opacity-50 sm:rounded-full sm:py-2.5"
             >
               {s}
             </button>

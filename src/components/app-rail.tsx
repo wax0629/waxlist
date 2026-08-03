@@ -14,13 +14,14 @@ export function AppRail({
   const onChat = path === "/chat" || path === "/";
 
   return (
-    <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-[var(--line)] bg-[var(--ink-2)]/80 py-4 md:flex">
+    <aside className="glass-panel hidden w-[72px] shrink-0 flex-col items-center rounded-none border-y-0 border-l-0 py-4 md:flex">
       <Link
         href="/chat"
-        className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--ink-elevated)] font-display text-[13px] font-bold text-[var(--gold-soft)] shadow-[0_0_0_1px_rgba(212,165,116,0.28),0_12px_28px_-12px_rgba(212,165,116,0.5)]"
+        className="relative flex h-11 w-11 items-center justify-center rounded-2xl font-display text-[13px] font-bold text-white shadow-[0_0_24px_-4px_rgba(165,180,252,0.55)]"
         title="Beat Hunter"
       >
-        <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[rgba(232,201,168,0.22)] to-transparent" />
+        <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-sky-300/40 via-violet-400/35 to-fuchsia-400/30" />
+        <span className="absolute inset-[1px] rounded-[0.9rem] bg-white/10 backdrop-blur-md" />
         <span className="relative">BH</span>
       </Link>
 
@@ -30,15 +31,15 @@ export function AppRail({
           title="找伴奏"
           className={
             onChat
-              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--gold-dim)] text-[var(--gold)] ring-1 ring-[rgba(212,165,116,0.35)]"
-              : "flex h-11 w-11 items-center justify-center rounded-2xl text-[var(--cream-faint)] transition hover:bg-white/[0.04] hover:text-[var(--cream-soft)]"
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-white/12 text-sky-100 ring-1 ring-white/20 shadow-[0_0_20px_-6px_rgba(125,211,252,0.6)]"
+              : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
           }
         >
           <ChatIcon />
         </Link>
         <span
           title="地下精选 · 稍后"
-          className="flex h-11 w-11 cursor-not-allowed items-center justify-center rounded-2xl text-[var(--cream-faint)]/40"
+          className="flex h-11 w-11 cursor-not-allowed items-center justify-center rounded-2xl text-white/20"
         >
           <DiscIcon />
         </span>
@@ -47,8 +48,8 @@ export function AppRail({
           title="关于"
           className={
             path === "/about"
-              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--gold-dim)] text-[var(--gold)] ring-1 ring-[rgba(212,165,116,0.35)]"
-              : "flex h-11 w-11 items-center justify-center rounded-2xl text-[var(--cream-faint)] transition hover:bg-white/[0.04] hover:text-[var(--cream-soft)]"
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-white/12 text-sky-100 ring-1 ring-white/20"
+              : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
           }
         >
           <InfoIcon />
@@ -60,7 +61,7 @@ export function AppRail({
           type="button"
           onClick={onNewChat}
           title="新会话"
-          className="mb-1 flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--line-strong)] text-[var(--cream-muted)] transition hover:border-[rgba(212,165,116,0.35)] hover:text-[var(--gold)]"
+          className="mb-1 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-white/5 text-white/55 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
         >
           <PlusIcon />
         </button>

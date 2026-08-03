@@ -15,41 +15,41 @@ export function SearchMeta({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--ink-elevated)]/90">
+    <div className="glass-panel overflow-hidden rounded-2xl">
       {intentSummary ? (
         <div className="px-4 py-3">
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--gold)]/75">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-sky-200/70">
             我的理解
           </p>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--cream-soft)]">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-white/80">
             {intentSummary}
           </p>
         </div>
       ) : null}
 
       {queriesUsed && queriesUsed.length > 0 ? (
-        <div className={intentSummary ? "border-t border-[var(--line)]" : ""}>
+        <div className={intentSummary ? "border-t border-white/10" : ""}>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-[12px] text-[var(--cream-muted)] transition hover:bg-white/[0.02] hover:text-[var(--cream-soft)]"
+            className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-[12px] text-white/50 transition hover:bg-white/5 hover:text-white/80"
           >
             <span>
               本轮检索词
-              <span className="ml-1.5 font-mono text-[var(--cream-faint)]">
+              <span className="ml-1.5 font-mono text-white/35">
                 {queriesUsed.length}
               </span>
             </span>
-            <span className="text-[11px] text-[var(--cream-faint)]">
+            <span className="text-[11px] text-white/35">
               {open ? "收起" : "展开"}
             </span>
           </button>
           {open ? (
-            <ul className="flex flex-wrap gap-1.5 border-t border-[var(--line)] px-4 py-3">
+            <ul className="flex flex-wrap gap-1.5 border-t border-white/10 px-4 py-3">
               {queriesUsed.map((q) => (
                 <li
                   key={q}
-                  className="max-w-full truncate rounded-lg bg-black/30 px-2.5 py-1 font-mono text-[11px] text-[var(--cream-muted)] ring-1 ring-[var(--line)]"
+                  className="max-w-full truncate rounded-lg bg-white/8 px-2.5 py-1 font-mono text-[11px] text-white/65 ring-1 ring-white/10"
                   title={q}
                 >
                   {q}

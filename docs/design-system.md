@@ -1,38 +1,43 @@
-# Beat Hunter 设计系统（色板 · 字体）
+# Beat Hunter 设计系统（色板 · 字体 · 玻璃）
 
-> Agent 页主参考：  
-> https://dribbble.com/shots/27052075-AI-Travel-Assistant-UI-Trip-Planning-Destination-Discovery  
-> （Dribbble 不提供色板导出；本文件按该作 **未来感旅行 AI Dashboard** 常见配色抄写，可再按滴管微调）
+> 当前视觉方向：**柔和极光渐变 + 透明玻璃卡片**  
+> 结构参考：AI Travel Dashboard（对话 + 发现区）  
+> https://dribbble.com/shots/27052075-AI-Travel-Assistant-UI-Trip-Planning-Destination-Discovery
 
 ---
 
-## 色板（抄 Travel AI Dashboard 方向）
+## 气质
 
-气质：**深海军底 + 电光蓝强调 + 冷白字**（不是暖金、也不是通用紫 AI）。
+**深夜极光 · 磨砂玻璃 · 柔光不刺眼**
 
-| Token | Hex / 值 | 用途 |
-|-------|----------|------|
-| `--ink` | `#0A0F1E` | 页面底 |
-| `--ink-2` | `#0D1426` | 次级底 |
-| `--ink-elevated` | `#151D33` | 卡片 / 面板 |
-| `--cream` | `#F2F6FF` | 主文字（冷白） |
-| `--cream-soft` | `#D7E0F2` | 次强调字 |
-| `--cream-muted` | `#8B9BB8` | 次级说明 |
-| `--cream-faint` | `#5A6A88` | 更弱说明 |
-| `--line` | `rgba(120,150,220,0.12)` | 描边 |
-| `--line-strong` | `rgba(120,150,220,0.22)` | 强描边 |
-| `--gold` | `#3B82F6` | **主强调蓝**（兼容旧 token 名） |
-| `--gold-soft` | `#60A5FA` | 浅蓝高光 / 渐变上沿 |
-| `--gold-dim` | `rgba(59,130,246,0.16)` | 选中底、弱高亮 |
-| `--cyan` | `#22D3EE` | 辅强调（点缀、状态点） |
-| `--ember` | `#38BDF8` | 次强调 |
-| `--ok` | `#34D399` | 成功 |
-| `--warn` | `#FBBF24` | 降级 |
-| `--danger` | `#FB7185` | 错误 |
+- 背景：多层柔和径向极光（青 / 靛 / 紫 / 薄荷绿），慢漂移  
+- 表面：半透明白 + `backdrop-filter: blur` + 内描边高光  
+- 文字：冷白；主按钮：近白玻璃高亮，不用硬霓虹  
 
-背景光晕：左上/右上 **蓝青径向光**，不用暖金/品红主光。
+---
 
-> 若你从 Dribbble 截图滴管得到精确 hex，发我 4～6 个主色，可再对齐一版。
+## 色板 Token
+
+| Token | 值 | 用途 |
+|-------|-----|------|
+| `--ink` | `#070b14` | 夜空底 |
+| `--glass` | `rgba(255,255,255,0.055)` | 轻玻璃 |
+| `--glass-strong` | `rgba(255,255,255,0.09)` | 输入区等 |
+| `--glass-border` | `rgba(255,255,255,0.14)` | 玻璃边 |
+| `--aurora-*` | cyan / indigo / fuchsia / mint | 极光光斑 |
+| `--cream` | `#f4f7ff` | 主字 |
+| `--gold` / `--gold-soft` | 天蓝 / 浅紫 | 兼容旧名的柔和强调 |
+
+### 工具类
+
+| Class | 作用 |
+|-------|------|
+| `.glass` | 轻磨砂面板 |
+| `.glass-strong` | 更不透明一点 |
+| `.glass-panel` | 渐变玻璃 + 强 blur |
+| `.gold-gradient-text` | 极光渐变字 |
+
+代码：`src/app/globals.css`
 
 ---
 
