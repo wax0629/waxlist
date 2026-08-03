@@ -314,67 +314,49 @@ body {
 }
 
 /*
-  Liquid glass panes — light, transparent.
-  Color hierarchy comes from the aurora behind; the card only frames it.
+  Liquid glass panes — clear window, not frosted milk.
+  Why cards looked whiter than the page:
+  - white rgba fills (even 2–6%) stack over the aurora
+  - backdrop-filter blur mixes dark aurora into a milky haze
+  - ::before white sheen washed the whole interior
+  Fix: near-transparent dark tint, light blur, stroke-only framing.
 */
 .liquid-glass {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   border-radius: 24px;
-  /* Very light frosted fill + clear gradient stroke (描边) */
+  /* Transparent dark tint (not white) + gradient 描边 only */
   background:
     linear-gradient(
-      165deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 45%,
-      rgba(255, 255, 255, 0.035) 100%
+      180deg,
+      rgba(5, 5, 5, 0.12) 0%,
+      rgba(5, 5, 5, 0.06) 100%
     )
       padding-box,
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.22) 35%,
-      rgba(255, 255, 255, 0.1) 70%,
-      rgba(255, 255, 255, 0.28) 100%
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.16) 40%,
+      rgba(255, 255, 255, 0.08) 70%,
+      rgba(255, 255, 255, 0.22) 100%
     )
       border-box;
   border: 1px solid transparent;
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  /* Low blur keeps aurora color; high blur = white milk */
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
   box-shadow:
-    0 12px 40px -16px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    0 12px 36px -18px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* Soft top rim only — no heavy gloss fill */
-.liquid-glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 18%
-  );
-  opacity: 0.85;
-}
-
-/* Subtle edge ring via inset box; skip heavy diagonal sheen */
+/* No full-face white overlay — only a hairline top highlight via box-shadow above */
+.liquid-glass::before,
 .liquid-glass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  opacity: 1;
+  content: none;
 }
 
 .liquid-glass > * {
