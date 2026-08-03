@@ -14,14 +14,13 @@ export function AppRail({
   const onChat = path === "/chat" || path === "/";
 
   return (
-    <aside className="glass-panel hidden w-[72px] shrink-0 flex-col items-center rounded-none border-y-0 border-l-0 py-4 md:flex">
+    <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-white/[0.06] bg-black/25 py-4 backdrop-blur-xl md:flex">
       <Link
         href="/chat"
-        className="relative flex h-11 w-11 items-center justify-center rounded-2xl font-display text-[13px] font-bold text-[#1a1020] shadow-[0_0_24px_-4px_rgba(224,122,138,0.55)]"
+        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-[13px] font-bold tracking-tight text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)]"
         title="Beat Hunter"
       >
-        <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#ffe8c8] via-[#f0b27a] to-[#e07a8a]" />
-        <span className="relative">BH</span>
+        BH
       </Link>
 
       <nav className="mt-8 flex flex-1 flex-col items-center gap-2">
@@ -30,7 +29,7 @@ export function AppRail({
           title="找伴奏"
           className={
             onChat
-              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--gold-dim)] text-[var(--gold-soft)] ring-1 ring-[rgba(240,178,122,0.4)] shadow-[0_0_20px_-6px_rgba(224,122,138,0.55)]"
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
               : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
           }
         >
@@ -47,7 +46,7 @@ export function AppRail({
           title="关于"
           className={
             path === "/about"
-              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--gold-dim)] text-[var(--gold-soft)] ring-1 ring-[rgba(240,178,122,0.4)]"
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/15"
               : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
           }
         >
@@ -60,7 +59,7 @@ export function AppRail({
           type="button"
           onClick={onNewChat}
           title="新会话"
-          className="mb-1 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-white/5 text-white/55 transition hover:border-[rgba(240,178,122,0.35)] hover:bg-white/10 hover:text-[var(--gold-soft)]"
+          className="mb-1 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white/55 transition hover:bg-white/10 hover:text-white"
         >
           <PlusIcon />
         </button>
@@ -81,7 +80,6 @@ function ChatIcon() {
     </svg>
   );
 }
-
 function DiscIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -90,7 +88,6 @@ function DiscIcon() {
     </svg>
   );
 }
-
 function InfoIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -104,7 +101,6 @@ function InfoIcon() {
     </svg>
   );
 }
-
 function PlusIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>

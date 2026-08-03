@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Noto_Sans_SC, Syne } from "next/font/google";
+import { Inter, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-display",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const notoSans = Noto_Sans_SC({
-  variable: "--font-sans",
+  variable: "--font-cjk",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -33,10 +33,22 @@ export default function RootLayout({
   return (
     <html
       lang="zh-CN"
-      className={`${syne.variable} ${notoSans.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${inter.variable} ${notoSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans text-[var(--cream)]">
-        <div className="scene-grain" aria-hidden />
+      <body
+        className="flex min-h-full flex-col text-white"
+        style={{
+          fontFamily:
+            "var(--font-sans), var(--font-cjk), Inter, 'Noto Sans SC', system-ui, sans-serif",
+        }}
+      >
+        {/* Touri aurora mesh */}
+        <div className="aurora-bg" aria-hidden>
+          <div className="aurora-blob blob-mesh" />
+          <div className="aurora-blob blob-1" />
+          <div className="aurora-blob blob-2" />
+          <div className="aurora-blob blob-3" />
+        </div>
         {children}
       </body>
     </html>

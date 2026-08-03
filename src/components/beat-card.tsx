@@ -40,10 +40,10 @@ export function BeatCard({
             className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-violet-500/20 via-sky-500/10 to-transparent" />
+          <div className="h-full w-full bg-gradient-to-br from-[#ff6b9e]/25 via-[#9b51e0]/15 to-transparent" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/15" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-sky-500/10 via-transparent to-fuchsia-400/10 mix-blend-soft-light" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#a94f28]/15 via-transparent to-[#9b51e0]/15 mix-blend-soft-light" />
       </div>
 
       <div className="relative z-10 flex items-start justify-between p-3.5">

@@ -1,36 +1,40 @@
 @import "tailwindcss";
 
+/*
+  Touri AI Travel design system
+  Sources:
+    /Users/apple/Downloads/touri_design_styleguide-v2.html
+    /Users/apple/Downloads/touri_design_clone.html
+*/
+
 :root {
-  /*
-   * Sunset dusk palette + aurora-mood glass formula
-   * Warm: amber / coral / rose / mauve → night purple
-   * Glass: blur(24) saturate(160%) + gradient border (from aurora-mood-dashboard)
-   */
-  --ink: #140e18;
-  --ink-2: #1a1222;
-  --ink-elevated: rgba(255, 255, 255, 0.07);
-  --cream: #fff6ef;
-  --cream-soft: #f5e6dc;
-  --cream-muted: #c4a99a;
-  --cream-faint: #8a7068;
-  --line: rgba(255, 230, 210, 0.12);
-  --line-strong: rgba(255, 230, 210, 0.2);
+  --ink: #050505;
+  --ink-2: #0a0a0a;
+  --ink-elevated: rgba(20, 20, 20, 0.4);
+  --surface-soft: rgba(255, 255, 255, 0.03);
+  --cream: #ffffff;
+  --cream-soft: rgba(255, 255, 255, 0.85);
+  --cream-muted: rgba(255, 255, 255, 0.6);
+  --cream-faint: rgba(255, 255, 255, 0.4);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.12);
 
-  /* accents — warm (token names kept for less churn) */
-  --gold: #f0b27a; /* amber */
-  --gold-soft: #f7c9a0;
-  --gold-dim: rgba(240, 178, 122, 0.16);
-  --cyan: #f3a683; /* warm secondary, not cyan */
-  --ember: #e07a8a; /* rose */
-  --rose: #c2748a;
-  --mauve: #6b3d70;
-  --night: #2d2351;
+  /* Primary gradient: pink → purple */
+  --grad-a: #ff6b9e;
+  --grad-b: #9b51e0;
+  --gold: #ff6b9e;
+  --gold-soft: #ff8fb3;
+  --gold-dim: rgba(255, 107, 158, 0.15);
 
-  --ok: #8fbc8f;
-  --warn: #f0c674;
-  --danger: #e88a8a;
+  /* Aurora blobs (styleguide) */
+  --aurora-orange: #a94f28;
+  --aurora-magenta: #9e3166;
+  --aurora-purple: #3b1c63;
 
-  --glass-fill: rgba(255, 255, 255, 0.08);
+  --ok: #6ee7b7;
+  --warn: #fbbf24;
+  --danger: #fb7185;
+
   --background: var(--ink);
   --foreground: var(--cream);
 }
@@ -38,9 +42,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans), "Noto Sans SC", system-ui, sans-serif;
+  --font-sans: var(--font-sans), "Inter", "Noto Sans SC", system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
-  --font-display: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  --font-display: var(--font-sans), "Inter", system-ui, sans-serif;
 }
 
 html,
@@ -49,183 +53,284 @@ body {
 }
 
 body {
-  background: var(--ink);
-  color: var(--cream);
-  font-family: var(--font-sans), "Noto Sans SC", system-ui, sans-serif;
+  margin: 0;
+  background: #050505;
+  color: #fff;
+  font-family: var(--font-sans), "Inter", "Noto Sans SC", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
-  letter-spacing: -0.02em;
+  font-family: var(--font-sans), "Inter", system-ui, sans-serif;
+  letter-spacing: -0.03em;
 }
 
-/* ——— Sunset aurora background ——— */
-body::before {
-  content: "";
-  pointer-events: none;
+/* ——— Touri interwoven aurora mesh ——— */
+.aurora-bg {
   position: fixed;
   inset: 0;
-  z-index: -2;
-  /* dusk clear from aurora-mood: #ee9a6e → #c2748a → #693d70 → #2d2351 */
-  background:
-    radial-gradient(ellipse 70% 55% at 20% 0%, rgba(240, 178, 122, 0.55), transparent 55%),
-    radial-gradient(ellipse 55% 50% at 85% 10%, rgba(224, 122, 138, 0.4), transparent 55%),
-    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(194, 116, 138, 0.28), transparent 60%),
-    radial-gradient(ellipse 50% 45% at 15% 75%, rgba(107, 61, 112, 0.45), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 80% 90%, rgba(45, 35, 81, 0.7), transparent 50%),
-    linear-gradient(
-      165deg,
-      #3a1f35 0%,
-      #2d2351 42%,
-      #1a1020 72%,
-      #120c16 100%
-    );
-}
-
-/* Soft milky drift layer */
-body::after {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: -25%;
   z-index: -1;
-  background:
-    radial-gradient(circle at 25% 20%, rgba(247, 201, 160, 0.35), transparent 38%),
-    radial-gradient(circle at 78% 30%, rgba(224, 122, 138, 0.28), transparent 40%),
-    radial-gradient(circle at 55% 70%, rgba(194, 116, 138, 0.2), transparent 42%),
-    radial-gradient(circle at 30% 85%, rgba(107, 61, 112, 0.25), transparent 40%);
-  filter: blur(64px);
-  opacity: 0.95;
-  animation: aurora-drift 26s ease-in-out infinite alternate;
+  background: #050505;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-@keyframes aurora-drift {
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.75;
+  animation: touri-pulse 10s infinite alternate ease-in-out;
+  will-change: transform, opacity;
+}
+
+/* Bronze/Orange from top left */
+.blob-1 {
+  top: -20%;
+  left: -10%;
+  width: 70vw;
+  height: 60vh;
+  background: #a94f28;
+  transform: rotate(15deg);
+}
+
+/* Pink/Magenta middle */
+.blob-2 {
+  top: 20%;
+  left: 20%;
+  width: 60vw;
+  height: 30vh;
+  background: #9e3166;
+  transform: rotate(-25deg);
+  opacity: 0.6;
+  animation-delay: -3s;
+}
+
+/* Deep purple bottom right */
+.blob-3 {
+  bottom: -20%;
+  right: -10%;
+  width: 60vw;
+  height: 70vh;
+  background: #3b1c63;
+  animation-delay: -6s;
+}
+
+/* Extra soft mesh like clone */
+.blob-mesh {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  filter: blur(60px);
+  opacity: 1;
+  animation: none;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(173, 73, 44, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(88, 44, 115, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(13, 10, 20, 0.8) 0%, transparent 60%);
+}
+
+@keyframes touri-pulse {
   0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-2%, 1.5%) scale(1.04);
+    opacity: 0.55;
+    transform: scale(1) translate(0, 0);
   }
   100% {
-    transform: translate(1.5%, -1%) scale(1.02);
+    opacity: 0.85;
+    transform: scale(1.05) translate(20px, 10px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::after {
+  .aurora-blob {
     animation: none;
   }
 }
 
-/* Film grain (from aurora-mood scene-grain idea) */
-.scene-grain {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.055;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(240, 178, 122, 0.3) transparent;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(240, 178, 122, 0.28);
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-/*
-  Glass primitives — ported from aurora-mood-dashboard/styles/glass.css
-  Dual-layer background: fill on padding-box + gradient border on border-box
-*/
+/* ——— Touri glass section/panel ——— */
 .glass,
 .glass-strong,
 .glass-panel {
   position: relative;
   isolation: isolate;
-  color: rgba(255, 246, 239, 0.95);
-
-  background:
-    linear-gradient(var(--glass-fill, rgba(255, 255, 255, 0.08)), var(--glass-fill, rgba(255, 255, 255, 0.08)))
-      padding-box,
-    linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.32),
-        rgba(255, 255, 255, 0.05)
-      )
-      border-box;
-  border: 1px solid transparent;
-
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-
+  background: rgba(20, 20, 20, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   box-shadow:
-    0 24px 64px -16px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .glass {
-  --glass-fill: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .glass-strong {
-  --glass-fill: rgba(255, 255, 255, 0.11);
-  backdrop-filter: blur(28px) saturate(170%);
-  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  background: rgba(20, 20, 20, 0.45);
 }
 
 .glass-panel {
-  --glass-fill: rgba(255, 255, 255, 0.09);
+  background: rgba(20, 20, 20, 0.4);
 }
 
-.glass > *,
-.glass-strong > *,
-.glass-panel > * {
-  position: relative;
-  z-index: 1;
+/* Primary gradient utilities */
+.touri-grad {
+  background: linear-gradient(135deg, #ff6b9e, #9b51e0);
 }
 
-/* Top liquid sheen */
-.glass::before,
-.glass-strong::before,
-.glass-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0) 40%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.gold-text {
-  color: var(--gold-soft);
-}
-
-.gold-gradient-text {
-  background: linear-gradient(
-    115deg,
-    #ffe8c8 0%,
-    #f0b27a 35%,
-    #e07a8a 70%,
-    #f5c9a8 100%
-  );
+.touri-grad-text {
+  background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.5));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #ffb3cc 45%, #c9a0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gold-text {
+  color: #ff8fb3;
+}
+
+/* Gradient border input shell (Touri chat-input-wrapper) */
+.touri-input-shell {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 107, 158, 0.85),
+    rgba(155, 81, 224, 0.85)
+  );
+  border-radius: 24px;
+  padding: 2px;
+  box-shadow: 0 10px 30px rgba(155, 81, 224, 0.25);
+  transition: box-shadow 0.3s ease;
+}
+.touri-input-shell:focus-within {
+  box-shadow: 0 10px 40px rgba(155, 81, 224, 0.45);
+}
+.touri-input-inner {
+  background: #121212;
+  border-radius: 22px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Nav pills */
+.touri-pills {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.touri-pill {
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+.touri-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.touri-pill-active {
+  background: linear-gradient(135deg, #ff6b9e, #9b51e0);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(155, 81, 224, 0.3);
+}
+
+/* Touri 3D sphere (hero) */
+.touri-sphere {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ff9a9e 0%,
+    #fecfef 20%,
+    #a18cd1 50%,
+    #4facfe 100%
+  );
+  box-shadow:
+    0 15px 35px rgba(161, 140, 209, 0.4),
+    inset -10px -10px 20px rgba(0, 0, 0, 0.5),
+    inset 10px 10px 20px rgba(255, 255, 255, 0.35);
+  animation: touri-float 4s ease-in-out infinite;
+}
+
+@keyframes touri-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Circular send button */
+.touri-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b9e, #9b51e0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(155, 81, 224, 0.35);
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.touri-send:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(155, 81, 224, 0.5);
+}
+.touri-send:disabled {
+  opacity: 0.35;
+}
+
+/* User chat bubble */
+.touri-user-bubble {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 158, 0.92),
+    rgba(155, 81, 224, 0.88)
+  );
+  color: #fff;
+  box-shadow: 0 10px 28px -10px rgba(155, 81, 224, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .touri-sphere {
+    animation: none;
+  }
+}
+
+/* Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 158, 0.25) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 158, 0.25);
+  border-radius: 999px;
 }
