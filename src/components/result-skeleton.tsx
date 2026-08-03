@@ -13,7 +13,13 @@ export function ResultSkeleton({ label }: { label: string }) {
       <div className="grid grid-cols-2 gap-3">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="glass-panel overflow-hidden rounded-2xl">
-            <div className="aspect-[3/4] animate-pulse rounded-2xl border border-white/10 bg-transparent" />
+            <div className="overflow-hidden rounded-2xl border border-white/10">
+              <div className="aspect-video animate-pulse bg-white/[0.04]" />
+              <div className="space-y-2 px-2.5 py-2.5">
+                <div className="h-3 w-[90%] animate-pulse rounded bg-white/10" />
+                <div className="h-2.5 w-[50%] animate-pulse rounded bg-white/8" />
+              </div>
+            </div>
           </div>
         ))}
       </div>
