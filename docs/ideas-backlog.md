@@ -60,7 +60,17 @@
 
 > 把后续想法直接贴在下面，不必排好序。
 
-<!-- 在此追加 -->
+### 风格域顶尖制作人优先检索 / 加权
+- **状态：** candidate（挂在搜索机制扩展）  
+- **大概版本：** v0.2 切片末 或 v0.2.1  
+- **一句话：** Intent 识别风格后，查表得到该风格若干顶尖制作人；追加一路 query 和/或对标题·频道命中做 score 加权。  
+- **为什么：** 领域 know-how，用户自己搜很少系统轮询制作人；比纯泛词 `type beat` 更像「懂行的帮搜」。  
+- **备注 / 风险：**  
+  - **软加权**，禁止硬过滤只出名单内  
+  - 配置化 JSON 策展，勿靠模型每次编名单  
+  - 详见 [search-strategy.md §3.3.1](./search-strategy.md)  
+  - 依赖 v0.2 的 Intent 风格归一 + filter/score 骨架  
+- **日期：** 2026-08-03  
 
 ---
 
@@ -68,6 +78,7 @@
 
 | 想法 | 出处 | 建议版本 | 状态 |
 |------|------|----------|------|
+| 风格 → 顶尖制作人 query/加权 | 用户 · search-strategy §3.3.1 | v0.2 扩展 | candidate |
 | `/explore` 地下精选只读列表 | product / underground | v0.2+ | candidate |
 | 用户打分 + 登录 | underground | v0.3 | candidate |
 | 发行详情 → `/chat?ref=` 弱连接 | IA | v0.3 | candidate |
