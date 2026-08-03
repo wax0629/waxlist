@@ -18,7 +18,7 @@ export function SearchMeta({
     <div className="glass-panel overflow-hidden rounded-2xl">
       {intentSummary ? (
         <div className="px-4 py-3">
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-sky-200/70">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--gold)]/80">
             我的理解
           </p>
           <p className="mt-1.5 text-[13px] leading-relaxed text-white/80">

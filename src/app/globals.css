@@ -2,33 +2,35 @@
 
 :root {
   /*
-   * Soft aurora + glass
-   * Deep night base, pastel aurora washes, frosted glass surfaces.
+   * Sunset dusk palette + aurora-mood glass formula
+   * Warm: amber / coral / rose / mauve → night purple
+   * Glass: blur(24) saturate(160%) + gradient border (from aurora-mood-dashboard)
    */
-  --ink: #070b14;
-  --ink-2: #0a1020;
-  --ink-elevated: rgba(255, 255, 255, 0.06);
-  --cream: #f4f7ff;
-  --cream-soft: #e4ebf8;
-  --cream-muted: #a3b0c9;
-  --cream-faint: #6b7a96;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --gold: #7dd3fc; /* soft sky — primary soft accent */
-  --gold-soft: #c4b5fd; /* soft lilac */
-  --gold-dim: rgba(165, 180, 252, 0.14);
-  --cyan: #5eead4;
-  --aurora-1: #67e8f9;
-  --aurora-2: #a5b4fc;
-  --aurora-3: #f0abfc;
-  --aurora-4: #6ee7b7;
-  --ember: #93c5fd;
-  --ok: #6ee7b7;
-  --warn: #fcd34d;
-  --danger: #fda4af;
-  --glass: rgba(255, 255, 255, 0.055);
-  --glass-strong: rgba(255, 255, 255, 0.09);
-  --glass-border: rgba(255, 255, 255, 0.14);
+  --ink: #140e18;
+  --ink-2: #1a1222;
+  --ink-elevated: rgba(255, 255, 255, 0.07);
+  --cream: #fff6ef;
+  --cream-soft: #f5e6dc;
+  --cream-muted: #c4a99a;
+  --cream-faint: #8a7068;
+  --line: rgba(255, 230, 210, 0.12);
+  --line-strong: rgba(255, 230, 210, 0.2);
+
+  /* accents — warm (token names kept for less churn) */
+  --gold: #f0b27a; /* amber */
+  --gold-soft: #f7c9a0;
+  --gold-dim: rgba(240, 178, 122, 0.16);
+  --cyan: #f3a683; /* warm secondary, not cyan */
+  --ember: #e07a8a; /* rose */
+  --rose: #c2748a;
+  --mauve: #6b3d70;
+  --night: #2d2351;
+
+  --ok: #8fbc8f;
+  --warn: #f0c674;
+  --danger: #e88a8a;
+
+  --glass-fill: rgba(255, 255, 255, 0.08);
   --background: var(--ink);
   --foreground: var(--cream);
 }
@@ -52,7 +54,6 @@ body {
   font-family: var(--font-sans), "Noto Sans SC", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  letter-spacing: 0.01em;
 }
 
 .font-display {
@@ -60,36 +61,44 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* Soft aurora washes — layered, blurry, gentle */
+/* ——— Sunset aurora background ——— */
 body::before {
   content: "";
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: -2;
+  /* dusk clear from aurora-mood: #ee9a6e → #c2748a → #693d70 → #2d2351 */
   background:
-    radial-gradient(ellipse 55% 45% at 15% 20%, rgba(103, 232, 249, 0.22), transparent 55%),
-    radial-gradient(ellipse 50% 50% at 85% 15%, rgba(240, 171, 252, 0.18), transparent 55%),
-    radial-gradient(ellipse 60% 45% at 70% 75%, rgba(165, 180, 252, 0.16), transparent 60%),
-    radial-gradient(ellipse 45% 40% at 20% 85%, rgba(110, 231, 183, 0.12), transparent 55%),
-    radial-gradient(ellipse 40% 35% at 50% 45%, rgba(125, 211, 252, 0.08), transparent 50%),
-    linear-gradient(165deg, #070b14 0%, #0b1224 45%, #0a101c 100%);
+    radial-gradient(ellipse 70% 55% at 20% 0%, rgba(240, 178, 122, 0.55), transparent 55%),
+    radial-gradient(ellipse 55% 50% at 85% 10%, rgba(224, 122, 138, 0.4), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(194, 116, 138, 0.28), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 15% 75%, rgba(107, 61, 112, 0.45), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 90%, rgba(45, 35, 81, 0.7), transparent 50%),
+    linear-gradient(
+      165deg,
+      #3a1f35 0%,
+      #2d2351 42%,
+      #1a1020 72%,
+      #120c16 100%
+    );
 }
 
-/* Soft blur layer so aurora feels milky, not neon hard-edge */
+/* Soft milky drift layer */
 body::after {
   content: "";
   pointer-events: none;
   position: fixed;
-  inset: -20%;
+  inset: -25%;
   z-index: -1;
   background:
-    radial-gradient(circle at 30% 30%, rgba(167, 139, 250, 0.12), transparent 35%),
-    radial-gradient(circle at 75% 55%, rgba(56, 189, 248, 0.1), transparent 40%),
-    radial-gradient(circle at 45% 80%, rgba(52, 211, 153, 0.08), transparent 38%);
-  filter: blur(60px);
-  opacity: 0.9;
-  animation: aurora-drift 22s ease-in-out infinite alternate;
+    radial-gradient(circle at 25% 20%, rgba(247, 201, 160, 0.35), transparent 38%),
+    radial-gradient(circle at 78% 30%, rgba(224, 122, 138, 0.28), transparent 40%),
+    radial-gradient(circle at 55% 70%, rgba(194, 116, 138, 0.2), transparent 42%),
+    radial-gradient(circle at 30% 85%, rgba(107, 61, 112, 0.25), transparent 40%);
+  filter: blur(64px);
+  opacity: 0.95;
+  animation: aurora-drift 26s ease-in-out infinite alternate;
 }
 
 @keyframes aurora-drift {
@@ -97,10 +106,10 @@ body::after {
     transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(-2%, 2%) scale(1.05);
+    transform: translate(-2%, 1.5%) scale(1.04);
   }
   100% {
-    transform: translate(2%, -1%) scale(1.02);
+    transform: translate(1.5%, -1%) scale(1.02);
   }
 }
 
@@ -110,56 +119,98 @@ body::after {
   }
 }
 
+/* Film grain (from aurora-mood scene-grain idea) */
+.scene-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+}
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(165, 180, 252, 0.3) transparent;
+  scrollbar-color: rgba(240, 178, 122, 0.3) transparent;
 }
 
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(165, 180, 252, 0.28);
+  background: rgba(240, 178, 122, 0.28);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
-/* ——— Glass utilities ——— */
-.glass {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px) saturate(1.35);
-  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+/*
+  Glass primitives — ported from aurora-mood-dashboard/styles/glass.css
+  Dual-layer background: fill on padding-box + gradient border on border-box
+*/
+.glass,
+.glass-strong,
+.glass-panel {
+  position: relative;
+  isolation: isolate;
+  color: rgba(255, 246, 239, 0.95);
+
+  background:
+    linear-gradient(var(--glass-fill, rgba(255, 255, 255, 0.08)), var(--glass-fill, rgba(255, 255, 255, 0.08)))
+      padding-box,
+    linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.32),
+        rgba(255, 255, 255, 0.05)
+      )
+      border-box;
+  border: 1px solid transparent;
+
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 12px 40px -16px rgba(0, 0, 0, 0.45);
+    0 24px 64px -16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass {
+  --glass-fill: rgba(255, 255, 255, 0.07);
 }
 
 .glass-strong {
-  background: var(--glass-strong);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(28px) saturate(1.45);
-  -webkit-backdrop-filter: blur(28px) saturate(1.45);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
-    0 16px 48px -18px rgba(0, 0, 0, 0.5);
+  --glass-fill: rgba(255, 255, 255, 0.11);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
 }
 
 .glass-panel {
+  --glass-fill: rgba(255, 255, 255, 0.09);
+}
+
+.glass > *,
+.glass-strong > *,
+.glass-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Top liquid sheen */
+.glass::before,
+.glass-strong::before,
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.09) 0%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.025) 100%
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 40%
   );
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.1) inset,
-    0 20px 50px -24px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .gold-text {
@@ -168,11 +219,11 @@ body::after {
 
 .gold-gradient-text {
   background: linear-gradient(
-    120deg,
-    #e0e7ff 0%,
-    #a5b4fc 35%,
-    #67e8f9 70%,
-    #c4b5fd 100%
+    115deg,
+    #ffe8c8 0%,
+    #f0b27a 35%,
+    #e07a8a 70%,
+    #f5c9a8 100%
   );
   -webkit-background-clip: text;
   background-clip: text;

@@ -317,7 +317,7 @@ export function ChatClient() {
             {turns.map((t) =>
               t.kind === "user" ? (
                 <div key={t.id} className="flex justify-end">
-                  <div className="max-w-[92%] rounded-2xl rounded-br-md border border-white/25 bg-gradient-to-br from-white/90 to-sky-100/85 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-slate-900 shadow-[0_8px_32px_-12px_rgba(125,211,252,0.45)] backdrop-blur-md">
+                  <div className="max-w-[92%] rounded-2xl rounded-br-md border border-white/20 bg-gradient-to-br from-[#ffe8c8]/95 to-[#f0b27a]/90 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-[#1a1020] shadow-[0_10px_32px_-12px_rgba(224,122,138,0.45)] backdrop-blur-md">
                     {t.content}
                   </div>
                 </div>
@@ -360,10 +360,10 @@ export function ChatClient() {
             )}
 
             {loading && (
-              <div className="flex items-center gap-2 text-[12px] text-sky-100/80">
+              <div className="flex items-center gap-2 text-[12px] text-[var(--gold-soft)]">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300/50" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-sky-300" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--ember)]/50" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--gold)]" />
                 </span>
                 {loadingHint}
               </div>
@@ -391,7 +391,7 @@ export function ChatClient() {
             onSubmit={onSend}
             className="border-t border-white/10 bg-white/[0.03] p-3 backdrop-blur-2xl sm:p-4"
           >
-            <div className="glass-strong rounded-[1.25rem] p-2 focus-within:border-white/30 focus-within:shadow-[0_0_0_3px_rgba(165,180,252,0.15)]">
+            <div className="glass-strong rounded-[1.25rem] p-2 focus-within:shadow-[0_0_0_3px_rgba(240,178,122,0.18)]">
               <div className="flex items-end gap-2">
                 <textarea
                   ref={composerRef}
@@ -399,7 +399,7 @@ export function ChatClient() {
                   onChange={(e) => setInput(e.target.value)}
                   rows={2}
                   placeholder="描述气质，或粘贴 YouTube 链接…"
-                  className="max-h-36 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-white placeholder:text-white/35 focus:outline-none sm:text-[13.5px]"
+                  className="max-h-36 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-[var(--cream)] placeholder:text-white/35 focus:outline-none sm:text-[13.5px]"
                   onKeyDown={(e) => {
                     if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -411,7 +411,7 @@ export function ChatClient() {
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="mb-1 min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-white to-sky-100 px-4 font-display text-[13px] font-semibold text-slate-900 shadow-[0_10px_30px_-10px_rgba(186,230,253,0.55)] disabled:opacity-35"
+                  className="mb-1 min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-[#ffe8c8] via-[#f0b27a] to-[#e07a8a] px-4 font-display text-[13px] font-semibold text-[#1a1020] shadow-[0_10px_30px_-10px_rgba(224,122,138,0.55)] disabled:opacity-35"
                 >
                   {loading ? "…" : "发送"}
                 </button>
@@ -424,20 +424,20 @@ export function ChatClient() {
         </section>
 
         <aside className="relative hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          <div className="relative flex items-end justify-between gap-4 border-b border-white/10 bg-white/[0.03] px-6 py-4 backdrop-blur-xl xl:px-8">
+          <div className="relative flex items-end justify-between gap-4 border-b border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl xl:px-8">
             <div>
-              <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-sky-200/60">
+              <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--gold-soft)]/80">
                 Discover
               </p>
               <h2 className="mt-1 font-display text-[1.35rem] font-semibold tracking-tight text-white">
                 伴奏发现
               </h2>
               <p className="mt-1 max-w-md text-[12px] text-white/45">
-                极光玻璃卡片 · 策略排序后的可试听短名单
+                晚霞玻璃 · 策略排序后的可试听短名单
               </p>
             </div>
             {latestShortlist ? (
-              <span className="glass mb-1 rounded-full px-3 py-1 font-mono text-[11px] font-medium text-sky-100">
+              <span className="glass mb-1 rounded-full px-3 py-1 font-mono text-[11px] font-medium text-[var(--gold-soft)]">
                 {latestShortlist.candidates.length} picks
               </span>
             ) : null}
@@ -487,15 +487,17 @@ export function ChatClient() {
                 ) : null}
               </div>
             ) : (
-              <div className="glass-panel flex h-full min-h-[320px] flex-col items-center justify-center rounded-[1.75rem] border-dashed px-10 text-center">
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-cyan-300/20 via-violet-300/20 to-fuchsia-300/15 ring-1 ring-white/15">
-                  <span className="font-display text-2xl text-white/90">♪</span>
+              <div className="glass-panel flex h-full min-h-[320px] flex-col items-center justify-center rounded-[1.75rem] px-10 text-center">
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-[#f0b27a]/25 via-[#e07a8a]/20 to-[#6b3d70]/25 ring-1 ring-white/15">
+                  <span className="font-display text-2xl text-[var(--gold-soft)]">
+                    ♪
+                  </span>
                 </div>
                 <p className="font-display text-[1.2rem] font-semibold text-white/90">
-                  极光玻璃 · 伴奏发现
+                  晚霞玻璃 · 伴奏发现
                 </p>
                 <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-white/45">
-                  左侧对话后，这里铺开磨砂玻璃短名单——柔和极光作底，卡片透出层次。
+                  左侧对话后，这里铺开磨砂玻璃短名单——暖色晚霞作底，卡片透出层次。
                 </p>
               </div>
             )}

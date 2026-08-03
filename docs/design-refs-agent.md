@@ -38,7 +38,7 @@
 ## 3. 实现原则
 
 - 学 **信息架构与层次**，不像素抄 Dribbble 作品  
-- **配色：** 已按该作「未来感旅行 Dashboard」方向抄写为 **深海军 + 电光蓝/青**（见 [design-system.md](./design-system.md)）。Dribbble 不提供色板文件，环境也无法滴管原图；若有精确 hex 可再校准。  
+- **配色：** 用户偏好 **暖色晚霞（红/粉/黄）**；玻璃技法参考 [aurora-mood-dashboard](https://github.com/nodelabstudio/aurora-mood-dashboard) 与 [auraglass](https://github.com/auraoneai/auraglass)。见 [design-system.md](./design-system.md)。  
 - 移动端：发现区收到对话下方，桌面保持轨 + 对话 + 发现  
 - 与 [design-refs-explore.md](./design-refs-explore.md) 分离：explore 另有参考  
 

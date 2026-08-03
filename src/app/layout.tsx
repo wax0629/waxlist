@@ -36,6 +36,7 @@ export default function RootLayout({
       className={`${syne.variable} ${notoSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans text-[var(--cream)]">
+        <div className="scene-grain" aria-hidden />
         {children}
       </body>
     </html>

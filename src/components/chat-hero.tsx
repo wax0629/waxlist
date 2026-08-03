@@ -18,8 +18,8 @@ export function ChatHero({
   return (
     <section className="flex h-full flex-col justify-center gap-10 py-6 lg:py-12">
       <div className="max-w-xl space-y-5">
-        <div className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-sky-100/90">
-          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-cyan-300 to-violet-300 shadow-[0_0_12px_rgba(165,180,252,0.9)]" />
+        <div className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-[var(--gold-soft)]">
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#f0b27a] to-[#e07a8a] shadow-[0_0_12px_rgba(224,122,138,0.9)]" />
           Beat Hunter · 找伴奏 Beta
         </div>
         <h1 className="font-display text-[2rem] font-semibold leading-[1.12] tracking-tight text-white sm:text-4xl lg:text-[2.85rem]">
@@ -36,7 +36,7 @@ export function ChatHero({
       <ol className="grid gap-3 sm:grid-cols-3 lg:max-w-3xl">
         {STEPS.map((s) => (
           <li key={s.n} className="glass-panel rounded-2xl p-4">
-            <span className="font-mono text-[11px] text-sky-200/70">{s.n}</span>
+            <span className="font-mono text-[11px] text-[var(--gold)]/80">{s.n}</span>
             <p className="mt-2 font-display text-[15px] font-semibold tracking-tight text-white/95">
               {s.t}
             </p>
