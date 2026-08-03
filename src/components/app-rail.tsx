@@ -35,12 +35,17 @@ export function AppRail({
         >
           <ChatIcon />
         </Link>
-        <span
-          title="地下精选 · 稍后"
-          className="flex h-11 w-11 cursor-not-allowed items-center justify-center rounded-2xl text-white/20"
+        <Link
+          href="/explore"
+          title="地下精选"
+          className={
+            path.startsWith("/explore")
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
+              : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
+          }
         >
           <DiscIcon />
-        </span>
+        </Link>
         <Link
           href="/about"
           title="关于"

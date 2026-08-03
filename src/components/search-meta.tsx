@@ -6,7 +6,7 @@ import {
   buildActiveLabels,
   buildRefineChips,
   type IntentActionChip,
-} from "@/lib/agent/intent";
+} from "@/lib/agent/intent-chips";
 
 export function SearchMeta({
   intentSummary,
