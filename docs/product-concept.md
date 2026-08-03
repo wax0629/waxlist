@@ -413,6 +413,8 @@ Beat Hunter 站点
 |------|------|
 | [thinking-map.md](./thinking-map.md) | 思路压缩：已定 / 待决 / v0.1 切口 |
 | [tech-decisions.md](./tech-decisions.md) | 技术选型：前端视觉、Agent、数据源等 |
+| [process.md](./process.md) | 文档分层与协作节奏 |
+| [ideas-backlog.md](./ideas-backlog.md) | 后续想法池（未承诺开发） |
 | [product-concept.md](./product-concept.md) | 本文：全站构思与方向 |
 | [underground-catalog.md](./underground-catalog.md) | 地下精选模块专篇 |
 | [information-architecture.md](./information-architecture.md) | 路由、导航、跳转约定 |
