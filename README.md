@@ -65,6 +65,7 @@ npm run dev
 | 文档 | 说明 |
 |------|------|
 | [完整产品成熟度](./docs/product-maturity.md) | **正式产品路线**（非玩具）：阶段与出口标准 |
+| [功能清单](./docs/feature-inventory.md) | **逐项理清功能**（状态 / 完整形态 / 分期） |
 | [协作流程](./docs/process.md) | 文档分层、何时写 spec、想法如何进开发 |
 | [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
 | [搜索机制笔记](./docs/search-strategy.md) | 需求→检索词→短名单，与裸搜 YouTube 的差异 |
