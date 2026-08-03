@@ -122,10 +122,10 @@ export default function OwnerReleasesPage() {
         <Link href="/explore" className="text-sm text-white/45 hover:text-white/80">
           ← 返回精选
         </Link>
-        <h1 className="mt-4 font-display text-2xl font-semibold">站主爱听</h1>
+        <h1 className="mt-4 font-display text-2xl font-semibold">添加专辑</h1>
         <p className="mt-2 text-sm text-white/50">
-          一期：手填标题/艺人/封面 URL + 网易云链接。封面以手填为主（决策
-          2C）。
+          发布到精选列表。想标「站主爱听」请在 explore
+          卡片右上角点红心（仅站主可点）。封面以手填 URL 为主。
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -208,12 +208,12 @@ export default function OwnerReleasesPage() {
             disabled={loading}
             className="touri-grad rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {loading ? "保存中…" : "发布到站主爱听"}
+            {loading ? "保存中…" : "发布到精选"}
           </button>
         </form>
 
         <section className="mt-12">
-          <h2 className="font-display text-lg font-semibold">已发布</h2>
+          <h2 className="font-display text-lg font-semibold">我添加的</h2>
           <ul className="mt-3 space-y-2">
             {items.map((r) => (
               <li

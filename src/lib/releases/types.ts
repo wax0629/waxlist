@@ -34,8 +34,9 @@ export interface Release {
   curatorial_note?: string;
   source: ReleaseSource;
   status: ReleaseStatus;
+  /** 站主红心 → 展示「站主爱听」特色标签 */
+  owner_loved: boolean;
   links: ReleaseLink[];
-  /** Manual sort for owner love-list (lower first) */
   sort_order?: number;
   created_by?: string;
   created_at: string;

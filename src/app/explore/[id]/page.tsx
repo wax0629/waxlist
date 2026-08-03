@@ -48,11 +48,17 @@ export default async function ReleaseDetailPage({ params }: Props) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">
-              {release.source === "owner" ? "站主爱听" : "社区推荐"} ·{" "}
-              {release.type}
-            </p>
-            <h1 className="mt-1 font-display text-2xl font-semibold leading-tight">
+            <div className="flex flex-wrap items-center gap-2">
+              {release.owner_loved ? (
+                <span className="rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                  ♥ 站主爱听
+                </span>
+              ) : null}
+              <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">
+                {release.type}
+              </p>
+            </div>
+            <h1 className="mt-2 font-display text-2xl font-semibold leading-tight">
               {release.title}
             </h1>
             <p className="mt-2 text-white/60">{release.artists.join(" / ")}</p>

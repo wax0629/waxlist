@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { AppRail } from "@/components/app-rail";
+import { ReleaseCard } from "@/components/release-card";
 import { auth } from "@/lib/auth";
 import { listReleases } from "@/lib/releases/store";
-import type { Release } from "@/lib/releases/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +10,6 @@ export default async function ExplorePage() {
   const session = await auth();
   const isOwner = session?.user?.role === "owner";
   const items = await listReleases({ status: "published" });
-  const owner = items.filter((r) => r.source === "owner");
-  const community = items.filter((r) => r.source === "community");
 
   return (
     <div className="flex min-h-dvh flex-1 text-white">
@@ -26,16 +24,16 @@ export default async function ExplorePage() {
               地下精选
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/50">
-              站主爱听与社区推荐（一期网易云外链）。未登录可逛；推荐与打分需登录。
+              一张列表。站主点卡片右上角红心，会亮起「站主爱听」标签；爱听的专会排在更前。
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
             {isOwner ? (
               <Link
                 href="/owner/releases"
-                className="touri-grad rounded-full px-3 py-1.5 font-medium text-white"
+                className="rounded-full border border-white/20 px-3 py-1.5 text-white/80 hover:border-white/40"
               >
-                站主爱听管理
+                添加专辑
               </Link>
             ) : null}
             {session?.user ? (
@@ -66,66 +64,28 @@ export default async function ExplorePage() {
           </div>
         </div>
 
-        <Section title="站主爱听" items={owner} empty="站主还没放上爱听。" />
-        <Section
-          title="社区推荐"
-          items={community}
-          empty="还没有通过审核的社区推荐。"
-        />
+        {items.length === 0 ? (
+          <p className="mt-12 text-center text-sm text-white/40">
+            还没有已发布专辑。
+            {isOwner ? (
+              <>
+                {" "}
+                <Link href="/owner/releases" className="text-white/70 underline">
+                  去添加
+                </Link>
+              </>
+            ) : null}
+          </p>
+        ) : (
+          <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {items.map((r) => (
+              <li key={r.id}>
+                <ReleaseCard release={r} isOwner={isOwner} />
+              </li>
+            ))}
+          </ul>
+        )}
       </main>
     </div>
-  );
-}
-
-function Section({
-  title,
-  items,
-  empty,
-}: {
-  title: string;
-  items: Release[];
-  empty: string;
-}) {
-  return (
-    <section className="mt-10">
-      <h2 className="font-display text-lg font-semibold text-white/90">{title}</h2>
-      {items.length === 0 ? (
-        <p className="mt-3 text-sm text-white/40">{empty}</p>
-      ) : (
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {items.map((r) => (
-            <li key={r.id}>
-              <Link
-                href={`/explore/${r.id}`}
-                className="group block overflow-hidden rounded-2xl border border-white/14 transition hover:border-white/30"
-              >
-                <div className="aspect-square bg-white/[0.04]">
-                  {r.cover_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={r.cover_url}
-                      alt=""
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-white/25">
-                      无封面
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-0.5 p-2.5">
-                  <p className="line-clamp-2 text-[13px] font-medium leading-snug">
-                    {r.title}
-                  </p>
-                  <p className="truncate text-[11px] text-white/45">
-                    {r.artists.join(" / ")}
-                  </p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
   );
 }

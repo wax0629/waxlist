@@ -16,6 +16,7 @@ function mapRow(r: {
   curatorialNote: string | null;
   source: string;
   status: string;
+  ownerLoved: boolean;
   links: Prisma.JsonValue;
   sortOrder: number | null;
   createdById: string | null;
@@ -37,6 +38,7 @@ function mapRow(r: {
     curatorial_note: r.curatorialNote ?? undefined,
     source: r.source as Release["source"],
     status: r.status as ReleaseStatus,
+    owner_loved: r.ownerLoved,
     links: (Array.isArray(r.links) ? r.links : []) as unknown as ReleaseLink[],
     sort_order: r.sortOrder ?? undefined,
     created_by: r.createdById ?? undefined,
@@ -62,7 +64,12 @@ export async function listReleases(opts?: {
       ...(statusFilter ? { status: statusFilter } : {}),
       ...(opts?.source ? { source: opts.source } : {}),
     },
-    orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }],
+    // 站主爱听（红心）优先，再按 sort / 更新时间
+    orderBy: [
+      { ownerLoved: "desc" },
+      { sortOrder: "asc" },
+      { updatedAt: "desc" },
+    ],
   });
   return rows.map(mapRow);
 }
@@ -128,6 +135,7 @@ export async function updateRelease(
       | "description"
       | "curatorial_note"
       | "status"
+      | "owner_loved"
       | "links"
       | "sort_order"
       | "rating_avg"
@@ -152,6 +160,9 @@ export async function updateRelease(
         ? { curatorialNote: patch.curatorial_note || null }
         : {}),
       ...(patch.status !== undefined ? { status: patch.status } : {}),
+      ...(patch.owner_loved !== undefined
+        ? { ownerLoved: patch.owner_loved }
+        : {}),
       ...(patch.links !== undefined
         ? { links: patch.links as unknown as Prisma.InputJsonValue }
         : {}),
@@ -173,6 +184,14 @@ export async function updateRelease(
     },
   });
   return mapRow(row);
+}
+
+/** Toggle 站主爱听 — only caller should enforce owner role. */
+export async function setOwnerLoved(
+  id: string,
+  loved: boolean,
+): Promise<Release> {
+  return updateRelease(id, { owner_loved: loved });
 }
 
 export async function deleteRelease(id: string): Promise<boolean> {

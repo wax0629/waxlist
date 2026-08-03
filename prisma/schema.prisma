@@ -37,10 +37,12 @@ model Release {
   tags            String[] @default([])
   description     String?
   curatorialNote  String?  @map("curatorial_note")
-  /// owner | community
+  /// owner | community — who first added the entry
   source          String
   /// draft | pending | published | rejected
   status          String   @default("draft")
+  /// 站主红心：点亮后展示「站主爱听」标签（仅 owner 可切换）
+  ownerLoved      Boolean  @default(false) @map("owner_loved")
   /// [{ label, url }]
   links           Json     @default("[]")
   sortOrder       Int?     @map("sort_order")
@@ -53,5 +55,6 @@ model Release {
 
   @@unique([neteaseId])
   @@index([status, source])
+  @@index([ownerLoved])
   @@map("releases")
 }
