@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BeatCard } from "@/components/beat-card";
 import { ChatHero } from "@/components/chat-hero";
@@ -90,6 +90,20 @@ export function ChatClient() {
   const composerRef = useRef<HTMLTextAreaElement>(null);
 
   const isFresh = turns.length === 0 && !loading && !restoring;
+
+  const latestShortlist = useMemo(() => {
+    for (let i = turns.length - 1; i >= 0; i--) {
+      const t = turns[i];
+      if (t.kind === "assistant" && t.candidates && t.candidates.length > 0) {
+        return {
+          candidates: t.candidates,
+          intent_summary: t.intent_summary,
+          queries_used: t.queries_used,
+        };
+      }
+    }
+    return null;
+  }, [turns]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -186,17 +200,18 @@ export function ChatClient() {
             : "";
 
         const candidates = data.candidates ?? [];
-        const assistantTurn: Turn = {
-          kind: "assistant",
-          id: `asst-${Date.now()}`,
-          content: `${data.assistant_message}${warn}`,
-          candidates,
-          intent_summary: data.intent_summary,
-          queries_used: data.queries_used,
-          empty: candidates.length === 0,
-        };
-
-        setTurns((prev) => [...prev, assistantTurn]);
+        setTurns((prev) => [
+          ...prev,
+          {
+            kind: "assistant",
+            id: `asst-${Date.now()}`,
+            content: `${data.assistant_message}${warn}`,
+            candidates,
+            intent_summary: data.intent_summary,
+            queries_used: data.queries_used,
+            empty: candidates.length === 0,
+          },
+        ]);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "网络错误";
         setError(msg);
@@ -248,169 +263,246 @@ export function ChatClient() {
     <div className="flex min-h-dvh flex-1 flex-col text-zinc-100">
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-4 md:px-6 md:pt-4">
-        {/* Status bar — compact on mobile */}
-        <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
-          <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px]">
-            {lastStatus ? (
-              <span
-                className={
-                  lastStatus === "ok"
-                    ? "rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-300/90 ring-1 ring-emerald-500/20"
+      {/* Full-bleed workspace — no skinny center column */}
+      <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col lg:min-h-0 lg:flex-row">
+        {/* LEFT: conversation */}
+        <section className="flex min-w-0 flex-1 flex-col border-white/[0.05] lg:max-w-[min(52%,720px)] lg:border-r">
+          <div className="flex items-center justify-between gap-3 border-b border-white/[0.05] px-4 py-3 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2 text-[12px]">
+              {lastStatus ? (
+                <span
+                  className={
+                    lastStatus === "ok"
+                      ? "rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-300/90 ring-1 ring-emerald-500/15"
+                      : lastStatus === "degraded"
+                        ? "rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-200/90 ring-1 ring-amber-500/15"
+                        : "rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-300/90 ring-1 ring-red-500/15"
+                  }
+                >
+                  {lastStatus === "ok"
+                    ? "检索正常"
                     : lastStatus === "degraded"
-                      ? "rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-200/90 ring-1 ring-amber-500/20"
-                      : "rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-300/90 ring-1 ring-red-500/20"
-                }
+                      ? "降级"
+                      : "出错"}
+                </span>
+              ) : (
+                <span className="text-zinc-500">对话</span>
+              )}
+              {sessionId ? (
+                <span className="truncate font-mono text-[11px] text-zinc-600">
+                  {sessionId.slice(0, 8)}
+                </span>
+              ) : null}
+            </div>
+            {!isFresh ? (
+              <button
+                type="button"
+                onClick={newChat}
+                className="rounded-full px-3 py-1.5 text-[12px] text-zinc-500 transition hover:bg-white/[0.05] hover:text-zinc-200"
               >
-                {lastStatus === "ok"
-                  ? "检索正常"
-                  : lastStatus === "degraded"
-                    ? "降级"
-                    : "出错"}
-              </span>
-            ) : isFresh ? (
-              <span className="text-zinc-600">准备就绪</span>
-            ) : (
-              <span className="text-zinc-600">进行中</span>
-            )}
+                新会话
+              </button>
+            ) : null}
           </div>
-          {!isFresh ? (
-            <button
-              type="button"
-              onClick={newChat}
-              className="min-h-9 shrink-0 rounded-lg px-2.5 text-[12px] text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200"
-            >
-              新会话
-            </button>
-          ) : null}
-        </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain pb-3">
-          {restoring && (
-            <p className="text-xs text-zinc-500">恢复会话…</p>
-          )}
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 lg:px-7">
+            {restoring && (
+              <p className="text-xs text-zinc-500">恢复会话…</p>
+            )}
 
-          {/* 1. First-screen product narrative */}
-          {isFresh && (
-            <ChatHero
-              suggestions={SUGGESTIONS}
-              disabled={loading}
-              onPick={(s) => void sendMessage(s)}
-            />
-          )}
+            {isFresh && (
+              <ChatHero
+                suggestions={SUGGESTIONS}
+                disabled={loading}
+                onPick={(s) => void sendMessage(s)}
+              />
+            )}
 
-          {/* Conversation */}
-          {turns.map((t) =>
-            t.kind === "user" ? (
-              <div key={t.id} className="flex justify-end">
-                <div className="max-w-[min(88%,22rem)] rounded-2xl rounded-br-md bg-gradient-to-br from-violet-500 to-violet-700 px-3.5 py-2.5 text-[13px] leading-relaxed text-white shadow-lg shadow-violet-950/40 sm:max-w-[min(85%,28rem)] sm:px-4">
-                  {t.content}
+            {turns.map((t) =>
+              t.kind === "user" ? (
+                <div key={t.id} className="flex justify-end">
+                  <div className="max-w-[90%] rounded-[1.25rem] rounded-br-md bg-gradient-to-br from-violet-500/95 to-violet-700 px-4 py-2.5 text-[14px] leading-relaxed text-white shadow-[0_8px_30px_-12px_rgba(91,33,182,0.7)] sm:max-w-[85%]">
+                    {t.content}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div key={t.id} className="flex w-full justify-start">
-                <div className="w-full max-w-full space-y-2.5 sm:max-w-[95%]">
-                  <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.035] px-3.5 py-3 text-[13px] leading-relaxed text-zinc-200 whitespace-pre-wrap shadow-lg shadow-black/20 backdrop-blur-md sm:px-4">
+              ) : (
+                <div key={t.id} className="space-y-3">
+                  <div className="rounded-[1.25rem] rounded-bl-md border border-white/[0.06] bg-white/[0.03] px-4 py-3.5 text-[14px] leading-relaxed text-zinc-200 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] backdrop-blur-md">
                     {t.content}
                   </div>
                   <SearchMeta
                     intentSummary={t.intent_summary}
                     queriesUsed={t.queries_used}
                   />
-                  {/* 3. Empty results state */}
+                  {/* Mobile: show cards under chat; desktop uses right panel */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
+                    {t.candidates?.map((b, i) => (
+                      <BeatCard key={b.id} beat={b} index={i} />
+                    ))}
+                  </div>
                   {t.empty ? (
                     <EmptyResults
-                      onRetry={
-                        lastFailedText
-                          ? undefined
-                          : () => {
-                              const prevUser = [...turns]
-                                .reverse()
-                                .find((x) => x.kind === "user");
-                              if (prevUser && prevUser.kind === "user") {
-                                void sendMessage(prevUser.content);
-                              }
-                            }
-                      }
+                      onRetry={() => {
+                        const prevUser = [...turns]
+                          .reverse()
+                          .find((x) => x.kind === "user");
+                        if (prevUser && prevUser.kind === "user") {
+                          void sendMessage(prevUser.content);
+                        }
+                      }}
                       onNewDirection={newChat}
                     />
                   ) : null}
-                  {t.candidates && t.candidates.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-2">
-                      {t.candidates.map((b, i) => (
-                        <BeatCard key={b.id} beat={b} index={i} />
-                      ))}
-                    </div>
-                  ) : null}
                 </div>
+              ),
+            )}
+
+            {loading && (
+              <div className="lg:hidden">
+                <ResultSkeleton label={loadingHint} />
               </div>
-            ),
-          )}
-
-          {/* 3. Loading skeleton */}
-          {loading && <ResultSkeleton label={loadingHint} />}
-
-          {/* 3. Error state */}
-          {error && (
-            <div className="flex flex-col gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-[13px] font-medium text-red-200/95">请求失败</p>
-                <p className="mt-0.5 text-[12px] text-red-300/70">{error}</p>
+            )}
+            {loading && (
+              <div className="hidden items-center gap-2 text-[13px] text-violet-200/80 lg:flex">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400/40" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+                </span>
+                {loadingHint}
               </div>
-              {lastFailedText ? (
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => void sendMessage(lastFailedText)}
-                  className="min-h-10 shrink-0 rounded-xl bg-red-500/20 px-4 py-2 text-[12px] font-semibold text-red-100 transition hover:bg-red-500/30"
-                >
-                  重试上一条
-                </button>
-              ) : null}
-            </div>
-          )}
+            )}
 
-          <div ref={bottomRef} className="h-px shrink-0" />
-        </div>
-
-        {/* Composer — mobile safe area + thumb reach */}
-        <form
-          onSubmit={onSend}
-          className="sticky bottom-0 z-20 mt-auto border border-white/[0.08] bg-[#0c0c12]/90 p-2 shadow-2xl shadow-black/60 ring-1 ring-white/[0.04] backdrop-blur-xl rounded-2xl sm:p-2.5"
-        >
-          <div className="flex items-end gap-2">
-            <textarea
-              ref={composerRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              rows={2}
-              placeholder="描述气质，或粘贴 YouTube 链接…"
-              className="max-h-32 min-h-[48px] flex-1 resize-none bg-transparent px-2.5 py-2.5 text-[16px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none sm:min-h-[52px] sm:px-3 sm:text-[13px]"
-              onKeyDown={(e) => {
-                if (e.nativeEvent.isComposing || e.keyCode === 229) return;
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void onSend(e);
-                }
-              }}
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="mb-0.5 min-h-11 min-w-[4.5rem] shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-violet-950/50 transition hover:from-violet-300 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-35 sm:min-h-10 sm:min-w-0 sm:px-5"
-            >
-              {loading ? "…" : "发送"}
-            </button>
+            {error && (
+              <div className="flex flex-col gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-[13px] font-medium text-red-200">请求失败</p>
+                  <p className="mt-0.5 text-[12px] text-red-300/70">{error}</p>
+                </div>
+                {lastFailedText ? (
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => void sendMessage(lastFailedText)}
+                    className="min-h-10 rounded-xl bg-red-500/20 px-4 text-[12px] font-semibold text-red-100"
+                  >
+                    重试上一条
+                  </button>
+                ) : null}
+              </div>
+            )}
+            <div ref={bottomRef} />
           </div>
-          <p className="px-2.5 pb-0.5 text-[10px] leading-relaxed text-zinc-600 sm:px-3">
-            试听参考 · 商用以源站为准
-            <span className="hidden sm:inline">
-              {" "}
-              · Enter 发送 · Shift+Enter 换行
-            </span>
-          </p>
-        </form>
-      </main>
+
+          <form
+            onSubmit={onSend}
+            className="border-t border-white/[0.05] bg-[#07070c]/80 p-3 backdrop-blur-xl sm:p-4"
+          >
+            <div className="rounded-[1.25rem] border border-white/[0.08] bg-white/[0.03] p-2 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] ring-1 ring-black/20 focus-within:border-violet-400/25 focus-within:ring-violet-500/10">
+              <div className="flex items-end gap-2">
+                <textarea
+                  ref={composerRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  rows={2}
+                  placeholder="描述气质，或粘贴 YouTube 参考链接…"
+                  className="max-h-36 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none sm:text-[14px]"
+                  onKeyDown={(e) => {
+                    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void onSend(e);
+                    }
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !input.trim()}
+                  className="mb-1 min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-5 text-[13px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(124,58,237,0.7)] transition hover:from-violet-300 hover:to-violet-500 disabled:opacity-35"
+                >
+                  {loading ? "…" : "发送"}
+                </button>
+              </div>
+            </div>
+            <p className="mt-2 px-1 text-[11px] text-zinc-600">
+              试听参考 · 商用以源站为准
+              <span className="hidden sm:inline">
+                {" "}
+                · Enter 发送 · Shift+Enter 换行
+              </span>
+            </p>
+          </form>
+        </section>
+
+        {/* RIGHT: shortlist panel — uses the empty side of the screen */}
+        <aside className="hidden min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-white/[0.02] to-transparent lg:flex">
+          <div className="flex items-center justify-between border-b border-white/[0.05] px-6 py-3.5">
+            <div>
+              <h2 className="text-[13px] font-semibold tracking-tight text-zinc-100">
+                本轮短名单
+              </h2>
+              <p className="mt-0.5 text-[11px] text-zinc-500">
+                策略排序后的可试听结果
+              </p>
+            </div>
+            {latestShortlist ? (
+              <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-zinc-400 ring-1 ring-white/[0.06]">
+                {latestShortlist.candidates.length} 条
+              </span>
+            ) : null}
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 xl:px-7">
+            {loading && !latestShortlist ? (
+              <ResultSkeleton label={loadingHint} />
+            ) : latestShortlist ? (
+              <div className="space-y-4">
+                {latestShortlist.intent_summary ? (
+                  <p className="rounded-2xl border border-white/[0.05] bg-black/20 px-4 py-3 text-[12px] leading-relaxed text-zinc-400">
+                    <span className="font-medium text-violet-300/80">理解 · </span>
+                    {latestShortlist.intent_summary}
+                  </p>
+                ) : null}
+                <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                  {latestShortlist.candidates.map((b, i) => (
+                    <BeatCard key={b.id} beat={b} index={i} />
+                  ))}
+                </div>
+                {latestShortlist.queries_used &&
+                latestShortlist.queries_used.length > 0 ? (
+                  <div className="pt-2">
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                      本轮检索词
+                    </p>
+                    <ul className="flex flex-wrap gap-1.5">
+                      {latestShortlist.queries_used.map((q) => (
+                        <li
+                          key={q}
+                          className="rounded-lg bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] text-zinc-500 ring-1 ring-white/[0.05]"
+                          title={q}
+                        >
+                          {q}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="flex h-full min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-white/[0.08] bg-white/[0.015] px-8 text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500/10 ring-1 ring-violet-400/20">
+                  <span className="text-lg text-violet-300">♪</span>
+                </div>
+                <p className="text-[15px] font-medium text-zinc-300">
+                  短名单会显示在这里
+                </p>
+                <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-zinc-560 text-zinc-500">
+                  在左侧描述需求或贴参考链接后，筛选后的伴奏卡片会出现在此面板，充分利用宽屏空间。
+                </p>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

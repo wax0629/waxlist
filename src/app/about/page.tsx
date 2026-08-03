@@ -5,7 +5,7 @@ export default function AboutPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col text-zinc-100">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 md:px-6">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <p className="text-xs font-medium uppercase tracking-wider text-violet-300/80">
           Beta
         </p>
