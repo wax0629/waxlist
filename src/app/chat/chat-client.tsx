@@ -260,23 +260,22 @@ export function ChatClient() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-1 flex-col text-zinc-100">
+    <div className="flex min-h-dvh flex-1 flex-col text-[var(--cream)]">
       <SiteHeader />
 
-      {/* Full-bleed workspace — no skinny center column */}
       <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col lg:min-h-0 lg:flex-row">
-        {/* LEFT: conversation */}
-        <section className="flex min-w-0 flex-1 flex-col border-white/[0.05] lg:max-w-[min(52%,720px)] lg:border-r">
-          <div className="flex items-center justify-between gap-3 border-b border-white/[0.05] px-4 py-3 sm:px-6">
+        {/* LEFT */}
+        <section className="flex min-w-0 flex-1 flex-col border-[var(--line)] lg:max-w-[min(48%,680px)] lg:border-r">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3 sm:px-6">
             <div className="flex min-w-0 items-center gap-2 text-[12px]">
               {lastStatus ? (
                 <span
                   className={
                     lastStatus === "ok"
-                      ? "rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-300/90 ring-1 ring-emerald-500/15"
+                      ? "rounded-full bg-[color-mix(in_srgb,var(--ok)_14%,transparent)] px-2.5 py-1 font-medium text-[var(--ok)] ring-1 ring-[color-mix(in_srgb,var(--ok)_25%,transparent)]"
                       : lastStatus === "degraded"
-                        ? "rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-200/90 ring-1 ring-amber-500/15"
-                        : "rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-300/90 ring-1 ring-red-500/15"
+                        ? "rounded-full bg-[color-mix(in_srgb,var(--warn)_14%,transparent)] px-2.5 py-1 font-medium text-[var(--warn)] ring-1 ring-[color-mix(in_srgb,var(--warn)_25%,transparent)]"
+                        : "rounded-full bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] px-2.5 py-1 font-medium text-[var(--danger)] ring-1 ring-[color-mix(in_srgb,var(--danger)_25%,transparent)]"
                   }
                 >
                   {lastStatus === "ok"
@@ -286,10 +285,10 @@ export function ChatClient() {
                       : "出错"}
                 </span>
               ) : (
-                <span className="text-zinc-500">对话</span>
+                <span className="text-[var(--cream-faint)]">对话</span>
               )}
               {sessionId ? (
-                <span className="truncate font-mono text-[11px] text-zinc-600">
+                <span className="truncate font-mono text-[11px] text-[var(--cream-faint)]">
                   {sessionId.slice(0, 8)}
                 </span>
               ) : null}
@@ -298,7 +297,7 @@ export function ChatClient() {
               <button
                 type="button"
                 onClick={newChat}
-                className="rounded-full px-3 py-1.5 text-[12px] text-zinc-500 transition hover:bg-white/[0.05] hover:text-zinc-200"
+                className="rounded-full px-3 py-1.5 text-[12px] text-[var(--cream-muted)] transition hover:bg-[var(--gold-dim)] hover:text-[var(--cream)]"
               >
                 新会话
               </button>
@@ -307,7 +306,7 @@ export function ChatClient() {
 
           <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 lg:px-7">
             {restoring && (
-              <p className="text-xs text-zinc-500">恢复会话…</p>
+              <p className="text-xs text-[var(--cream-faint)]">恢复会话…</p>
             )}
 
             {isFresh && (
@@ -321,20 +320,19 @@ export function ChatClient() {
             {turns.map((t) =>
               t.kind === "user" ? (
                 <div key={t.id} className="flex justify-end">
-                  <div className="max-w-[90%] rounded-[1.25rem] rounded-br-md bg-gradient-to-br from-violet-500/95 to-violet-700 px-4 py-2.5 text-[14px] leading-relaxed text-white shadow-[0_8px_30px_-12px_rgba(91,33,182,0.7)] sm:max-w-[85%]">
+                  <div className="max-w-[90%] rounded-[1.25rem] rounded-br-md bg-gradient-to-br from-[var(--gold-soft)] to-[var(--gold)] px-4 py-2.5 text-[14px] leading-relaxed text-[var(--ink)] shadow-[0_10px_28px_-12px_rgba(212,165,116,0.55)] sm:max-w-[85%]">
                     {t.content}
                   </div>
                 </div>
               ) : (
                 <div key={t.id} className="space-y-3">
-                  <div className="rounded-[1.25rem] rounded-bl-md border border-white/[0.06] bg-white/[0.03] px-4 py-3.5 text-[14px] leading-relaxed text-zinc-200 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] backdrop-blur-md">
+                  <div className="rounded-[1.25rem] rounded-bl-md border border-[var(--line)] bg-[var(--ink-elevated)] px-4 py-3.5 text-[14px] leading-relaxed text-[var(--cream-soft)] shadow-[0_1px_0_rgba(243,238,230,0.04)_inset]">
                     {t.content}
                   </div>
                   <SearchMeta
                     intentSummary={t.intent_summary}
                     queriesUsed={t.queries_used}
                   />
-                  {/* Mobile: show cards under chat; desktop uses right panel */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
                     {t.candidates?.map((b, i) => (
                       <BeatCard key={b.id} beat={b} index={i} />
@@ -363,27 +361,31 @@ export function ChatClient() {
               </div>
             )}
             {loading && (
-              <div className="hidden items-center gap-2 text-[13px] text-violet-200/80 lg:flex">
+              <div className="hidden items-center gap-2 text-[13px] text-[var(--gold-soft)] lg:flex">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400/40" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--gold)]/40" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--gold)]" />
                 </span>
                 {loadingHint}
               </div>
             )}
 
             {error && (
-              <div className="flex flex-col gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-[13px] font-medium text-red-200">请求失败</p>
-                  <p className="mt-0.5 text-[12px] text-red-300/70">{error}</p>
+                  <p className="text-[13px] font-medium text-[var(--danger)]">
+                    请求失败
+                  </p>
+                  <p className="mt-0.5 text-[12px] text-[var(--cream-muted)]">
+                    {error}
+                  </p>
                 </div>
                 {lastFailedText ? (
                   <button
                     type="button"
                     disabled={loading}
                     onClick={() => void sendMessage(lastFailedText)}
-                    className="min-h-10 rounded-xl bg-red-500/20 px-4 text-[12px] font-semibold text-red-100"
+                    className="min-h-10 rounded-xl bg-[color-mix(in_srgb,var(--danger)_18%,transparent)] px-4 text-[12px] font-semibold text-[var(--cream)]"
                   >
                     重试上一条
                   </button>
@@ -395,9 +397,9 @@ export function ChatClient() {
 
           <form
             onSubmit={onSend}
-            className="border-t border-white/[0.05] bg-[#07070c]/80 p-3 backdrop-blur-xl sm:p-4"
+            className="border-t border-[var(--line)] bg-[color-mix(in_srgb,var(--ink)_88%,transparent)] p-3 backdrop-blur-xl sm:p-4"
           >
-            <div className="rounded-[1.25rem] border border-white/[0.08] bg-white/[0.03] p-2 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] ring-1 ring-black/20 focus-within:border-violet-400/25 focus-within:ring-violet-500/10">
+            <div className="rounded-[1.25rem] border border-[var(--line-strong)] bg-[var(--ink-elevated)] p-2 focus-within:border-[rgba(212,165,116,0.35)] focus-within:shadow-[0_0_0_3px_var(--gold-dim)]">
               <div className="flex items-end gap-2">
                 <textarea
                   ref={composerRef}
@@ -405,7 +407,7 @@ export function ChatClient() {
                   onChange={(e) => setInput(e.target.value)}
                   rows={2}
                   placeholder="描述气质，或粘贴 YouTube 参考链接…"
-                  className="max-h-36 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none sm:text-[14px]"
+                  className="max-h-36 min-h-[48px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-[var(--cream)] placeholder:text-[var(--cream-faint)] focus:outline-none sm:text-[14px]"
                   onKeyDown={(e) => {
                     if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -417,13 +419,13 @@ export function ChatClient() {
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="mb-1 min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-5 text-[13px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(124,58,237,0.7)] transition hover:from-violet-300 hover:to-violet-500 disabled:opacity-35"
+                  className="mb-1 min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-[var(--gold-soft)] to-[var(--gold)] px-5 font-display text-[13px] font-semibold text-[var(--ink)] shadow-[0_10px_28px_-10px_rgba(212,165,116,0.65)] transition hover:brightness-105 disabled:opacity-35"
                 >
                   {loading ? "…" : "发送"}
                 </button>
               </div>
             </div>
-            <p className="mt-2 px-1 text-[11px] text-zinc-600">
+            <p className="mt-2 px-1 text-[11px] text-[var(--cream-faint)]">
               试听参考 · 商用以源站为准
               <span className="hidden sm:inline">
                 {" "}
@@ -433,20 +435,20 @@ export function ChatClient() {
           </form>
         </section>
 
-        {/* RIGHT: shortlist panel — uses the empty side of the screen */}
-        <aside className="hidden min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-white/[0.02] to-transparent lg:flex">
-          <div className="flex items-center justify-between border-b border-white/[0.05] px-6 py-3.5">
+        {/* RIGHT */}
+        <aside className="hidden min-h-0 min-w-0 flex-1 flex-col bg-[var(--ink-2)]/40 lg:flex">
+          <div className="flex items-center justify-between border-b border-[var(--line)] px-6 py-3.5">
             <div>
-              <h2 className="text-[13px] font-semibold tracking-tight text-zinc-100">
+              <h2 className="font-display text-[14px] font-semibold tracking-tight text-[var(--cream)]">
                 本轮短名单
               </h2>
-              <p className="mt-0.5 text-[11px] text-zinc-500">
+              <p className="mt-0.5 text-[11px] text-[var(--cream-faint)]">
                 策略排序后的可试听结果
               </p>
             </div>
             {latestShortlist ? (
-              <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-zinc-400 ring-1 ring-white/[0.06]">
-                {latestShortlist.candidates.length} 条
+              <span className="rounded-full bg-[var(--gold-dim)] px-2.5 py-1 font-mono text-[11px] font-medium text-[var(--gold)] ring-1 ring-[rgba(212,165,116,0.25)]">
+                {latestShortlist.candidates.length}
               </span>
             ) : null}
           </div>
@@ -457,8 +459,8 @@ export function ChatClient() {
             ) : latestShortlist ? (
               <div className="space-y-4">
                 {latestShortlist.intent_summary ? (
-                  <p className="rounded-2xl border border-white/[0.05] bg-black/20 px-4 py-3 text-[12px] leading-relaxed text-zinc-400">
-                    <span className="font-medium text-violet-300/80">理解 · </span>
+                  <p className="rounded-2xl border border-[var(--line)] bg-black/25 px-4 py-3 text-[12px] leading-relaxed text-[var(--cream-muted)]">
+                    <span className="font-medium text-[var(--gold)]">理解 · </span>
                     {latestShortlist.intent_summary}
                   </p>
                 ) : null}
@@ -470,14 +472,14 @@ export function ChatClient() {
                 {latestShortlist.queries_used &&
                 latestShortlist.queries_used.length > 0 ? (
                   <div className="pt-2">
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                      本轮检索词
+                    <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--cream-faint)]">
+                      Queries
                     </p>
                     <ul className="flex flex-wrap gap-1.5">
                       {latestShortlist.queries_used.map((q) => (
                         <li
                           key={q}
-                          className="rounded-lg bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] text-zinc-500 ring-1 ring-white/[0.05]"
+                          className="rounded-lg bg-black/30 px-2.5 py-1 font-mono text-[10px] text-[var(--cream-muted)] ring-1 ring-[var(--line)]"
                           title={q}
                         >
                           {q}
@@ -488,15 +490,15 @@ export function ChatClient() {
                 ) : null}
               </div>
             ) : (
-              <div className="flex h-full min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-white/[0.08] bg-white/[0.015] px-8 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500/10 ring-1 ring-violet-400/20">
-                  <span className="text-lg text-violet-300">♪</span>
+              <div className="flex h-full min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--line-strong)] bg-[var(--ink-elevated)]/40 px-8 text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--gold-dim)] ring-1 ring-[rgba(212,165,116,0.3)]">
+                  <span className="font-display text-lg text-[var(--gold)]">♪</span>
                 </div>
-                <p className="text-[15px] font-medium text-zinc-300">
+                <p className="font-display text-[16px] font-semibold text-[var(--cream-soft)]">
                   短名单会显示在这里
                 </p>
-                <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-zinc-560 text-zinc-500">
-                  在左侧描述需求或贴参考链接后，筛选后的伴奏卡片会出现在此面板，充分利用宽屏空间。
+                <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-[var(--cream-muted)]">
+                  左侧发起检索后，筛选结果铺在此宽栏——告别中间一条窄栏。
                 </p>
               </div>
             )}

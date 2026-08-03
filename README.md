@@ -71,6 +71,7 @@ npm run dev
 | [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
 | [搜索机制笔记](./docs/search-strategy.md) | 需求→检索词→短名单，与裸搜 YouTube 的差异 |
 | [搜索排名逻辑](./docs/ranking-logic.md) | **当前加减分、制作人先验、LLM 边界** |
+| [设计系统](./docs/design-system.md) | 色板（暖墨+金）· 字体（Syne / Noto SC / JetBrains） |
 | [思路整理图](./docs/thinking-map.md) | 已定结论、v0.1 切口 |
 | [技术与实现决策](./docs/tech-decisions.md) | 前端/Agent/数据源选型 |
 | [v0.1 可开发规格](./docs/spec-v0.1.md) | 已交付基线 |
