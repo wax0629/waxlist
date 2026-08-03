@@ -3,24 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BeatCard } from "@/components/beat-card";
+import { ChatHero } from "@/components/chat-hero";
+import { EmptyResults } from "@/components/empty-results";
+import { ResultSkeleton } from "@/components/result-skeleton";
 import { SearchMeta } from "@/components/search-meta";
 import { SiteHeader } from "@/components/site-header";
 import type { BeatCandidate, ChatMessage, SearchIntent } from "@/lib/types";
 
 const SESSION_KEY = "beat-hunter-session-id";
 
-const WELCOME: ChatMessage = {
-  id: "welcome",
-  role: "assistant",
-  content:
-    "你好，我是 Beat Hunter。用自然语言描述想要的伴奏，或粘贴 YouTube 参考曲链接。\n\n我会先理解需求，再生成多路伴奏域检索词并筛选短名单——不是简单套一层 YouTube 搜索。",
-  created_at: new Date().toISOString(),
-};
-
 const SUGGESTIONS = [
   "适合女声的慢热 R&B，鼓别太抢",
-  "偏暗一点的 trap soul type beat",
-  "再快一点，旋律再抓耳一些",
+  "udg type beat，偏暗一点",
+  "偏暗 trap soul，适合写词",
 ];
 
 const LOADING_HINTS = [
@@ -42,10 +37,46 @@ interface ChatApiResponse {
   error?: string;
 }
 
+type Turn =
+  | { kind: "user"; id: string; content: string }
+  | {
+      kind: "assistant";
+      id: string;
+      content: string;
+      candidates?: BeatCandidate[];
+      intent_summary?: string;
+      queries_used?: string[];
+      empty?: boolean;
+    };
+
+function toTurns(messages: ChatMessage[]): Turn[] {
+  const out: Turn[] = [];
+  for (const m of messages) {
+    if (m.role === "user") {
+      out.push({ kind: "user", id: m.id, content: m.content });
+    } else if (m.role === "assistant") {
+      const empty =
+        Array.isArray(m.candidates) &&
+        m.candidates.length === 0 &&
+        !m.content.includes("出了点问题");
+      out.push({
+        kind: "assistant",
+        id: m.id,
+        content: m.content,
+        candidates: m.candidates,
+        intent_summary: m.intent_summary,
+        queries_used: m.queries_used,
+        empty: empty || undefined,
+      });
+    }
+  }
+  return out;
+}
+
 export function ChatClient() {
   const searchParams = useSearchParams();
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
+  const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingHint, setLoadingHint] = useState(LOADING_HINTS[0]);
@@ -56,10 +87,13 @@ export function ChatClient() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const refBootstrapped = useRef(false);
   const loadingRef = useRef(false);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+
+  const isFresh = turns.length === 0 && !loading && !restoring;
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [turns, loading, error]);
 
   useEffect(() => {
     if (!loading) return;
@@ -94,7 +128,7 @@ export function ChatClient() {
       };
       setSessionId(data.id);
       if (data.messages?.length) {
-        setMessages([WELCOME, ...data.messages]);
+        setTurns(toTurns(data.messages));
       }
     } catch {
       // ignore
@@ -114,11 +148,10 @@ export function ChatClient() {
       if ((!trimmed && !refUrl) || loadingRef.current) return;
 
       const displayText = trimmed || `参考：${refUrl}`;
-      const optimisticUser: ChatMessage = {
+      const userTurn: Turn = {
+        kind: "user",
         id: `local-${Date.now()}`,
-        role: "user",
         content: displayText,
-        created_at: new Date().toISOString(),
       };
 
       setInput("");
@@ -126,7 +159,7 @@ export function ChatClient() {
       setLastFailedText(null);
       setLoading(true);
       loadingRef.current = true;
-      setMessages((prev) => [...prev, optimisticUser]);
+      setTurns((prev) => [...prev, userTurn]);
 
       try {
         const res = await fetch("/api/chat", {
@@ -152,30 +185,29 @@ export function ChatClient() {
             ? `\n\n（${data.warnings.join(" ")}）`
             : "";
 
-        const assistantMsg: ChatMessage = {
+        const candidates = data.candidates ?? [];
+        const assistantTurn: Turn = {
+          kind: "assistant",
           id: `asst-${Date.now()}`,
-          role: "assistant",
           content: `${data.assistant_message}${warn}`,
-          created_at: new Date().toISOString(),
-          candidates: data.candidates ?? [],
+          candidates,
           intent_summary: data.intent_summary,
           queries_used: data.queries_used,
-          intent: data.intent,
+          empty: candidates.length === 0,
         };
 
-        setMessages((prev) => [...prev, assistantMsg]);
+        setTurns((prev) => [...prev, assistantTurn]);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "网络错误";
         setError(msg);
         setLastFailedText(displayText);
         setLastStatus("error");
-        setMessages((prev) => [
+        setTurns((prev) => [
           ...prev,
           {
+            kind: "assistant",
             id: `err-${Date.now()}`,
-            role: "assistant",
-            content: `出了点问题：${msg}。可点下方重试。`,
-            created_at: new Date().toISOString(),
+            content: `出了点问题：${msg}`,
           },
         ]);
       } finally {
@@ -204,21 +236,22 @@ export function ChatClient() {
   function newChat() {
     localStorage.removeItem(SESSION_KEY);
     setSessionId(null);
-    setMessages([WELCOME]);
+    setTurns([]);
     setError(null);
     setLastStatus(null);
+    setLastFailedText(null);
     setInput("");
+    composerRef.current?.focus();
   }
-
-  const showSuggestions = messages.length <= 1 && !loading && !restoring;
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col text-zinc-100">
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-6 pt-4 md:px-6">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-4 md:px-6 md:pt-4">
+        {/* Status bar — compact on mobile */}
+        <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 text-[11px]">
             {lastStatus ? (
               <span
                 className={
@@ -232,126 +265,127 @@ export function ChatClient() {
                 {lastStatus === "ok"
                   ? "检索正常"
                   : lastStatus === "degraded"
-                    ? "降级模式"
+                    ? "降级"
                     : "出错"}
               </span>
+            ) : isFresh ? (
+              <span className="text-zinc-600">准备就绪</span>
             ) : (
-              <span className="text-zinc-600">策略检索 · 伴奏短名单</span>
+              <span className="text-zinc-600">进行中</span>
             )}
-            {sessionId ? (
-              <span className="hidden text-zinc-600 sm:inline">
-                {sessionId.slice(0, 8)}…
-              </span>
-            ) : null}
           </div>
-          <button
-            type="button"
-            onClick={newChat}
-            className="rounded-lg px-2 py-1 text-[11px] text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200"
-          >
-            新会话
-          </button>
+          {!isFresh ? (
+            <button
+              type="button"
+              onClick={newChat}
+              className="min-h-9 shrink-0 rounded-lg px-2.5 text-[12px] text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200"
+            >
+              新会话
+            </button>
+          ) : null}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-3">
+        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain pb-3">
           {restoring && (
             <p className="text-xs text-zinc-500">恢复会话…</p>
           )}
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={
-                m.role === "user" ? "flex justify-end" : "flex justify-start"
-              }
-            >
-              <div
-                className={
-                  m.role === "user"
-                    ? "max-w-[min(85%,28rem)] rounded-2xl rounded-br-md bg-gradient-to-br from-violet-500 to-violet-700 px-4 py-2.5 text-[13px] leading-relaxed text-white shadow-lg shadow-violet-950/50"
-                    : "w-full max-w-[95%] space-y-2.5"
-                }
-              >
-                {m.role === "assistant" ? (
-                  <>
-                    <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.035] px-4 py-3 text-[13px] leading-relaxed text-zinc-200 whitespace-pre-wrap shadow-lg shadow-black/20 backdrop-blur-md">
-                      {m.content}
-                    </div>
-                    <SearchMeta
-                      intentSummary={m.intent_summary}
-                      queriesUsed={m.queries_used}
+
+          {/* 1. First-screen product narrative */}
+          {isFresh && (
+            <ChatHero
+              suggestions={SUGGESTIONS}
+              disabled={loading}
+              onPick={(s) => void sendMessage(s)}
+            />
+          )}
+
+          {/* Conversation */}
+          {turns.map((t) =>
+            t.kind === "user" ? (
+              <div key={t.id} className="flex justify-end">
+                <div className="max-w-[min(88%,22rem)] rounded-2xl rounded-br-md bg-gradient-to-br from-violet-500 to-violet-700 px-3.5 py-2.5 text-[13px] leading-relaxed text-white shadow-lg shadow-violet-950/40 sm:max-w-[min(85%,28rem)] sm:px-4">
+                  {t.content}
+                </div>
+              </div>
+            ) : (
+              <div key={t.id} className="flex w-full justify-start">
+                <div className="w-full max-w-full space-y-2.5 sm:max-w-[95%]">
+                  <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.035] px-3.5 py-3 text-[13px] leading-relaxed text-zinc-200 whitespace-pre-wrap shadow-lg shadow-black/20 backdrop-blur-md sm:px-4">
+                    {t.content}
+                  </div>
+                  <SearchMeta
+                    intentSummary={t.intent_summary}
+                    queriesUsed={t.queries_used}
+                  />
+                  {/* 3. Empty results state */}
+                  {t.empty ? (
+                    <EmptyResults
+                      onRetry={
+                        lastFailedText
+                          ? undefined
+                          : () => {
+                              const prevUser = [...turns]
+                                .reverse()
+                                .find((x) => x.kind === "user");
+                              if (prevUser && prevUser.kind === "user") {
+                                void sendMessage(prevUser.content);
+                              }
+                            }
+                      }
+                      onNewDirection={newChat}
                     />
-                    {m.candidates && m.candidates.length > 0 && (
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {m.candidates.map((b, i) => (
-                          <BeatCard key={b.id} beat={b} index={i} />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  m.content
-                )}
+                  ) : null}
+                  {t.candidates && t.candidates.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-2">
+                      {t.candidates.map((b, i) => (
+                        <BeatCard key={b.id} beat={b} index={i} />
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          ))}
-          {showSuggestions && (
-            <div className="space-y-2">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-                试试这样问
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    disabled={loading}
-                    onClick={() => void sendMessage(s)}
-                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-left text-[12px] text-zinc-400 transition hover:border-violet-400/30 hover:bg-violet-500/10 hover:text-zinc-200"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+            ),
           )}
-          {loading && (
-            <div className="flex items-center gap-2 text-xs text-violet-300/80">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400/40" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400/80" />
-              </span>
-              <span className="animate-pulse">{loadingHint}</span>
-            </div>
-          )}
+
+          {/* 3. Loading skeleton */}
+          {loading && <ResultSkeleton label={loadingHint} />}
+
+          {/* 3. Error state */}
           {error && (
-            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs">
-              <p className="text-red-300/90">{error}</p>
+            <div className="flex flex-col gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-red-200/95">请求失败</p>
+                <p className="mt-0.5 text-[12px] text-red-300/70">{error}</p>
+              </div>
               {lastFailedText ? (
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => void sendMessage(lastFailedText)}
-                  className="rounded-lg bg-red-500/15 px-2.5 py-1 font-medium text-red-200/90 transition hover:bg-red-500/25"
+                  className="min-h-10 shrink-0 rounded-xl bg-red-500/20 px-4 py-2 text-[12px] font-semibold text-red-100 transition hover:bg-red-500/30"
                 >
                   重试上一条
                 </button>
               ) : null}
             </div>
           )}
-          <div ref={bottomRef} />
+
+          <div ref={bottomRef} className="h-px shrink-0" />
         </div>
 
+        {/* Composer — mobile safe area + thumb reach */}
         <form
           onSubmit={onSend}
-          className="sticky bottom-0 mt-auto rounded-2xl border border-white/[0.08] bg-[#0c0c12]/85 p-2 shadow-2xl shadow-black/60 ring-1 ring-white/[0.04] backdrop-blur-xl"
+          className="sticky bottom-0 z-20 mt-auto border border-white/[0.08] bg-[#0c0c12]/90 p-2 shadow-2xl shadow-black/60 ring-1 ring-white/[0.04] backdrop-blur-xl rounded-2xl sm:p-2.5"
         >
           <div className="flex items-end gap-2">
             <textarea
+              ref={composerRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={2}
-              placeholder="描述气质，或粘贴参考曲链接…"
-              className="min-h-[52px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[13px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
+              placeholder="描述气质，或粘贴 YouTube 链接…"
+              className="max-h-32 min-h-[48px] flex-1 resize-none bg-transparent px-2.5 py-2.5 text-[16px] text-zinc-100 placeholder:text-zinc-600 focus:outline-none sm:min-h-[52px] sm:px-3 sm:text-[13px]"
               onKeyDown={(e) => {
                 if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -363,13 +397,17 @@ export function ChatClient() {
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="mb-1 shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-5 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-violet-950/50 transition hover:from-violet-300 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-35"
+              className="mb-0.5 min-h-11 min-w-[4.5rem] shrink-0 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600 px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-violet-950/50 transition hover:from-violet-300 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-35 sm:min-h-10 sm:min-w-0 sm:px-5"
             >
               {loading ? "…" : "发送"}
             </button>
           </div>
-          <p className="px-3 pb-1 text-[10px] leading-relaxed text-zinc-600">
-            结果仅供试听参考，商用请以源站授权为准。Enter 发送 · Shift+Enter 换行
+          <p className="px-2.5 pb-0.5 text-[10px] leading-relaxed text-zinc-600 sm:px-3">
+            试听参考 · 商用以源站为准
+            <span className="hidden sm:inline">
+              {" "}
+              · Enter 发送 · Shift+Enter 换行
+            </span>
           </p>
         </form>
       </main>
