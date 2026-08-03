@@ -1,10 +1,9 @@
-# Beat Hunter
+# Waxlist
 
-面向**歌手 / 说唱人**的伴奏发现 Web 应用：用自然语言或参考曲链接，拿到可试听的 type beat / instrumental 短名单。
+**Waxlist** 是面向听专、荐专与口碑沉淀的音乐社区（一期偏中文地下发行 / 网易云外链）。  
+站内找伴奏 Agent 仍叫 **Beat Hunter**：自然语言或参考曲 → 可试听 type beat 短名单。
 
 ## 使用文档
-
-完整说明见 **[docs/user/](./docs/user/README.md)**：
 
 - [快速开始与用法](./docs/user/README.md)
 - [环境变量](./docs/user/environment.md)
@@ -14,27 +13,30 @@
 
 ```bash
 npm install
-cp .env.example .env.local   # 填入密钥，见 docs/user/environment.md
+cp .env.example .env.local
+# AUTH_SECRET、DATABASE_URL、可选 YouTube / LLM 密钥
+
+npm run db:up    # 本机 Postgres
+npm run db:push
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000) → `/chat`。
+打开 [http://localhost:3000](http://localhost:3000)。
 
 ## 功能概览
 
-| 能力 | 说明 |
-|------|------|
-| 对话找伴奏 | 描述风格 / 情绪 / 人声向 |
-| 参考歌手气质 | 支持部分国内说唱歌手名 → 伴奏域检索 |
-| 参考链接 | YouTube URL 或 `?ref_url=` |
-| 点选 refine | 「再慢一点」「换一批」等 |
-| 短名单 | 右侧卡片试听（授权以源站为准） |
+| 模块 | 路径 | 说明 |
+|------|------|------|
+| 地下精选 | `/explore` | 专辑列表、红心、站主爱听标签 |
+| 我的红心 | `/favorites` | 个人收藏 |
+| Beat Hunter | `/chat` | 找伴奏 Agent |
+| 登录 / 注册 | `/login` `/register` | 社区写操作需要 |
 
 ## 合规
 
-结果仅供试听与发现，商用请遵循源站与版权方要求。详见站内 [关于](/about)。
+结果与外链仅供试听与发现，商用请遵循源站与版权方要求。详见站内 [关于](/about)。
 
-## 开发与贡献
+## 开发
 
 功能规划与缺陷跟踪使用 **GitHub Issues**。  
-内部产品/技术设计文档不放在本仓库远程，仅维护在本地工作区。
+内部产品/技术设计文档仅维护在本地工作区，不推远程。

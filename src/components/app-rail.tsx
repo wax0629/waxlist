@@ -16,17 +16,28 @@ export function AppRail({
   return (
     <aside className="hidden w-[72px] shrink-0 flex-col items-center border-r border-white/[0.05] bg-transparent py-4 md:flex">
       <Link
-        href="/chat"
-        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-[13px] font-bold tracking-tight text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)]"
-        title="Beat Hunter"
+        href="/explore"
+        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-[11px] font-bold tracking-tight text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)]"
+        title="Waxlist"
       >
-        BH
+        WX
       </Link>
 
       <nav className="mt-8 flex flex-1 flex-col items-center gap-2">
         <Link
+          href="/explore"
+          title="精选"
+          className={
+            path.startsWith("/explore") || path.startsWith("/favorites")
+              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
+              : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
+          }
+        >
+          <DiscIcon />
+        </Link>
+        <Link
           href="/chat"
-          title="找伴奏"
+          title="Beat Hunter · 找伴奏"
           className={
             onChat
               ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
@@ -34,17 +45,6 @@ export function AppRail({
           }
         >
           <ChatIcon />
-        </Link>
-        <Link
-          href="/explore"
-          title="地下精选"
-          className={
-            path.startsWith("/explore")
-              ? "flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
-              : "flex h-11 w-11 items-center justify-center rounded-2xl text-white/40 transition hover:bg-white/8 hover:text-white/80"
-          }
-        >
-          <DiscIcon />
         </Link>
         <Link
           href="/about"

@@ -11,7 +11,7 @@ import { ResultSkeleton } from "@/components/result-skeleton";
 import { SearchMeta } from "@/components/search-meta";
 import type { BeatCandidate, ChatMessage, SearchIntent } from "@/lib/types";
 
-const SESSION_KEY = "beat-hunter-session-id";
+const SESSION_KEY = "waxlist-bh-session-id";
 
 const SUGGESTIONS = [
   "适合女声的慢热 R&B，鼓别太抢",
@@ -265,13 +265,13 @@ export function ChatClient() {
               <p className="font-display text-[14px] font-semibold text-white">
                 Beat Hunter
               </p>
-              <p className="text-[10px] text-white/40">找伴奏 · Beta</p>
+              <p className="text-[10px] text-white/40">Waxlist · 找伴奏</p>
             </div>
             <div className="touri-pills max-md:hidden">
-              <span className="touri-pill touri-pill-active">✨ AI Chat</span>
-              <span className="touri-pill cursor-not-allowed opacity-50">
-                🎵 精选
-              </span>
+              <span className="touri-pill touri-pill-active">✨ Beat Hunter</span>
+              <a href="/explore" className="touri-pill">
+                🎵 Waxlist
+              </a>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2.5">

@@ -22,8 +22,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Beat Hunter — 找伴奏",
-  description: "自然语言 + 参考曲链接，快速发现可试听伴奏短名单",
+  title: "Waxlist",
+  description:
+    "听专、荐专与口碑 · 站内 Beat Hunter 帮你找可试听伴奏",
 };
 
 export default function RootLayout({

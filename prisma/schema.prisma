@@ -1,4 +1,4 @@
-// Beat Hunter — Postgres schema (local via docker compose)
+// Waxlist — Postgres schema (local via docker compose)
 // Roles: owner | admin | user
 
 generator client {

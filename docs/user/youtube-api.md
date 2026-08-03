@@ -1,6 +1,6 @@
 # YouTube Data API 配置（自托管）
 
-真检索依赖 [YouTube Data API v3](https://developers.google.com/youtube/v3)。
+**Beat Hunter**（找伴奏）真检索依赖 [YouTube Data API v3](https://developers.google.com/youtube/v3)。
 
 ## 步骤概要
 

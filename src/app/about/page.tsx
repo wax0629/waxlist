@@ -10,22 +10,20 @@ export default function AboutPage() {
           Beta
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white">
-          关于 Beat Hunter
+          关于 Waxlist
         </h1>
         <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-white/60">
           <p>
-            Beat Hunter 帮助
-            <strong className="font-medium text-white/85">歌手与说唱人</strong>
-            用自然语言或参考曲链接，快速收成可试听的伴奏短名单——而不是在 YouTube
-            上自己猜关键词、翻噪音结果。
+            <strong className="font-medium text-white/85">Waxlist</strong>{" "}
+            是听专、荐专与口碑沉淀的社区（一期偏中文地下发行 / 网易云外链）：红心、站主爱听标签、后续评分与推荐理由。
           </p>
           <p>
-            当前阶段聚焦
-            <strong className="font-medium text-white/85"> 找伴奏 Agent</strong>
-            。同站「地下精选」为后续模块，会认真单独建设，本 Beta 不包含。
+            站内找伴奏模块仍叫{" "}
+            <strong className="font-medium text-white/85">Beat Hunter</strong>
+            ：帮歌手与说唱人用自然语言或参考曲链接，快速收成可试听的伴奏短名单。
           </p>
           <h2 className="pt-2 font-display text-lg font-semibold text-white">
-            如何工作
+            Beat Hunter 如何工作
           </h2>
           <ol className="list-decimal space-y-2 pl-5">
             <li>理解你的风格、速度、人声向与避开项</li>
@@ -43,10 +41,10 @@ export default function AboutPage() {
           </ul>
           <p className="pt-6">
             <Link
-              href="/chat"
+              href="/explore"
               className="touri-grad inline-flex items-center rounded-full px-5 py-2.5 font-display text-[13px] font-semibold text-white shadow-[0_10px_28px_-10px_rgba(155,81,224,0.55)]"
             >
-              开始找伴奏 →
+              打开精选 →
             </Link>
           </p>
         </div>

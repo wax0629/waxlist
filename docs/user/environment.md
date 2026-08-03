@@ -26,7 +26,7 @@ cp .env.example .env.local
 npm run db:up
 
 # .env.local 中：
-# DATABASE_URL=postgresql://beathunter:beathunter@localhost:5432/beathunter
+# DATABASE_URL=postgresql://waxlist:waxlist@localhost:5432/waxlist
 
 # 同步表结构
 npm run db:push
