@@ -255,8 +255,8 @@ export function ChatClient() {
       <AppRail onNewChat={newChat} showNewChat={!isFresh} />
 
       <div className="flex min-w-0 flex-1 flex-col lg:flex-row">
-        {/* CENTER: AI chat */}
-        <section className="glass flex min-h-0 min-w-0 flex-1 flex-col rounded-none border-y-0 border-l-0 lg:max-w-[440px] xl:max-w-[480px]">
+        {/* CENTER: AI chat — larger share of width */}
+        <section className="glass flex min-h-0 min-w-0 flex-1 flex-col rounded-none border-y-0 border-l-0 lg:min-w-0 lg:flex-[1.55]">
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
             <div>
               <p className="font-display text-[14px] font-semibold text-white">
@@ -329,14 +329,9 @@ export function ChatClient() {
                     queriesUsed={t.queries_used}
                   />
                   {t.candidates && t.candidates.length > 0 ? (
-                    <div className="grid gap-3 lg:hidden">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
                       {t.candidates.map((b, i) => (
-                        <BeatCard
-                          key={b.id}
-                          beat={b}
-                          index={i}
-                          featured={i === 0}
-                        />
+                        <BeatCard key={b.id} beat={b} index={i} />
                       ))}
                     </div>
                   ) : null}
@@ -441,31 +436,29 @@ export function ChatClient() {
           </form>
         </section>
 
-        <aside className="relative hidden min-h-0 min-w-0 flex-1 flex-col lg:flex">
-          <div className="relative flex items-end justify-between gap-4 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 backdrop-blur-xl xl:px-8">
+        {/* RIGHT: results — narrower share, unified cards */}
+        <aside className="relative hidden min-h-0 min-w-0 flex-col border-l border-white/[0.06] lg:flex lg:w-[min(36vw,400px)] lg:max-w-[400px] lg:flex-none xl:w-[min(34vw,420px)] xl:max-w-[420px]">
+          <div className="relative flex items-end justify-between gap-3 border-b border-white/[0.06] bg-white/[0.02] px-4 py-3.5 backdrop-blur-xl">
             <div>
               <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
                 Discover
               </p>
-              <h2 className="mt-1 font-display text-[1.35rem] font-semibold tracking-tight text-white">
+              <h2 className="mt-0.5 font-display text-[1.1rem] font-semibold tracking-tight text-white">
                 伴奏发现
               </h2>
-              <p className="mt-1 max-w-md text-[12px] text-white/45">
-                Touri 玻璃 · 策略排序后的可试听短名单
-              </p>
             </div>
             {latestShortlist ? (
-              <span className="glass mb-1 rounded-full px-3 py-1 font-mono text-[11px] font-medium text-[#ff8fb3]">
+              <span className="glass mb-0.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-medium text-[#ff8fb3]">
                 {latestShortlist.candidates.length} picks
               </span>
             ) : null}
           </div>
 
-          <div className="relative min-h-0 flex-1 overflow-y-auto px-5 py-5 xl:px-8 xl:py-6">
+          <div className="relative min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
             {loading && !latestShortlist ? (
               <ResultSkeleton label={loadingHint} />
             ) : latestShortlist ? (
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {latestShortlist.intent_summary ? (
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="glass rounded-full px-3 py-1.5 text-[11px] text-white/70">
@@ -474,19 +467,15 @@ export function ChatClient() {
                   </div>
                 ) : null}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+                {/* Single-column unified cards in the slim results pane */}
+                <div className="grid grid-cols-1 gap-3">
                   {latestShortlist.candidates.map((b, i) => (
-                    <BeatCard
-                      key={b.id}
-                      beat={b}
-                      index={i}
-                      featured={i === 0}
-                    />
+                    <BeatCard key={b.id} beat={b} index={i} />
                   ))}
                 </div>
 
                 {latestShortlist.queries_used?.length ? (
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
                       Search strategy
                     </p>
@@ -494,7 +483,7 @@ export function ChatClient() {
                       {latestShortlist.queries_used.map((q) => (
                         <li
                           key={q}
-                          className="glass rounded-full px-3 py-1 font-mono text-[10px] text-white/60"
+                          className="glass rounded-full px-2.5 py-1 font-mono text-[10px] text-white/60"
                           title={q}
                         >
                           {q}
@@ -505,14 +494,13 @@ export function ChatClient() {
                 ) : null}
               </div>
             ) : (
-              <div className="glass-panel flex h-full min-h-[320px] flex-col items-center justify-center rounded-[1.75rem] px-10 text-center">
-                <div className="touri-sphere mb-5 opacity-90" aria-hidden />
-                <p className="font-display text-[1.2rem] font-semibold text-white/90">
-                  粉紫极光 · 伴奏发现
+              <div className="glass-panel flex h-full min-h-[280px] flex-col items-center justify-center rounded-2xl px-6 text-center">
+                <div className="touri-sphere mb-4 scale-90 opacity-90" aria-hidden />
+                <p className="font-display text-[1rem] font-semibold text-white/90">
+                  等待短名单
                 </p>
-                <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-white/45">
-                  左侧对话后，这里铺开玻璃短名单——暖橙 / 品红 / 深紫 mesh
-                  作底，卡片透出层次。
+                <p className="mt-2 max-w-[14rem] text-[12px] leading-relaxed text-white/45">
+                  左侧描述需求后，这里会列出统一样式的可试听结果。
                 </p>
               </div>
             )}

@@ -3,14 +3,14 @@
 import { motion } from "framer-motion";
 import type { BeatCandidate } from "@/lib/types";
 
-/** Glass destination card on aurora background */
+/** Unified glass result card — same size/style for every pick */
 export function BeatCard({
   beat,
   index = 0,
-  featured = false,
 }: {
   beat: BeatCandidate;
   index?: number;
+  /** @deprecated ignored — all cards use one style */
   featured?: boolean;
 }) {
   return (
@@ -18,18 +18,14 @@ export function BeatCard({
       href={beat.url}
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.4,
-        delay: Math.min(index, 6) * 0.05,
+        duration: 0.35,
+        delay: Math.min(index, 6) * 0.04,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className={
-        featured
-          ? "group relative col-span-full flex min-h-[230px] overflow-hidden rounded-[1.5rem] border border-white/15 bg-white/[0.06] shadow-[0_1px_0_rgba(255,255,255,0.12)_inset,0_24px_60px_-28px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:min-h-[270px] lg:col-span-2"
-          : "group relative flex min-h-[210px] flex-col overflow-hidden rounded-[1.35rem] border border-white/14 bg-white/[0.055] shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_20px_48px_-28px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08]"
-      }
+      className="group relative flex min-h-[200px] flex-col overflow-hidden rounded-2xl border border-white/12 bg-white/[0.05] shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-white/22 hover:bg-white/[0.07]"
     >
       <div className="absolute inset-0">
         {beat.thumbnail ? (
@@ -37,38 +33,32 @@ export function BeatCard({
           <img
             src={beat.thumbnail}
             alt=""
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
+            className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-[#ff6b9e]/25 via-[#9b51e0]/15 to-transparent" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#a94f28]/15 via-transparent to-[#9b51e0]/15 mix-blend-soft-light" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#a94f28]/12 via-transparent to-[#9b51e0]/12 mix-blend-soft-light" />
       </div>
 
-      <div className="relative z-10 flex items-start justify-between p-3.5">
-        <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-md">
+      <div className="relative z-10 flex items-start justify-between p-3">
+        <span className="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-md">
           {beat.source}
         </span>
-        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-slate-900 opacity-0 shadow-lg transition group-hover:opacity-100">
+        <span className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-900 opacity-0 shadow-lg transition group-hover:opacity-100">
           试听
         </span>
       </div>
 
-      <div className="relative z-10 mt-auto space-y-1.5 p-4 pt-16">
-        <p className="truncate text-[11px] font-medium tracking-wide text-white/55">
+      <div className="relative z-10 mt-auto space-y-1 p-3.5 pt-12">
+        <p className="truncate text-[10px] font-medium tracking-wide text-white/55">
           {beat.channel_title || "未知频道"}
         </p>
-        <h3
-          className={
-            featured
-              ? "font-display text-[1.35rem] font-semibold leading-snug tracking-tight text-white sm:text-[1.5rem]"
-              : "line-clamp-2 font-display text-[15px] font-semibold leading-snug tracking-tight text-white"
-          }
-        >
+        <h3 className="line-clamp-2 font-display text-[14px] font-semibold leading-snug tracking-tight text-white">
           {beat.title}
         </h3>
-        <p className="line-clamp-2 text-[12px] leading-relaxed text-white/70">
+        <p className="line-clamp-2 text-[11px] leading-relaxed text-white/65">
           {beat.reason || "点开试听，判断是否合拍。"}
         </p>
       </div>
