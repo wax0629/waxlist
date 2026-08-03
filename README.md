@@ -67,6 +67,8 @@ npm run dev
 
 | 文档 | 说明 |
 |------|------|
+| [协作流程](./docs/process.md) | 文档分层、何时写 spec、想法如何进开发 |
+| [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
 | [思路整理图](./docs/thinking-map.md) | 已定结论、v0.1 切口 |
 | [技术与实现决策](./docs/tech-decisions.md) | 前端/Agent/数据源选型 |
 | [v0.1 可开发规格](./docs/spec-v0.1.md) | 用户故事、API、验收 |
@@ -88,6 +90,6 @@ npm run dev
 
 ## 建议下一步
 
-1. `POST /api/chat` + 服务端会话  
-2. 接入 YouTube 真检索  
-3. LLM tool calling 闭环（描述 / 参考 / refine）  
+1. 后续想法写入 [ideas-backlog](./docs/ideas-backlog.md)  
+2. 从 backlog 勾选后写 `spec-v0.2` 再开工  
+3. 可选：流式输出、部署 Demo、`/explore` 占位  
