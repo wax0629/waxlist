@@ -326,23 +326,25 @@ Mock：无 key 时允许 `source: "mock"` 假数据跑通 UI（README 注明 dem
 
 ### 功能
 
-- [ ] US-1 纯描述 → ≤5 条可点开 shortlist  
-- [ ] US-2 YouTube 参考链接 → reason 含风格相关语义  
-- [ ] US-3 同会话 refine 一轮可见变化  
-- [ ] US-4 API/解析失败有说明、不白屏  
-- [ ] 刷新后（进程未重启）可用 sessionId 恢复消息  
+- [x] US-1 纯描述 → ≤5 条可点开 shortlist  
+- [x] US-2 YouTube 参考链接 → reason 含风格相关语义  
+- [x] US-3 同会话 refine 一轮可见变化  
+- [x] US-4 API/解析失败有说明、不白屏  
+- [x] 刷新后（进程未重启）可用 sessionId 恢复消息  
+- [x] `/chat?ref_url=` 深链预检索  
 
 ### 工程
 
-- [ ] 密钥不进客户端 bundle  
-- [ ] README：如何配置 env、如何跑三条演示路径  
-- [ ] TypeScript 核心类型与 `BeatCandidate` 一致  
+- [x] 密钥不进客户端 bundle  
+- [x] README：如何配置 env、如何跑三条演示路径  
+- [x] TypeScript 核心类型与 `BeatCandidate` 一致  
 
 ### 体验
 
-- [ ] 中文 UI  
-- [ ] 暗色 + 结果卡可读（对比度可用）  
-- [ ] 合规小字可见  
+- [x] 中文 UI  
+- [x] 暗色 + 结果卡可读（对比度可用）  
+- [x] 合规小字可见  
+- [x] 卡片入场动效（Framer Motion）  
 
 ---
 

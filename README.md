@@ -47,6 +47,15 @@ cp .env.example .env.local
 npm run dev
 ```
 
+### 演示三条路径
+
+1. **描述：** `适合女声的慢热 R&B，鼓别太抢` → 点开 YouTube 卡片  
+2. **参考：** 粘贴任意 YouTube 成品/伴奏链接，或打开  
+   `/chat?ref_url=https://www.youtube.com/watch?v=VIDEO_ID`  
+3. **Refine：** 同会话继续 `再快一点` / `鼓再轻一点`  
+
+也可点输入框上方的快捷建议。
+
 ## 站点结构
 
 | 页面 | 路径 | 说明 |
