@@ -1,23 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm ink + champagne gold (not default AI purple) */
-  --ink: #0c0b0a;
-  --ink-2: #121110;
-  --ink-elevated: #171513;
-  --cream: #f3eee6;
-  --cream-soft: #e8e2d8;
-  --cream-muted: #9a9286;
-  --cream-faint: #6b655c;
-  --line: rgba(243, 238, 230, 0.09);
-  --line-strong: rgba(243, 238, 230, 0.14);
-  --gold: #d4a574;
-  --gold-soft: #e8c9a8;
-  --gold-dim: rgba(212, 165, 116, 0.15);
-  --ember: #c45c3e;
-  --ok: #7dba8c;
-  --warn: #d4a017;
-  --danger: #d4736b;
+  /*
+   * Palette inspired by Dribbble:
+   * AI Travel Assistant UI — Trip Planning & Destination Discovery
+   * https://dribbble.com/shots/27052075-AI-Travel-Assistant-UI-Trip-Planning-Destination-Discovery
+   * Cool navy + electric blue/cyan (futuristic travel dashboard).
+   * Note: --gold* tokens keep old names but hold blue accents for less churn.
+   */
+  --ink: #0a0f1e;
+  --ink-2: #0d1426;
+  --ink-elevated: #151d33;
+  --cream: #f2f6ff;
+  --cream-soft: #d7e0f2;
+  --cream-muted: #8b9bb8;
+  --cream-faint: #5a6a88;
+  --line: rgba(120, 150, 220, 0.12);
+  --line-strong: rgba(120, 150, 220, 0.22);
+  --gold: #3b82f6;
+  --gold-soft: #60a5fa;
+  --gold-dim: rgba(59, 130, 246, 0.16);
+  --cyan: #22d3ee;
+  --ember: #38bdf8;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --danger: #fb7185;
   --background: var(--ink);
   --foreground: var(--cream);
 }
@@ -49,7 +56,7 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* Warm night glow — amber not violet */
+/* Cool blue night glow — travel dashboard */
 body::before {
   content: "";
   pointer-events: none;
@@ -57,9 +64,9 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 70% 45% at 15% -5%, rgba(212, 165, 116, 0.14), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 90% 5%, rgba(196, 92, 62, 0.08), transparent 50%),
-    radial-gradient(ellipse 55% 35% at 60% 100%, rgba(20, 18, 16, 0.95), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 12% -8%, rgba(59, 130, 246, 0.22), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 92% 8%, rgba(34, 211, 238, 0.1), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 70% 100%, rgba(15, 23, 42, 0.95), transparent 50%),
     var(--ink);
 }
 
@@ -69,14 +76,14 @@ body::after {
   position: fixed;
   inset: 0;
   z-index: -1;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(212, 165, 116, 0.25) transparent;
+  scrollbar-color: rgba(59, 130, 246, 0.28) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -84,22 +91,23 @@ body::after {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 165, 116, 0.22);
+  background: rgba(59, 130, 246, 0.25);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
-/* Utility surfaces */
 .surface {
   background: var(--ink-elevated);
   border: 1px solid var(--line);
 }
+
 .gold-text {
-  color: var(--gold);
+  color: var(--gold-soft);
 }
+
 .gold-gradient-text {
-  background: linear-gradient(120deg, var(--gold-soft), var(--gold) 45%, #c4895a);
+  background: linear-gradient(120deg, #93c5fd, #3b82f6 40%, #22d3ee 95%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
