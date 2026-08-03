@@ -29,8 +29,6 @@ const PatchBody = z.object({
   cover_url: z.string().optional(),
   tags: z.array(z.string()).optional(),
   sort_order: z.number().optional(),
-  /** 站主红心 */
-  owner_loved: z.boolean().optional(),
 });
 
 export async function PATCH(req: Request, ctx: Ctx) {
@@ -38,25 +36,12 @@ export async function PATCH(req: Request, ctx: Ctx) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "请先登录" }, { status: 401 });
   }
+  if (!canModerate(session.user.role)) {
+    return NextResponse.json({ error: "需要管理权限" }, { status: 403 });
+  }
   const { id } = await ctx.params;
   try {
     const body = PatchBody.parse(await req.json());
-
-    // 红心：仅站主
-    if (body.owner_loved !== undefined) {
-      if (session.user.role !== "owner") {
-        return NextResponse.json({ error: "仅站主可标记爱听" }, { status: 403 });
-      }
-      const release = await updateRelease(id, {
-        owner_loved: body.owner_loved,
-      });
-      return NextResponse.json({ release });
-    }
-
-    // 其它字段：管理或站主
-    if (!canModerate(session.user.role)) {
-      return NextResponse.json({ error: "需要管理权限" }, { status: 403 });
-    }
     const release = await updateRelease(id, {
       ...body,
       cover_url: body.cover_url,

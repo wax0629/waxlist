@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppRail } from "@/components/app-rail";
+import { auth } from "@/lib/auth";
+import { isFavorited } from "@/lib/favorites/store";
 import { getRelease } from "@/lib/releases/store";
+import { DetailHeart } from "@/components/detail-heart";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +14,10 @@ export default async function ReleaseDetailPage({ params }: Props) {
   const { id } = await params;
   const release = await getRelease(id);
   if (!release || release.status !== "published") notFound();
+  const session = await auth();
+  const favorited = session?.user?.id
+    ? await isFavorited(session.user.id, id)
+    : false;
 
   const netease =
     release.netease_url ||
@@ -48,15 +55,23 @@ export default async function ReleaseDetailPage({ params }: Props) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              {release.owner_loved ? (
-                <span className="rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
-                  ♥ 站主爱听
-                </span>
-              ) : null}
-              <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">
-                {release.type}
-              </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {release.owner_loved ? (
+                  <span className="rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                    ♥ 站主爱听
+                  </span>
+                ) : null}
+                <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">
+                  {release.type}
+                </p>
+              </div>
+              <DetailHeart
+                releaseId={release.id}
+                initialFavorited={favorited}
+                initialOwnerLoved={release.owner_loved}
+                loggedIn={Boolean(session?.user)}
+              />
             </div>
             <h1 className="mt-2 font-display text-2xl font-semibold leading-tight">
               {release.title}

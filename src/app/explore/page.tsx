@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppRail } from "@/components/app-rail";
 import { ReleaseCard } from "@/components/release-card";
 import { auth } from "@/lib/auth";
+import { favoritedReleaseIds } from "@/lib/favorites/store";
 import { listReleases } from "@/lib/releases/store";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,12 @@ export default async function ExplorePage() {
   const session = await auth();
   const isOwner = session?.user?.role === "owner";
   const items = await listReleases({ status: "published" });
+  const mine = session?.user?.id
+    ? await favoritedReleaseIds(
+        session.user.id,
+        items.map((i) => i.id),
+      )
+    : new Set<string>();
 
   return (
     <div className="flex min-h-dvh flex-1 text-white">
@@ -24,10 +31,18 @@ export default async function ExplorePage() {
               地下精选
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/50">
-              一张列表。站主点卡片右上角红心，会亮起「站主爱听」标签；爱听的专会排在更前。
+              人人可点红心，收藏进自己的列表。站主点过的专会显示「站主爱听」标签并靠前。
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
+            {session?.user ? (
+              <Link
+                href="/favorites"
+                className="rounded-full border border-rose-400/40 px-3 py-1.5 text-rose-200/90 hover:border-rose-300/60"
+              >
+                ♥ 我的红心
+              </Link>
+            ) : null}
             {isOwner ? (
               <Link
                 href="/owner/releases"
@@ -67,20 +82,16 @@ export default async function ExplorePage() {
         {items.length === 0 ? (
           <p className="mt-12 text-center text-sm text-white/40">
             还没有已发布专辑。
-            {isOwner ? (
-              <>
-                {" "}
-                <Link href="/owner/releases" className="text-white/70 underline">
-                  去添加
-                </Link>
-              </>
-            ) : null}
           </p>
         ) : (
           <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {items.map((r) => (
               <li key={r.id}>
-                <ReleaseCard release={r} isOwner={isOwner} />
+                <ReleaseCard
+                  release={r}
+                  loggedIn={Boolean(session?.user)}
+                  initialFavorited={mine.has(r.id)}
+                />
               </li>
             ))}
           </ul>

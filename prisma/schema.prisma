@@ -20,7 +20,8 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  releases     Release[] @relation("ReleaseCreator")
+  releases     Release[]   @relation("ReleaseCreator")
+  favorites    Favorite[]
 
   @@map("users")
 }
@@ -41,7 +42,7 @@ model Release {
   source          String
   /// draft | pending | published | rejected
   status          String   @default("draft")
-  /// 站主红心：点亮后展示「站主爱听」标签（仅 owner 可切换）
+  /// 站主是否点过红心（缓存：任一 owner 用户收藏时为 true，用于标签与排序）
   ownerLoved      Boolean  @default(false) @map("owner_loved")
   /// [{ label, url }]
   links           Json     @default("[]")
@@ -52,9 +53,25 @@ model Release {
   updatedAt       DateTime @updatedAt @map("updated_at")
   ratingAvg       Float?   @map("rating_avg")
   ratingCount     Int      @default(0) @map("rating_count")
+  favorites       Favorite[]
 
   @@unique([neteaseId])
   @@index([status, source])
   @@index([ownerLoved])
   @@map("releases")
+}
+
+/// 个人红心列表：任何登录用户可收藏
+model Favorite {
+  id        String   @id
+  userId    String   @map("user_id")
+  releaseId String   @map("release_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, releaseId])
+  @@index([userId])
+  @@index([releaseId])
+  @@map("favorites")
 }

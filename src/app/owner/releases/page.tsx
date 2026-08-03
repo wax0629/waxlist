@@ -124,8 +124,7 @@ export default function OwnerReleasesPage() {
         </Link>
         <h1 className="mt-4 font-display text-2xl font-semibold">添加专辑</h1>
         <p className="mt-2 text-sm text-white/50">
-          发布到精选列表。想标「站主爱听」请在 explore
-          卡片右上角点红心（仅站主可点）。封面以手填 URL 为主。
+          发布到精选列表。任何登录用户都可点红心进「我的红心」；你作为站主点红心后，该专会显示「站主爱听」标签。
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
