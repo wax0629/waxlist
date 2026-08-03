@@ -43,3 +43,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Development / product design docs (local only; not published to GitHub)
+# Keep user-facing docs under docs/user/
+/docs/*
+!/docs/user/
+!/docs/user/**

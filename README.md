@@ -1,103 +1,40 @@
 # Beat Hunter
 
-面向歌手的**伴奏发现** Web 产品，并规划同站的中文地下发行精选模块。
+面向**歌手 / 说唱人**的伴奏发现 Web 应用：用自然语言或参考曲链接，拿到可试听的 type beat / instrumental 短名单。
 
-## 一句话
+## 使用文档
 
-- **找伴奏（主线）：** 自然语言 + 参考曲链接 → 多平台可试听短名单（对话 Agent）  
-- **地下精选（二期）：** 中文地下优质发行整理 + 用户打分（独立页面）  
+完整说明见 **[docs/user/](./docs/user/README.md)**：
 
-## 本地开发
+- [快速开始与用法](./docs/user/README.md)
+- [环境变量](./docs/user/environment.md)
+- [YouTube API 配置](./docs/user/youtube-api.md)
+
+## 本地运行
 
 ```bash
 npm install
+cp .env.example .env.local   # 填入密钥，见 docs/user/environment.md
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)（会跳到 `/chat`）。
+打开 [http://localhost:3000](http://localhost:3000) → `/chat`。
 
-复制环境变量模板（接 API 时再填）：
+## 功能概览
 
-```bash
-cp .env.example .env.local
-```
-
-当前阶段（**v0.2 搜索机制**）：
-
-- Intent 理解 → 多角度伴奏域 query → YouTube 多路召回 → 过滤打分 → 短名单  
-- UI 展示「我的理解」+ 可展开「本轮检索词」  
-- 无 YouTube Key 时 mock 降级；会话 `session_id` 在 `localStorage`
-
-### 环境变量
-
-```bash
-cp .env.example .env.local
-```
-
-| 变量 | 用途 |
+| 能力 | 说明 |
 |------|------|
-| `YOUTUBE_API_KEY` | 真检索（[获取说明](./docs/youtube-api-setup.md)） |
-| `XAI_API_KEY` | LLM tool calling（OpenAI 兼容，默认 xAI） |
-| `LLM_BASE_URL` | 默认 `https://api.x.ai/v1` |
-| `LLM_MODEL` | 模型 ID（如控制台里的 grok 模型名） |
+| 对话找伴奏 | 描述风格 / 情绪 / 人声向 |
+| 参考歌手气质 | 支持部分国内说唱歌手名 → 伴奏域检索 |
+| 参考链接 | YouTube URL 或 `?ref_url=` |
+| 点选 refine | 「再慢一点」「换一批」等 |
+| 短名单 | 右侧卡片试听（授权以源站为准） |
 
-```bash
-npm run dev
-```
+## 合规
 
-### 演示三条路径（v0.2）
+结果仅供试听与发现，商用请遵循源站与版权方要求。详见站内 [关于](/about)。
 
-1. **描述：** `适合女声的慢热 R&B，鼓别太抢` → 看 **我的理解** + 展开 **检索词** → 点开卡片  
-2. **参考：** 粘贴 YouTube 链接，或 `/chat?ref_url=https://www.youtube.com/watch?v=VIDEO_ID`  
-3. **Refine：** `再快一点` / `鼓再轻一点` → 理解与检索词/列表变化  
+## 开发与贡献
 
-快捷建议 chip 可一点发送。
-
-## 站点结构
-
-| 页面 | 路径 | 说明 |
-|------|------|------|
-| 找伴奏 | `/chat` | 主产品，v0.1 |
-| 地下精选 | `/explore` | 二期；导航暂「即将推出」 |
-
-## 文档
-
-| 文档 | 说明 |
-|------|------|
-| [完整产品成熟度](./docs/product-maturity.md) | **正式产品路线**（非玩具）：阶段与出口标准 |
-| [大功能与主流程](./docs/product-flows.md) | **整站地图 + 四条主流程**（先对齐大块） |
-| [功能清单](./docs/feature-inventory.md) | 细项清单（大块对齐后再拆） |
-| [协作流程](./docs/process.md) | 文档分层、何时写 spec、想法如何进开发 |
-| [想法 backlog](./docs/ideas-backlog.md) | **后续想法记这里**（不等于要做） |
-| [搜索机制笔记](./docs/search-strategy.md) | 需求→检索词→短名单，与裸搜 YouTube 的差异 |
-| [搜索排名逻辑](./docs/ranking-logic.md) | **当前加减分、制作人先验、LLM 边界** |
-| [设计系统](./docs/design-system.md) | 色板（暖墨+金）· 字体（Syne / Noto SC / JetBrains） |
-| [Agent 页视觉参考](./docs/design-refs-agent.md) | Dribbble AI Travel Dashboard 方向 |
-| [地下精选视觉参考](./docs/design-refs-explore.md) | Collect UI 灵感（后置实现） |
-| [思路整理图](./docs/thinking-map.md) | 已定结论、v0.1 切口 |
-| [技术与实现决策](./docs/tech-decisions.md) | 前端/Agent/数据源选型 |
-| [v0.1 可开发规格](./docs/spec-v0.1.md) | 已交付基线 |
-| [v0.2 可开发规格](./docs/spec-v0.2.md) | **当前：** 搜索机制 + UI（理解/检索词） |
-| [产品构思与方向](./docs/product-concept.md) | 全站定位与路线 |
-| [信息架构](./docs/information-architecture.md) | 路由、导航 |
-| [地下精选模块](./docs/underground-catalog.md) | 发行库 + 打分（二期） |
-
-## 技术栈（v0.1）
-
-- Next.js (App Router) + TypeScript + Tailwind  
-- 视觉参考 [Suno](https://suno.com/)（暗色、结果卡）  
-- Agent：自建薄编排；真源：YouTube Data API  
-
-## 明确不做（v0.1）
-
-- 编曲 / 混音主流程  
-- 灰产下载  
-- Agent 推荐专辑（后期附加）  
-
-## 建议下一步
-
-目标是**完整正式产品**。当前阶段：**Phase 1 只做 Agent 找伴奏**（地下精选后置认真做）。
-
-1. 按 [Phase 1 Agent Beta 规格](./docs/spec-phase1-agent-beta.md) 实现  
-2. 地图见 [product-flows](./docs/product-flows.md) · [product-maturity](./docs/product-maturity.md)  
-3. 之后：Phase 2 账号/资产 → Phase 3 **地下精选（重点模块）**  
+功能规划与缺陷跟踪使用 **GitHub Issues**。  
+内部产品/技术设计文档不放在本仓库远程，仅维护在本地工作区。
