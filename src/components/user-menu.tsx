@@ -114,8 +114,8 @@ export function UserMenu() {
         onClick={() => setOpen((v) => !v)}
         className={
           open
-            ? "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)] ring-2 ring-white/30"
-            : "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(155,81,224,0.55)] ring-1 ring-white/20 transition hover:ring-white/40"
+            ? "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-2 ring-white/35"
+            : "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-1 ring-white/25 transition hover:ring-white/45"
         }
       >
         {initials}
@@ -124,7 +124,7 @@ export function UserMenu() {
       {open ? (
         <div
           role="menu"
-          className="glass-rim absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl bg-[#141414]/95 py-1 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.65)] backdrop-blur-xl"
+          className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-white/20 bg-[#141414]/98 py-1 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.65)] backdrop-blur-xl"
         >
           <div className="border-b border-white/18 px-3 py-3">
             <p className="truncate text-sm font-medium text-white">{label}</p>
@@ -163,10 +163,10 @@ export function UserMenu() {
   );
 }
 
-/** Fixed top-right shell used site-wide */
+/** Fixed top-right shell used site-wide (single instance in Providers) */
 export function UserAccountCorner() {
   return (
-    <div className="pointer-events-none fixed right-3 top-3 z-[60] sm:right-5 sm:top-4">
+    <div className="pointer-events-none fixed right-3 top-3 z-[60] isolate sm:right-5 sm:top-4">
       <div className="pointer-events-auto">
         <UserMenu />
       </div>

@@ -64,7 +64,7 @@ DATABASE_URL='你的Neon连接串' npx prisma db push
 | `AUTH_URL` | ✅ | **必须带 https://**，如 `https://waxlist-nu.vercel.app`（不要只写域名） |
 | `AUTH_TRUST_HOST` | 建议 | 填 `true` |
 | `OWNER_EMAILS` | 建议 | 你的站主邮箱，如 `xux9278@gmail.com` |
-| `YOUTUBE_API_KEY` | 可选 | 找伴奏真检索 |
+| `YOUTUBE_API_KEY` | 找伴奏必填 | 未配置时 /chat 会降级为 mock 演示数据 |
 | `OPENAI_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | 可选 | 找伴奏中文意图 |
 
 5. **Deploy**  

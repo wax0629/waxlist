@@ -181,13 +181,15 @@ export async function runPipelineTurn(
   };
 
   if (!hasYouTubeKey()) {
-    warnings.push("未配置 YOUTUBE_API_KEY，使用 mock 短名单。");
+    warnings.push("未配置 YOUTUBE_API_KEY，使用演示短名单。");
     return finish({
-      assistant_message: composeAssistant({
-        mode: "mock",
-        intent_summary,
-        refineCount,
-      }),
+      assistant_message:
+        "YouTube 检索未启用：请在 Vercel 环境变量中配置 YOUTUBE_API_KEY 并 Redeploy。当前返回演示短名单。\n\n" +
+        composeAssistant({
+          mode: "mock",
+          intent_summary,
+          refineCount,
+        }),
       candidates: mockCandidates(intent, refineCount),
       status: "degraded",
       warnings,

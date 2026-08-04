@@ -292,35 +292,7 @@ export function ChatClient() {
                     : "错误"}
               </span>
             ) : null}
-            {/* Circular glass user card — profile page later */}
-            <Link
-              href="/about"
-              className="user-orb"
-              title="用户（即将上线）"
-              aria-label="用户中心"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden
-              >
-                <circle
-                  cx="12"
-                  cy="9"
-                  r="3.2"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-                <path
-                  d="M5.5 19c1.2-3 3.4-4.5 6.5-4.5s5.3 1.5 6.5 4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </Link>
+            {/* 账号入口统一用全局右上角 UserAccountCorner，此处不再重复头像 */}
           </div>
         </header>
 
