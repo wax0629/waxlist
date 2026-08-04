@@ -66,7 +66,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
           href="/explore"
           className="text-sm text-white/62 hover:text-white/80"
         >
-          ← 返回精选
+          ← 返回优质发行
         </Link>
 
         <div className="mt-6 flex flex-col gap-6 sm:flex-row">
@@ -143,7 +143,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
                   href={netease}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-white/28 px-4 py-2 text-sm text-white/85 hover:border-white/45"
+                  className="glass-btn px-4 py-2 text-sm font-medium"
                   title="来源：网易云音乐"
                 >
                   网易云
@@ -155,7 +155,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-white/28 px-4 py-2 text-sm text-white/70 hover:border-white/40"
+                  className="glass-btn px-4 py-2 text-sm font-medium"
                 >
                   {l.label}
                 </a>
@@ -163,7 +163,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
               {netease ? (
                 <Link
                   href={`/chat?ref_url=${encodeURIComponent(netease)}`}
-                  className="touri-grad rounded-full px-4 py-2 text-sm font-medium text-white"
+                  className="glass-btn px-4 py-2 text-sm font-medium"
                 >
                   当参考找伴奏
                 </Link>

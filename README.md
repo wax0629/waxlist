@@ -1,6 +1,6 @@
 # Waxlist
 
-**Waxlist** 是面向听专、荐专与口碑沉淀的音乐社区（一期偏中文地下发行 / 网易云外链）。  
+**Waxlist** 是面向听专、荐专与口碑沉淀的音乐社区（主入口：**优质发行**；一期偏网易云外链）。  
 站内找伴奏 Agent 仍叫 **Beat Hunter**：自然语言或参考曲 → 可试听 type beat 短名单。
 
 ## 使用文档
@@ -8,6 +8,8 @@
 - [快速开始与用法](./docs/user/README.md)
 - [环境变量](./docs/user/environment.md)
 - [YouTube API 配置](./docs/user/youtube-api.md)
+- [国内部署：阿里云 + 香港轻量](./docs/user/deploy-aliyun-hk.md)（国内用户主推）
+- [海外试用：Vercel + Neon](./docs/user/deploy.md)
 
 ## 本地运行
 
@@ -27,7 +29,7 @@ npm run dev
 
 | 模块 | 路径 | 说明 |
 |------|------|------|
-| 地下精选 | `/explore` | 专辑列表、红心、站主爱听标签 |
+| 优质发行 | `/explore` | 专辑列表、红心、站主爱听标签 |
 | 我的红心 | `/favorites` | 个人收藏 |
 | Beat Hunter | `/chat` | 找伴奏 Agent |
 | 登录 / 注册 | `/login` `/register` | 社区写操作需要 |

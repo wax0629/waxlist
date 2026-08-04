@@ -120,11 +120,11 @@ export default function OwnerReleasesPage() {
       <AppRail />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         <Link href="/explore" className="text-sm text-white/45 hover:text-white/80">
-          ← 返回精选
+          ← 返回优质发行
         </Link>
         <h1 className="mt-4 font-display text-2xl font-semibold">添加专辑</h1>
         <p className="mt-2 text-sm text-white/50">
-          发布到精选列表。任何登录用户都可点红心进「我的红心」；你作为站主点红心后，该专会显示「站主爱听」标签。
+          发布到优质发行列表。任何登录用户都可点红心进「我的红心」；你作为站主点红心后，该专会显示「站主爱听」标签。
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -205,9 +205,9 @@ export default function OwnerReleasesPage() {
           <button
             type="submit"
             disabled={loading}
-            className="touri-grad rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="glass-btn glass-btn-block px-5 py-2.5 text-sm font-semibold"
           >
-            {loading ? "保存中…" : "发布到精选"}
+            {loading ? "保存中…" : "发布到优质发行"}
           </button>
         </form>
 

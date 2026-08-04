@@ -24,7 +24,7 @@ export function SiteHeader() {
             href="/explore"
             className="rounded-full bg-[var(--gold-dim)] px-3.5 py-1.5 font-medium text-[var(--gold-soft)] ring-1 ring-[rgba(212,165,116,0.28)]"
           >
-            精选
+            优质发行
           </Link>
           <Link
             href="/chat"

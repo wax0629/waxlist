@@ -24,7 +24,7 @@ export default async function FavoritesPage() {
           href="/explore"
           className="text-sm text-white/62 hover:text-white/80"
         >
-          ← 返回精选
+          ← 返回优质发行
         </Link>
         <h1 className="mt-4 font-display text-2xl font-semibold">我的红心</h1>
 
@@ -32,7 +32,7 @@ export default async function FavoritesPage() {
           <p className="mt-12 text-center text-sm text-white/58">
             还没有收藏。{" "}
             <Link href="/explore" className="text-white/70 underline">
-              去精选看看
+              去优质发行看看
             </Link>
           </p>
         ) : (

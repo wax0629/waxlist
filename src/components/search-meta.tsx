@@ -44,7 +44,7 @@ export function SearchMeta({
               {active.map((label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-white/28 px-2.5 py-1 text-[11px] text-white/70"
+                  className="glass-btn glass-btn-sm"
                 >
                   {label}
                 </span>
@@ -70,7 +70,7 @@ export function SearchMeta({
                 type="button"
                 disabled={disabled}
                 onClick={() => onRefine(chip.message)}
-                className="rounded-full border border-white/18 bg-transparent px-2.5 py-1 text-[11px] font-medium text-white/75 transition hover:border-[#ff6b9e]/50 hover:text-white disabled:opacity-40"
+                className="glass-btn glass-btn-sm disabled:opacity-40"
               >
                 {chip.label}
               </button>

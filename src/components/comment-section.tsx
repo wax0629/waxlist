@@ -107,7 +107,7 @@ export function CommentSection({
           <button
             type="submit"
             disabled={loading || body.trim().length < 2}
-            className="touri-grad rounded-full px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="glass-btn px-5 py-2 text-sm font-medium"
           >
             {loading ? "发布中…" : "发布评论"}
           </button>

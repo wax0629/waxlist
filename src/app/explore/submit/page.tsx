@@ -169,7 +169,7 @@ export default function SubmitReleasePage() {
       <AppRail />
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-8 sm:px-6">
         <Link href="/explore" className="text-sm text-white/62 hover:text-white/80">
-          ← 返回精选
+          ← 返回优质发行
         </Link>
         <h1 className="mt-4 font-display text-2xl font-semibold">推荐专辑</h1>
 
@@ -319,7 +319,7 @@ export default function SubmitReleasePage() {
           <button
             type="submit"
             disabled={loading || resolving}
-            className="touri-grad rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="glass-btn glass-btn-block px-5 py-2.5 text-sm font-semibold"
           >
             {loading ? "提交中…" : "提交推荐"}
           </button>

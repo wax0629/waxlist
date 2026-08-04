@@ -119,7 +119,7 @@ function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="touri-grad w-full rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="glass-btn glass-btn-block py-2.5 text-sm font-semibold"
         >
           {loading ? "提交中…" : presetEmail ? "设置密码并登录" : "注册"}
         </button>

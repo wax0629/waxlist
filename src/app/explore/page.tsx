@@ -45,7 +45,7 @@ export default async function ExplorePage() {
               Explore
             </p>
             <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
-              地下精选
+              优质发行
             </h1>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
@@ -55,7 +55,7 @@ export default async function ExplorePage() {
                   ? "/explore/submit"
                   : "/login?callbackUrl=/explore/submit"
               }
-              className="touri-grad rounded-full px-3 py-1.5 font-medium text-white"
+              className="glass-btn px-3.5 py-1.5 text-sm font-medium"
             >
               推荐专辑
             </Link>

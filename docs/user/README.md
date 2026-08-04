@@ -1,11 +1,11 @@
 # Waxlist 使用说明
 
-**Waxlist**：听专、荐专、红心与口碑（一期：网易云外链精选）。  
+**Waxlist**：听专、荐专、红心与口碑（主入口：**优质发行**；一期：网易云外链）。  
 **Beat Hunter**（站内模块）：帮歌手用自然语言或参考曲链接，拿到可试听的伴奏短名单。
 
 ## 能做什么
 
-### 精选社区（Waxlist）
+### 优质发行（Waxlist）
 - 浏览专辑封面列表
 - 登录后点红心 → 进入「我的红心」
 - 站主点过红心的专会显示 **站主爱听** 标签
@@ -32,12 +32,15 @@ npm run dev
 
 - [环境变量](./environment.md)
 - [YouTube API](./youtube-api.md)
+- [**试用：Zeabur**](./deploy-zeabur.md)（类 Vercel，先测国内能否打开）
+- [**国内部署：阿里云域名 + 香港轻量**](./deploy-aliyun-hk.md)（要稳时主推）
+- [海外试用：Vercel + Neon](./deploy.md)
 
 ## 页面
 
 | 页面 | 路径 |
 |------|------|
-| 精选 | `/explore` |
+| 优质发行 | `/explore` |
 | 推荐专辑 | `/explore/submit`（登录后） |
 | 我的红心 | `/favorites` |
 | 审核队列 | `/moderation`（站主 / 管理；侧栏盾牌图标） |

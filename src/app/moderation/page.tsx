@@ -26,7 +26,7 @@ export default async function ModerationPage() {
             href="/explore"
             className="mt-6 inline-block text-sm text-[#ff8fb3] hover:underline"
           >
-            ← 返回精选
+            ← 返回优质发行
           </Link>
         </main>
       </div>
@@ -43,7 +43,7 @@ export default async function ModerationPage() {
           href="/explore"
           className="text-sm text-white/62 hover:text-white/80"
         >
-          ← 返回精选
+          ← 返回优质发行
         </Link>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-3 pr-12 sm:pr-14">
           <div>

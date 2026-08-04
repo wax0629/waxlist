@@ -96,7 +96,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="touri-grad w-full rounded-xl py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="glass-btn glass-btn-block py-2.5 text-sm font-semibold"
         >
           {loading ? "登录中…" : "登录"}
         </button>
@@ -108,7 +108,7 @@ function LoginForm() {
         </Link>
       </p>
       <p className="mt-3 text-center text-sm text-white/35">
-        <Link href="/explore">先去逛精选 →</Link>
+        <Link href="/explore">先去逛优质发行 →</Link>
       </p>
     </div>
   );

@@ -32,7 +32,7 @@ export function AppRail({
         <nav className="mt-9 flex flex-1 flex-col items-center gap-2.5">
           <Link
             href="/explore"
-            title="精选"
+            title="优质发行"
             className={
               path.startsWith("/explore") || path.startsWith("/favorites")
                 ? "flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"
