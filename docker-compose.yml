@@ -1,19 +1,68 @@
-# Local Postgres for Waxlist community features (P1).
-# Usage: docker compose up -d
-# Connection: postgresql://waxlist:waxlist@localhost:5432/waxlist
+# Local Postgres for Waxlist (lightweight).
+# Usage: npm run db:up && npm run db:push
+# URL:    postgresql://waxlist:waxlist@localhost:5432/waxlist
+#
+# Also open Docker Desktop → Settings → Resources and keep VM modest
+# (e.g. 2–4 CPUs, 2–4 GB RAM). Container limits below only cap Postgres,
+# not the whole Docker Desktop VM.
 
 services:
   db:
     image: postgres:16-alpine
-    restart: unless-stopped
+    # Don't auto-restart forever; start only when you need the DB
+    restart: "no"
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: waxlist
       POSTGRES_PASSWORD: waxlist
       POSTGRES_DB: waxlist
+      # Faster small-instance boot
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    # Cap this container (Compose v2 on Docker Desktop)
+    cpus: 1.0
+    mem_limit: 512m
+    memswap_limit: 512m
+    shm_size: 64mb
+    # Dev-only tuning: small RAM footprint
+    command:
+      - postgres
+      - -c
+      - max_connections=40
+      - -c
+      - shared_buffers=64MB
+      - -c
+      - effective_cache_size=128MB
+      - -c
+      - work_mem=2MB
+      - -c
+      - maintenance_work_mem=32MB
+      - -c
+      - wal_buffers=2MB
+      - -c
+      - min_wal_size=32MB
+      - -c
+      - max_wal_size=128MB
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - log_min_duration_statement=-1
+      - -c
+      - fsync=off
+      - -c
+      - full_page_writes=off
+      - -c
+      - synchronous_commit=off
     volumes:
       - waxlist_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waxlist -d waxlist"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
 volumes:
   waxlist_pg_data:

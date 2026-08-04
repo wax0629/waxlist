@@ -22,20 +22,29 @@ cp .env.example .env.local
 ### 本机数据库
 
 ```bash
-# 启动 Postgres
+# 启动轻量 Postgres（容器上限约 1 CPU / 512MB）
 npm run db:up
 
-# .env.local 中：
+# .env.local / .env：
 # DATABASE_URL=postgresql://waxlist:waxlist@localhost:5432/waxlist
 
-# 同步表结构
 npm run db:push
 ```
+
+不用库时关掉容器更省内存：
+
+```bash
+npm run db:down
+```
+
+**Docker Desktop 整机配额**（和容器限制不同）：  
+Settings → Resources → 建议 **CPU 2～4、Memory 2～4 GB**。  
+默认常给虚拟机很多核/约 8GB，开发机会明显卡；改完 Apply & Restart。
 
 | 路径 | 用途 |
 |------|------|
 | `.data/sessions/` | 找伴奏聊天会话（仍为 JSON） |
-| Postgres `users` / `releases` | 账号与精选发行 |
+| Postgres `users` / `releases` / `favorites` | 账号与精选 |
 
 ### 角色说明
 
