@@ -59,6 +59,13 @@ export async function addFavorite(
   if (!release || release.status !== "published") {
     throw new Error("专辑不存在或未发布");
   }
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+  if (!user) {
+    throw new Error("登录状态已失效，请重新登录后再收藏");
+  }
   await prisma.favorite.upsert({
     where: {
       userId_releaseId: { userId, releaseId },

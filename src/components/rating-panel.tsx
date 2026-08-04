@@ -61,7 +61,7 @@ export function RatingPanel({
   const hoverStars = hover != null ? scoreToStars(hover) : null;
 
   return (
-    <div className="mt-5">
+    <div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <StarsDisplay score={avg != null && count > 0 ? avg : 0} size={18} />
         <span className="font-display text-lg font-semibold tabular-nums text-white">
@@ -72,7 +72,7 @@ export function RatingPanel({
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-3">
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <StarsPicker
           value={mine}
           hover={hover}

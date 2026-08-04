@@ -10,10 +10,13 @@ export function TrackRecommendList({
   releaseId,
   initialTracks,
   loggedIn,
+  /** Inside a parent panel: no extra chrome / nested scroll cap */
+  embedded = false,
 }: {
   releaseId: string;
   initialTracks: TrackRow[];
   loggedIn: boolean;
+  embedded?: boolean;
 }) {
   const router = useRouter();
   const [tracks, setTracks] = useState(initialTracks);
@@ -100,7 +103,13 @@ export function TrackRecommendList({
 
   if (!tracks.length) {
     return (
-      <div className="mt-4 rounded-2xl border border-dashed border-white/20 px-4 py-8 text-center">
+      <div
+        className={
+          embedded
+            ? "px-2 py-10 text-center"
+            : "mt-4 rounded-2xl border border-dashed border-white/20 px-4 py-8 text-center"
+        }
+      >
         {listError ? (
           <p className="text-xs text-rose-300">{listError}</p>
         ) : (
@@ -118,71 +127,97 @@ export function TrackRecommendList({
     );
   }
 
+  const list = (
+    <ul
+      className={
+        embedded
+          ? "divide-y divide-white/10"
+          : "glass-rim mt-4 max-h-[calc(10*2.75rem)] divide-y divide-white/10 overflow-y-auto overscroll-contain rounded-2xl"
+      }
+    >
+      {tracks.map((t) => (
+        <li
+          key={`${t.index}-${t.name}`}
+          className="flex items-center gap-3 px-1 py-2.5 sm:px-2"
+        >
+          <span className="w-7 shrink-0 text-right font-mono text-xs tabular-nums text-white/40">
+            {String(t.index + 1).padStart(2, "0")}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-sm text-white/90">
+            {t.name}
+          </span>
+          <span
+            className={
+              t.recommend_count > 0
+                ? "min-w-[1.5rem] shrink-0 text-right text-xs tabular-nums text-sky-200/90"
+                : "min-w-[1.5rem] shrink-0 text-right text-xs tabular-nums text-white/45"
+            }
+            title="推荐数"
+          >
+            {t.recommend_count}
+          </span>
+          <button
+            type="button"
+            disabled={busy === t.name}
+            onClick={() => void toggle(t.name)}
+            title={
+              !loggedIn
+                ? "登录后点赞推荐"
+                : t.recommended_by_me
+                  ? "取消点赞"
+                  : "点赞推荐"
+            }
+            className={
+              t.recommended_by_me
+                ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500/20 p-0 text-base ring-1 ring-sky-400/40 transition hover:bg-sky-500/30 disabled:opacity-50"
+                : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/18 bg-transparent p-0 text-base transition hover:border-sky-400/35 hover:bg-white/5 disabled:opacity-50"
+            }
+            aria-label={t.recommended_by_me ? "取消点赞" : "点赞推荐"}
+          >
+            <LikeIcon filled={t.recommended_by_me} />
+          </button>
+        </li>
+      ))}
+      {!loggedIn ? (
+        <li className="px-2 py-2 text-center text-xs text-white/45">
+          <Link
+            href={`/login?callbackUrl=/explore/${releaseId}`}
+            className="text-[#ff8fb3] hover:underline"
+          >
+            登录
+          </Link>
+          后可点赞推荐曲目
+        </li>
+      ) : null}
+    </ul>
+  );
+
+  if (embedded) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {list}
+        </div>
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-white/10 pt-2">
+          {listError ? (
+            <p className="mr-auto text-xs text-rose-300">{listError}</p>
+          ) : null}
+          <button
+            type="button"
+            disabled={loadingList}
+            onClick={() => void reloadFromNetease()}
+            className="text-xs text-white/40 hover:text-white/70 disabled:opacity-50"
+          >
+            {loadingList ? "同步中…" : "重新同步"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* ~10 行高度；超出滚动。单行约 44px */}
-      <ul
-        className="glass-rim mt-4 divide-y divide-white/10 overflow-y-auto overscroll-contain rounded-2xl"
-        style={{
-          maxHeight:
-            tracks.length > 10 ? "calc(10 * 2.75rem)" : undefined,
-        }}
-      >
-        {tracks.map((t) => (
-          <li
-            key={`${t.index}-${t.name}`}
-            className="flex items-center gap-3 px-3 py-2.5 sm:px-4"
-          >
-            <span className="w-7 shrink-0 text-right font-mono text-xs tabular-nums text-white/40">
-              {String(t.index + 1).padStart(2, "0")}
-            </span>
-            <span className="min-w-0 flex-1 truncate text-sm text-white/90">
-              {t.name}
-            </span>
-            <span
-              className={
-                t.recommend_count > 0
-                  ? "min-w-[1.5rem] shrink-0 text-right text-xs tabular-nums text-sky-200/90"
-                  : "min-w-[1.5rem] shrink-0 text-right text-xs tabular-nums text-white/45"
-              }
-              title="推荐数"
-            >
-              {t.recommend_count}
-            </span>
-            <button
-              type="button"
-              disabled={busy === t.name}
-              onClick={() => void toggle(t.name)}
-              title={
-                !loggedIn
-                  ? "登录后点赞推荐"
-                  : t.recommended_by_me
-                    ? "取消点赞"
-                    : "点赞推荐"
-              }
-              className={
-                t.recommended_by_me
-                  ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500/20 p-0 text-base ring-1 ring-sky-400/40 transition hover:bg-sky-500/30 disabled:opacity-50"
-                  : "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/18 bg-transparent p-0 text-base transition hover:border-sky-400/35 hover:bg-white/5 disabled:opacity-50"
-              }
-              aria-label={t.recommended_by_me ? "取消点赞" : "点赞推荐"}
-            >
-              <LikeIcon filled={t.recommended_by_me} />
-            </button>
-          </li>
-        ))}
-        {!loggedIn ? (
-          <li className="px-4 py-2 text-center text-xs text-white/45">
-            <Link
-              href={`/login?callbackUrl=/explore/${releaseId}`}
-              className="text-[#ff8fb3] hover:underline"
-            >
-              登录
-            </Link>
-            后可点赞推荐曲目
-          </li>
-        ) : null}
-      </ul>
+      {list}
       <div className="mt-2 flex justify-end">
         <button
           type="button"

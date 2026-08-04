@@ -13,7 +13,10 @@ type Ctx = { params: Promise<{ id: string }> };
 export async function POST(_req: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "请先登录" }, { status: 401 });
+    return NextResponse.json(
+      { error: "请先登录（若刚同步过数据库，请退出后重新登录）" },
+      { status: 401 },
+    );
   }
   const { id } = await ctx.params;
   try {
@@ -25,7 +28,8 @@ export async function POST(_req: Request, ctx: Ctx) {
     return NextResponse.json(result);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "操作失败";
-    return NextResponse.json({ error: msg }, { status: 400 });
+    const status = msg.includes("重新登录") ? 401 : 400;
+    return NextResponse.json({ error: msg }, { status });
   }
 }
 

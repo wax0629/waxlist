@@ -1,24 +1,24 @@
 # Waxlist
 
-**Waxlist** 是面向听专、荐专与口碑沉淀的音乐社区（主入口：**优质发行**；一期偏网易云外链）。  
-站内找伴奏 Agent 仍叫 **Beat Hunter**：自然语言或参考曲 → 可试听 type beat 短名单。
+**Waxlist**：听专、荐专与口碑（主入口：**优质发行**；一期偏网易云外链）。  
+站内找伴奏模块仍叫 **Beat Hunter**（Beta）。
 
-## 使用文档
+生产：**https://waxlist.cn**
 
-- [快速开始与用法](./docs/user/README.md)
+## 文档
+
+- [使用说明](./docs/user/README.md)
+- [**内测计划与开发模式**](./docs/user/beta-and-dev.md)（发版节奏、内测清单）
 - [环境变量](./docs/user/environment.md)
-- [YouTube API 配置](./docs/user/youtube-api.md)
-- [国内部署：阿里云 + 香港轻量](./docs/user/deploy-aliyun-hk.md)（国内用户主推）
-- [海外试用：Vercel + Neon](./docs/user/deploy.md)
+- [香港机部署](./docs/user/deploy-aliyun-hk.md)
+- [YouTube API](./docs/user/youtube-api.md)
 
 ## 本地运行
 
 ```bash
 npm install
-cp .env.example .env.local
-# AUTH_SECRET、DATABASE_URL、可选 YouTube / LLM 密钥
-
-npm run db:up    # 本机 Postgres
+cp .env.example .env.local   # 配置 AUTH_SECRET、DATABASE_URL 等
+npm run db:up
 npm run db:push
 npm run dev
 ```
@@ -29,16 +29,29 @@ npm run dev
 
 | 模块 | 路径 | 说明 |
 |------|------|------|
-| 优质发行 | `/explore` | 专辑列表、红心、站主爱听标签 |
-| 我的红心 | `/favorites` | 个人收藏 |
-| Beat Hunter | `/chat` | 找伴奏 Agent |
-| 登录 / 注册 | `/login` `/register` | 社区写操作需要 |
+| 优质发行 | `/explore` | 列表、筛选、排序、详情 |
+| 推荐专辑 | `/explore/submit` | 登录后提交 |
+| 我的红心 | `/explore?filter=heart` | 同页筛选（旧 `/favorites` 会跳转） |
+| 审核 | `/moderation` | 站主 / 管理 |
+| Beat Hunter | `/chat` | 找伴奏（Beta） |
+| 关于 | `/about` | 故事与联系 |
+
+## 发版（生产）
+
+日常在本地开发；版本成熟后：
+
+```bash
+git push origin main
+./scripts/deploy-prod.sh
+```
+
+详见 [内测计划与开发模式](./docs/user/beta-and-dev.md)。
 
 ## 合规
 
-结果与外链仅供试听与发现，商用请遵循源站与版权方要求。详见站内 [关于](/about)。
+结果与外链仅供试听与发现。详见站内 [关于](https://waxlist.cn/about)。
 
 ## 开发
 
-功能规划与缺陷跟踪使用 **GitHub Issues**。  
-内部产品/技术设计文档仅维护在本地工作区，不推远程。
+功能与缺陷用 **GitHub Issues** 跟踪。  
+产品/设计草稿可只放本地 `docs/` 工作区，按需提交。

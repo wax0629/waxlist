@@ -80,6 +80,8 @@ model Release {
   ratingCount     Int      @default(0) @map("rating_count")
   /// 曲目名列表（解析网易云时缓存）
   tracklist       String[] @default([])
+  /// 专辑/发行日期（网易云 publishTime 等）
+  releasedAt      DateTime? @map("released_at")
   favorites       Favorite[]
   recommendations Recommendation[]
   trackRecs       TrackRecommendation[]

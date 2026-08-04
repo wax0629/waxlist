@@ -19,6 +19,8 @@ const SubmitBody = z.object({
   cover_url: z.string().optional(),
   type: z.enum(["single", "ep", "album", "other"]).optional(),
   tags: z.array(z.string()).optional(),
+  /** Owner-only: pink「友情」badge */
+  friend: z.boolean().optional(),
 });
 
 /** Submit a recommendation (login required). */
@@ -41,6 +43,7 @@ export async function POST(req: Request) {
       cover_url: body.cover_url,
       type: body.type,
       tags: body.tags,
+      friend: body.friend,
     });
     const pending = result.status === "pending";
     return NextResponse.json(

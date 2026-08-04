@@ -262,13 +262,23 @@ export function ChatClient() {
         <header className="mb-3 flex shrink-0 items-center justify-between gap-3 px-0.5 sm:mb-4">
           <div className="flex min-w-0 items-center gap-3">
             <div className="md:hidden">
-              <p className="font-display text-[14px] font-semibold text-white">
-                Beat Hunter
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-display text-[14px] font-semibold text-white">
+                  Beat Hunter
+                </p>
+                <span className="rounded-full border border-[#ff8fb3]/35 bg-[#ff8fb3]/10 px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[#ff8fb3]">
+                  Beta
+                </span>
+              </div>
               <p className="text-[10px] text-white/58">Waxlist · 找伴奏</p>
             </div>
             <div className="touri-pills max-md:hidden">
-              <span className="touri-pill touri-pill-active">✨ Beat Hunter</span>
+              <span className="touri-pill touri-pill-active">
+                ✨ Beat Hunter
+                <span className="ml-1.5 rounded-full border border-[#ff8fb3]/40 bg-[#ff8fb3]/12 px-1.5 py-px font-mono text-[9px] font-medium uppercase tracking-[0.1em] text-[#ff8fb3]">
+                  Beta
+                </span>
+              </span>
               <a href="/explore" className="touri-pill">
                 🎵 Waxlist
               </a>
@@ -295,6 +305,25 @@ export function ChatClient() {
             {/* 账号入口统一用全局右上角 UserAccountCorner，此处不再重复头像 */}
           </div>
         </header>
+
+        {/* Soft Beta notice — visible after chat starts */}
+        {!isFresh ? (
+          <div className="mb-3 shrink-0 rounded-xl border border-white/12 bg-white/[0.03] px-3 py-2 sm:px-3.5">
+            <p className="text-[11px] leading-relaxed text-white/58">
+              <span className="mr-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#ff8fb3]">
+                Beta
+              </span>
+              找伴奏仍在研发测试中；本站现阶段以{" "}
+              <Link
+                href="/explore"
+                className="text-white/75 underline-offset-2 hover:text-[#ff8fb3] hover:underline"
+              >
+                优质发行
+              </Link>{" "}
+              为主。结果仅供试听参考。
+            </p>
+          </div>
+        ) : null}
 
         {/* Two liquid-glass panes under nav — ~52:48 (right a bit wider) */}
         <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">

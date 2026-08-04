@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HeartIcon } from "@/components/action-icons";
 import { StarsDisplay } from "@/components/star-rating";
+import { formatReleasedAt } from "@/lib/releases/format";
+import { hasFriendTag } from "@/lib/releases/friend-tag";
 import type { Release } from "@/lib/releases/types";
 
 export function ReleaseCard({
@@ -91,6 +93,17 @@ export function ReleaseCard({
             </span>
           </div>
         ) : null}
+
+        {/* 友情：封面右上角粉胶囊 */}
+        {hasFriendTag(release.tags) ? (
+          <span
+            className="pointer-events-none absolute right-2 top-2 z-10 rounded-full border border-pink-200/50 bg-gradient-to-r from-[#ff6b9e] via-[#ff8fb3] to-[#f0abfc] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(255,107,158,0.55)]"
+            aria-label="友情"
+            title="友情"
+          >
+            友情
+          </span>
+        ) : null}
       </div>
       {/* 文案区：左专辑名/艺人（原间距），右红心相对整块文案垂直居中 */}
       <div className="flex items-center gap-2 p-2.5">
@@ -101,6 +114,11 @@ export function ReleaseCard({
           <p className="truncate text-[11px] text-white/65">
             {release.artists.join(" / ")}
           </p>
+          {formatReleasedAt(release.released_at) ? (
+            <p className="truncate text-[10px] tabular-nums text-white/40">
+              {formatReleasedAt(release.released_at)}
+            </p>
+          ) : null}
           <div className="flex items-center gap-1 pt-0.5">
             <StarsDisplay
               score={

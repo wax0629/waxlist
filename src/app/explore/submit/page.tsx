@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { AppRail } from "@/components/app-rail";
+import { BackLink } from "@/components/back-link";
 import {
   formatSelectedTracks,
   TrackSelectList,
@@ -40,11 +41,17 @@ export default function SubmitReleasePage() {
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  /** Owner: attach pink 友情 badge (mixing clients etc.) */
+  const [friend, setFriend] = useState(false);
   const lastResolved = useRef("");
+  const isOwner = session?.user?.role === "owner";
 
   const resolveUrl = useCallback(async (url: string) => {
     const trimmed = url.trim();
-    if (!trimmed || !/163\.com|music\.163|^\d+$/i.test(trimmed)) {
+    if (
+      !trimmed ||
+      !/163cn\.tv|163\.com|music\.163|^\d+$|专辑|分享/i.test(trimmed)
+    ) {
       return;
     }
     if (trimmed === lastResolved.current) return;
@@ -107,6 +114,7 @@ export default function SubmitReleasePage() {
           type,
           reason,
           tracks: formatSelectedTracks(trackList, selectedTrackIdx),
+          ...(isOwner && friend ? { friend: true } : {}),
         }),
       });
       const data = (await res.json()) as {
@@ -127,6 +135,7 @@ export default function SubmitReleasePage() {
       setReason("");
       setTrackList([]);
       setSelectedTrackIdx([]);
+      setFriend(false);
       setMeta(null);
       lastResolved.current = "";
     } catch (err) {
@@ -168,9 +177,7 @@ export default function SubmitReleasePage() {
     <div className="flex min-h-dvh flex-1 text-white">
       <AppRail />
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-8 sm:px-6">
-        <Link href="/explore" className="text-sm text-white/62 hover:text-white/80">
-          ← 返回优质发行
-        </Link>
+        <BackLink href="/explore" label="返回优质发行" />
         <h1 className="mt-4 font-display text-2xl font-semibold">推荐专辑</h1>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -192,7 +199,7 @@ export default function SubmitReleasePage() {
                     setTimeout(() => void resolveUrl(text), 0);
                   }
                 }}
-                placeholder="https://music.163.com/album?id=..."
+                placeholder="网易云链接或手机分享短链 163cn.tv/…"
                 className={`${inputCls} mt-0 flex-1`}
               />
               <button
@@ -312,6 +319,26 @@ export default function SubmitReleasePage() {
               disabled={resolving}
             />
           </div>
+
+          {isOwner ? (
+            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-pink-300/25 bg-gradient-to-r from-[#ff6b9e]/10 via-[#ff8fb3]/08 to-[#f0abfc]/10 px-3.5 py-3">
+              <input
+                type="checkbox"
+                checked={friend}
+                onChange={(e) => setFriend(e.target.checked)}
+                className="h-4 w-4 shrink-0 rounded border-pink-300/50 accent-[#ff6b9e]"
+              />
+              <span
+                className={
+                  friend
+                    ? "rounded-full border border-pink-200/40 bg-gradient-to-r from-[#ff6b9e] via-[#ff8fb3] to-[#f0abfc] px-2.5 py-0.5 text-[11px] font-semibold text-white"
+                    : "rounded-full border border-pink-300/25 px-2.5 py-0.5 text-[11px] font-semibold text-pink-200/50"
+                }
+              >
+                友情
+              </span>
+            </label>
+          ) : null}
 
           {error ? <p className="text-sm text-rose-300">{error}</p> : null}
           {ok ? <p className="text-sm text-emerald-300">{ok}</p> : null}

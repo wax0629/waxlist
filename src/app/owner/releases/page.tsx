@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
 import { AppRail } from "@/components/app-rail";
+import { BackLink } from "@/components/back-link";
 import type { Release } from "@/lib/releases/types";
 
 export default function OwnerReleasesPage() {
@@ -23,6 +24,7 @@ export default function OwnerReleasesPage() {
     "album",
   );
   const [sortOrder, setSortOrder] = useState("0");
+  const [friend, setFriend] = useState(false);
 
   const isOwner = session?.user?.role === "owner";
 
@@ -58,10 +60,14 @@ export default function OwnerReleasesPage() {
           netease_url: neteaseUrl || undefined,
           cover_url: coverUrl || undefined,
           curatorial_note: note || undefined,
-          tags: tags
-            .split(/[,，、\s]+/)
-            .map((s) => s.trim())
-            .filter(Boolean),
+          tags: (() => {
+            const base = tags
+              .split(/[,，、\s]+/)
+              .map((s) => s.trim())
+              .filter(Boolean);
+            if (friend && !base.includes("友情")) base.push("友情");
+            return base;
+          })(),
           sort_order: Number(sortOrder) || 0,
         }),
       });
@@ -74,6 +80,7 @@ export default function OwnerReleasesPage() {
       setNote("");
       setNeteaseUrl("");
       setTags("");
+      setFriend(false);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");
@@ -119,9 +126,7 @@ export default function OwnerReleasesPage() {
     <div className="flex min-h-dvh flex-1 text-white">
       <AppRail />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
-        <Link href="/explore" className="text-sm text-white/45 hover:text-white/80">
-          ← 返回优质发行
-        </Link>
+        <BackLink href="/explore" label="返回优质发行" />
         <h1 className="mt-4 font-display text-2xl font-semibold">添加专辑</h1>
         <p className="mt-2 text-sm text-white/50">
           发布到优质发行列表。任何登录用户都可点红心进「我的红心」；你作为站主点红心后，该专会显示「站主爱听」标签。
@@ -200,6 +205,23 @@ export default function OwnerReleasesPage() {
               className="mt-1.5 w-full resize-y rounded-xl border border-white/15 bg-transparent px-3 py-2.5 text-white outline-none focus:border-white/35"
             />
           </Field>
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-pink-300/25 bg-gradient-to-r from-[#ff6b9e]/10 via-[#ff8fb3]/08 to-[#f0abfc]/10 px-3.5 py-3">
+            <input
+              type="checkbox"
+              checked={friend}
+              onChange={(e) => setFriend(e.target.checked)}
+              className="h-4 w-4 shrink-0 rounded border-pink-300/50 accent-[#ff6b9e]"
+            />
+            <span
+              className={
+                friend
+                  ? "rounded-full border border-pink-200/40 bg-gradient-to-r from-[#ff6b9e] via-[#ff8fb3] to-[#f0abfc] px-2.5 py-0.5 text-[11px] font-semibold text-white"
+                  : "rounded-full border border-pink-300/25 px-2.5 py-0.5 text-[11px] font-semibold text-pink-200/50"
+              }
+            >
+              友情
+            </span>
+          </label>
           {error ? <p className="text-sm text-rose-300">{error}</p> : null}
           {ok ? <p className="text-sm text-emerald-300">{ok}</p> : null}
           <button

@@ -43,7 +43,7 @@ export function AppRail({
           </Link>
           <Link
             href="/chat"
-            title="Beat Hunter · 找伴奏"
+            title="Beat Hunter · 找伴奏（Beta）"
             className={
               onChat
                 ? "flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF6B9E]/25 to-[#9B51E0]/25 text-white ring-1 ring-[#ff6b9e]/35"

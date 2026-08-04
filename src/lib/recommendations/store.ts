@@ -4,6 +4,7 @@ import { isOwner } from "@/lib/auth/roles";
 import { prisma } from "@/lib/db";
 import { resolveNeteaseMeta } from "@/lib/netease/fetch-meta";
 import { parseNeteaseUrl } from "@/lib/netease/parse";
+import { mergeFriendFlag } from "@/lib/releases/friend-tag";
 import {
   createRelease,
   findByNeteaseId,
@@ -116,6 +117,8 @@ export async function submitRecommendation(opts: {
   cover_url?: string;
   type?: "single" | "ep" | "album" | "other";
   tags?: string[];
+  /** Owner-only: attach pink「友情」badge (e.g. mixing clients). */
+  friend?: boolean;
 }): Promise<{
   release_id: string;
   recommendation_id: string;
@@ -128,6 +131,8 @@ export async function submitRecommendation(opts: {
   }
 
   const skipReview = isOwner(opts.role);
+  /** Only owner may attach 友情 badge */
+  const wantFriend = Boolean(opts.friend) && skipReview;
   let releaseId = opts.releaseId;
   let isNew = false;
   let recStatus: "pending" | "published" = "pending";
@@ -145,6 +150,11 @@ export async function submitRecommendation(opts: {
       recStatus = skipReview ? "published" : "pending";
       if (skipReview) releaseNeedsPublish = true;
     }
+    if (wantFriend) {
+      await updateRelease(existing.id, {
+        tags: mergeFriendFlag(existing.tags, true),
+      });
+    }
   } else {
     // New submission via NetEase + fields (auto-fill from NetEase if missing)
     const url = opts.netease_url?.trim();
@@ -158,6 +168,7 @@ export async function submitRecommendation(opts: {
     let neteaseUrl = parsed.url || url;
     let neteaseId = parsed.id;
     let tracklist: string[] = [];
+    let releasedAt: string | undefined;
 
     try {
       const meta = await resolveNeteaseMeta(url);
@@ -168,6 +179,7 @@ export async function submitRecommendation(opts: {
       neteaseUrl = meta.netease_url || neteaseUrl;
       neteaseId = meta.netease_id || neteaseId;
       tracklist = meta.tracks ?? [];
+      releasedAt = meta.publish_time;
     } catch {
       // keep manual fields; validate below
     }
@@ -182,8 +194,22 @@ export async function submitRecommendation(opts: {
           throw new Error("该专辑曾被拒绝");
         }
         releaseId = dup.id;
+        const patch: {
+          tracklist?: string[];
+          tags?: string[];
+          released_at?: string;
+        } = {};
         if (tracklist.length && !(dup.tracklist && dup.tracklist.length)) {
-          await updateRelease(dup.id, { tracklist });
+          patch.tracklist = tracklist;
+        }
+        if (wantFriend) {
+          patch.tags = mergeFriendFlag(dup.tags, true);
+        }
+        if (releasedAt && !dup.released_at) {
+          patch.released_at = releasedAt;
+        }
+        if (Object.keys(patch).length) {
+          await updateRelease(dup.id, patch);
         }
         if (dup.status === "published") {
           recStatus = "published";
@@ -198,6 +224,9 @@ export async function submitRecommendation(opts: {
       const releaseType =
         type ??
         (parsed.kind === "song" ? "single" : "album");
+      const tags = wantFriend
+        ? mergeFriendFlag(opts.tags, true)
+        : opts.tags ?? [];
       const created = await createRelease({
         title,
         artists,
@@ -205,12 +234,13 @@ export async function submitRecommendation(opts: {
         netease_id: neteaseId,
         netease_url: neteaseUrl,
         cover_url: cover,
-        tags: opts.tags ?? [],
+        tags,
         source: "community",
         status: skipReview ? "published" : "pending",
         created_by: opts.userId,
         links: [{ label: "网易云", url: neteaseUrl }],
         tracklist,
+        released_at: releasedAt,
       });
       releaseId = created.id;
       isNew = true;

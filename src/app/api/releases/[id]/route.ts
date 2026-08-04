@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { canModerate } from "@/lib/auth/roles";
+import { canModerate, isOwner } from "@/lib/auth/roles";
+import { mergeFriendFlag } from "@/lib/releases/friend-tag";
 import { getRelease, updateRelease } from "@/lib/releases/store";
 import { z } from "zod";
 
@@ -29,6 +30,8 @@ const PatchBody = z.object({
   cover_url: z.string().optional(),
   tags: z.array(z.string()).optional(),
   sort_order: z.number().optional(),
+  /** Owner: set/clear pink「友情」badge */
+  friend: z.boolean().optional(),
 });
 
 export async function PATCH(req: Request, ctx: Ctx) {
@@ -42,9 +45,27 @@ export async function PATCH(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   try {
     const body = PatchBody.parse(await req.json());
+    let tags = body.tags;
+    if (typeof body.friend === "boolean") {
+      if (!isOwner(session.user.role)) {
+        return NextResponse.json(
+          { error: "仅站主可设置友情标签" },
+          { status: 403 },
+        );
+      }
+      const current = await getRelease(id);
+      if (!current) {
+        return NextResponse.json({ error: "未找到" }, { status: 404 });
+      }
+      tags = mergeFriendFlag(body.tags ?? current.tags, body.friend);
+    }
     const release = await updateRelease(id, {
-      ...body,
+      status: body.status,
+      title: body.title,
+      curatorial_note: body.curatorial_note,
       cover_url: body.cover_url,
+      tags,
+      sort_order: body.sort_order,
     });
     return NextResponse.json({ release });
   } catch (err) {

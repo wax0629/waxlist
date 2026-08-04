@@ -134,7 +134,10 @@ export function UserMenu() {
             </p>
           </div>
 
-          <MenuLink href="/favorites" onNavigate={() => setOpen(false)}>
+          <MenuLink
+            href="/explore?filter=heart"
+            onNavigate={() => setOpen(false)}
+          >
             ♥ 我的红心
           </MenuLink>
           <MenuLink href="/explore/submit" onNavigate={() => setOpen(false)}>

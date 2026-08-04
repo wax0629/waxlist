@@ -18,7 +18,7 @@ export function RecommendationsFold({
   const rest = items.slice(1);
 
   return (
-    <div className="glass-rim mt-3 overflow-hidden rounded-2xl">
+    <div className="glass-rim mt-1.5 overflow-hidden rounded-2xl">
       {first ? (
         <article className="px-4 py-3">
           <div className="flex flex-wrap items-center gap-2 text-xs text-white/55">

@@ -1,4 +1,9 @@
-import { parseNeteaseUrl, type NeteaseKind } from "./parse";
+import {
+  extractNeteaseInput,
+  isNeteaseShortLink,
+  parseNeteaseUrl,
+  type NeteaseKind,
+} from "./parse";
 
 export type NeteaseReleaseType = "single" | "ep" | "album" | "other";
 
@@ -194,12 +199,44 @@ export async function fetchSongMeta(songId: string): Promise<NeteaseMeta> {
 }
 
 /**
- * Parse URL (or bare id) and fetch metadata from NetEase public APIs.
+ * Follow mobile share short links (163cn.tv/xxx → music.163.com/...id=).
+ */
+export async function expandNeteaseShortLink(rawUrl: string): Promise<string> {
+  const input = extractNeteaseInput(rawUrl);
+  if (!isNeteaseShortLink(input)) return input;
+
+  let target = input;
+  try {
+    if (!/^https?:\/\//i.test(target)) target = `https://${target}`;
+    const res = await fetch(target, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        "User-Agent": UA,
+        Accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+        Referer: "https://music.163.com/",
+      },
+      cache: "no-store",
+      next: { revalidate: 0 },
+    });
+    if (res.url) return res.url;
+  } catch {
+    // fall through — parse may still fail with a clear error
+  }
+  return target;
+}
+
+/**
+ * Parse URL / share text / short link and fetch metadata from NetEase APIs.
  */
 export async function resolveNeteaseMeta(rawUrl: string): Promise<NeteaseMeta> {
-  const parsed = parseNeteaseUrl(rawUrl);
+  const extracted = extractNeteaseInput(rawUrl);
+  const expanded = await expandNeteaseShortLink(extracted);
+  const parsed = parseNeteaseUrl(expanded);
   if (!parsed.id) {
-    throw new Error("无法从链接识别网易云 ID，请粘贴完整专辑或单曲链接");
+    throw new Error(
+      "无法从链接识别网易云 ID。可粘贴完整专辑/单曲链接，或手机分享的 163cn.tv 短链（可连同分享文案一起贴）",
+    );
   }
 
   if (parsed.kind === "song") {

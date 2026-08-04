@@ -6,8 +6,8 @@
 ## 能做什么
 
 ### 优质发行（Waxlist）
-- 浏览专辑封面列表
-- 登录后点红心 → 进入「我的红心」
+- 浏览专辑封面列表；筛选（红心 / 站主爱听 / 友情）与排序
+- 登录后点红心收藏；「我的红心」在 explore 内筛选
 - 站主点过红心的专会显示 **站主爱听** 标签
 
 ### 找伴奏（Beat Hunter）
@@ -33,7 +33,8 @@ npm run dev
 - [环境变量](./environment.md)
 - [YouTube API](./youtube-api.md)
 - [**试用：Zeabur**](./deploy-zeabur.md)（类 Vercel，先测国内能否打开）
-- [**国内部署：阿里云域名 + 香港轻量**](./deploy-aliyun-hk.md)（要稳时主推）
+- [**内测计划与开发模式**](./beta-and-dev.md)
+- [**国内部署：阿里云域名 + 香港轻量**](./deploy-aliyun-hk.md)（生产可参考；现网为腾讯云香港）
 - [海外试用：Vercel + Neon](./deploy.md)
 
 ## 页面
@@ -42,7 +43,7 @@ npm run dev
 |------|------|
 | 优质发行 | `/explore` |
 | 推荐专辑 | `/explore/submit`（登录后） |
-| 我的红心 | `/favorites` |
+| 我的红心 | `/explore?filter=heart` |
 | 审核队列 | `/moderation`（站主 / 管理；侧栏盾牌图标） |
 | 找伴奏 Beat Hunter | `/chat` |
 | 登录 / 注册 | `/login` `/register` |

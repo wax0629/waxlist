@@ -23,6 +23,8 @@ export function mapRow(r: {
   updatedAt: Date;
   ratingAvg: number | null;
   ratingCount: number;
+  tracklist?: string[];
+  releasedAt?: Date | null;
 }): Release {
   return {
     id: r.id,
@@ -45,5 +47,7 @@ export function mapRow(r: {
     updated_at: r.updatedAt.toISOString(),
     rating_avg: r.ratingAvg ?? undefined,
     rating_count: r.ratingCount,
+    tracklist: r.tracklist?.length ? r.tracklist : undefined,
+    released_at: r.releasedAt ? r.releasedAt.toISOString() : undefined,
   };
 }

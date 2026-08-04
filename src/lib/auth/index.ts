@@ -3,6 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import type { UserRole } from "./roles";
 import {
   accountNeedsPasswordSetup,
+  findUserByEmail,
+  findUserById,
   verifyPassword,
 } from "./user-store";
 import { normalizeEmail } from "./identifiers";
@@ -54,6 +56,11 @@ declare module "next-auth" {
   }
 }
 
+const useSecureCookies =
+  (process.env.AUTH_URL || process.env.NEXTAUTH_URL || "").startsWith(
+    "https://",
+  );
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
@@ -68,20 +75,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = String(credentials?.password ?? "");
         if (!email || !password) return null;
 
-        // Legacy OTP accounts without password
-        if (await accountNeedsPasswordSetup(email)) {
-          throw new NeedPasswordSetup();
-        }
+        try {
+          // Legacy OTP accounts without password
+          if (await accountNeedsPasswordSetup(email)) {
+            throw new NeedPasswordSetup();
+          }
 
-        const user = await verifyPassword(email, password);
-        if (!user) return null;
-        return {
-          id: user.id,
-          email: user.email ?? null,
-          phone: user.phone ?? null,
-          name: user.name,
-          role: user.role,
-        };
+          const user = await verifyPassword(email, password);
+          if (!user) return null;
+          return {
+            id: user.id,
+            email: user.email ?? null,
+            phone: user.phone ?? null,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (err) {
+          if (err instanceof NeedPasswordSetup) throw err;
+          console.error("[auth] authorize failed", err);
+          return null;
+        }
       },
     }),
   ],
@@ -97,6 +110,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.phone = user.phone ?? null;
         token.email = user.email ?? null;
         token.name = user.name;
+        token.userSyncedAt = Date.now();
+        return token;
+      }
+
+      // 库被替换/恢复后 JWT 里的 userId 可能失效；按邮箱或 id 回表并对齐
+      // 约 60s 校验一次，避免每个请求都打库
+      const syncedAt =
+        typeof token.userSyncedAt === "number" ? token.userSyncedAt : 0;
+      if (Date.now() - syncedAt < 60_000 && token.id) {
+        return token;
+      }
+
+      try {
+        const email =
+          typeof token.email === "string"
+            ? normalizeEmail(token.email)
+            : "";
+        const id = String(token.id ?? token.sub ?? "");
+        let row = email ? await findUserByEmail(email) : null;
+        if (!row && id) row = await findUserById(id);
+        if (row) {
+          token.id = row.id;
+          token.role = row.role;
+          token.phone = row.phone ?? null;
+          token.email = row.email ?? null;
+          token.name = row.name;
+          token.userSyncedAt = Date.now();
+        } else {
+          // 会话用户已不在库中：清空 id，需重新登录
+          token.id = undefined;
+          token.userSyncedAt = Date.now();
+        }
+      } catch (err) {
+        console.error("[auth] jwt user reconcile failed", err);
       }
       return token;
     },
@@ -115,6 +162,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   trustHost: true,
+  /** Match cookie Secure flag to AUTH_URL (http domain → non-Secure cookies). */
+  useSecureCookies,
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 });
 

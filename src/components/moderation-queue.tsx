@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PendingReleaseRow } from "@/lib/recommendations/types";
 
 export function ModerationQueue({
@@ -14,6 +14,11 @@ export function ModerationQueue({
   const [items, setItems] = useState(initialItems);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
 
   async function act(id: string, action: "approve" | "reject") {
     setBusyId(id);
@@ -36,6 +41,8 @@ export function ModerationQueue({
   }
 
   async function refresh() {
+    if (refreshing) return;
+    setRefreshing(true);
     setError(null);
     try {
       const res = await fetch("/api/recommendations?queue=pending");
@@ -45,82 +52,57 @@ export function ModerationQueue({
       };
       if (!res.ok) throw new Error(data.error || "刷新失败");
       setItems(data.items ?? []);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "刷新失败");
+    } finally {
+      setRefreshing(false);
     }
   }
 
   return (
     <div>
-      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-white/55">
+          {items.length > 0
+            ? `队列中 ${items.length} 条`
+            : "当前没有待审提交"}
+        </p>
         <button
           type="button"
           onClick={() => void refresh()}
-          className="rounded-full border border-white/28 px-3 py-1 text-xs text-white/78 hover:border-white/30"
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.05] px-4 py-2 text-[13px] text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/30 hover:bg-white/[0.09] hover:text-white disabled:cursor-not-allowed disabled:opacity-55"
         >
-          刷新
+          <RefreshIcon spin={refreshing} />
+          {refreshing ? "刷新中…" : "刷新队列"}
         </button>
       </div>
 
       {error ? (
-        <p className="mt-4 text-sm text-rose-300">{error}</p>
+        <div className="mb-5 rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100/90">
+          {error}
+        </div>
       ) : null}
 
-      <ul className="mt-8 space-y-4">
-        {items.map((item) => (
-          <li
-            key={item.release_id}
-            className="glass-rim rounded-2xl bg-white/[0.02] p-4"
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/15 px-4 py-16 text-center">
+          <p className="text-sm text-white/55">暂无待审</p>
+          <p className="mt-2 text-[12px] text-white/35">
+            用户推荐专辑后会出现在这里
+          </p>
+          <Link
+            href="/explore"
+            className="mt-5 inline-block text-sm text-[#ff8fb3] hover:underline"
           >
-            <div className="flex gap-3">
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-white/[0.04]">
-                {item.cover_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.cover_url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-[10px] text-white/25">
-                    无封面
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium text-white">{item.title}</p>
-                  {item.type ? (
-                    <span className="rounded-full border border-white/24 px-2 py-0.5 font-mono text-[10px] uppercase text-white/58">
-                      {item.type}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="text-sm text-white/68">
-                  {item.artists.join(" / ")}
-                </p>
-                <p className="mt-1 text-xs text-white/35">
-                  提交于{" "}
-                  {new Date(item.created_at).toLocaleString("zh-CN")}
-                  {item.rec_count > 1
-                    ? ` · ${item.rec_count} 条推荐`
-                    : null}
-                </p>
-                {item.netease_url ? (
-                  <a
-                    href={item.netease_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 inline-block text-xs text-[#ff8fb3] hover:underline"
-                  >
-                    在网易云打开 →
-                  </a>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {(item.recommendations?.length
+            回优质发行 →
+          </Link>
+        </div>
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-5">
+          {items.map((item) => {
+            const recs =
+              item.recommendations?.length
                 ? item.recommendations
                 : item.first_reason
                   ? [
@@ -131,69 +113,157 @@ export function ModerationQueue({
                         created_at: item.created_at,
                       },
                     ]
-                  : []
-              ).map((rec, idx) => (
-                <div
-                  key={`${item.release_id}-rec-${idx}`}
-                  className="rounded-xl border border-white/16 bg-black/20 px-3 py-2.5"
-                >
-                  <p className="text-xs text-white/62">
-                    推荐人：
-                    <span className="text-white/70">{rec.user_name}</span>
-                  </p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-white/80">
-                    {rec.reason}
-                  </p>
-                  {rec.tracks ? (
-                    <ul className="mt-2 space-y-0.5 border-t border-white/16 pt-2">
-                      {rec.tracks
-                        .split(/[\n,，]/)
-                        .map((t) => t.trim())
-                        .filter(Boolean)
-                        .map((t) => (
-                          <li
-                            key={t}
-                            className="text-xs text-white/68 before:mr-1.5 before:text-white/25 before:content-['·']"
-                          >
-                            {t}
-                          </li>
-                        ))}
-                    </ul>
-                  ) : null}
-                </div>
-              ))}
-              {!item.first_reason &&
-              !(item.recommendations && item.recommendations.length) ? (
-                <p className="text-sm text-white/58">暂无推荐理由</p>
-              ) : null}
-            </div>
+                  : [];
+            const busy = busyId === item.release_id;
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={busyId === item.release_id}
-                onClick={() => void act(item.release_id, "approve")}
-                className="rounded-full bg-emerald-500/20 px-4 py-1.5 text-sm text-emerald-200 ring-1 ring-emerald-400/30 disabled:opacity-50"
+            return (
+              <li
+                key={item.release_id}
+                className="flex flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-5"
               >
-                {busyId === item.release_id ? "处理中…" : "通过上架"}
-              </button>
-              <button
-                type="button"
-                disabled={busyId === item.release_id}
-                onClick={() => void act(item.release_id, "reject")}
-                className="rounded-full bg-rose-500/15 px-4 py-1.5 text-sm text-rose-200 ring-1 ring-rose-400/25 disabled:opacity-50"
-              >
-                拒绝
-              </button>
-            </div>
-          </li>
-        ))}
-        {items.length === 0 ? (
-          <li className="rounded-2xl border border-dashed border-white/24 px-4 py-12 text-center">
-            <p className="text-sm text-white/50">暂无待审</p>
-          </li>
-        ) : null}
-      </ul>
+                <div className="flex gap-4">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/10 sm:h-28 sm:w-28">
+                    {item.cover_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.cover_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[10px] text-white/25">
+                        无封面
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-base font-medium text-white sm:text-[17px]">
+                        {item.title}
+                      </p>
+                      {item.type ? (
+                        <span className="rounded-full border border-white/18 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white/50">
+                          {item.type}
+                        </span>
+                      ) : null}
+                      {item.rec_count > 1 ? (
+                        <span className="rounded-full bg-[#ff6b9e]/12 px-2 py-0.5 text-[10px] text-[#ffb3cc] ring-1 ring-[#ff6b9e]/25">
+                          {item.rec_count} 条推荐
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-0.5 truncate text-sm text-white/60">
+                      {item.artists.join(" / ")}
+                    </p>
+                    <p className="mt-2 text-[12px] text-white/38">
+                      提交于{" "}
+                      {new Date(item.created_at).toLocaleString("zh-CN")}
+                    </p>
+                    {item.netease_url ? (
+                      <a
+                        href={item.netease_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex text-[12px] text-[#ff8fb3] transition hover:text-[#ffb3cc] hover:underline"
+                      >
+                        在网易云打开 →
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="mt-4 flex-1 space-y-2.5">
+                  {recs.length === 0 ? (
+                    <p className="rounded-xl border border-dashed border-white/12 px-3 py-3 text-sm text-white/45">
+                      暂无推荐理由
+                    </p>
+                  ) : (
+                    recs.map((rec, idx) => (
+                      <div
+                        key={`${item.release_id}-rec-${idx}`}
+                        className="rounded-xl border border-white/10 bg-black/25 px-3.5 py-3"
+                      >
+                        <p className="text-[12px] text-white/50">
+                          推荐人{" "}
+                          <span className="font-medium text-white/75">
+                            {rec.user_name}
+                          </span>
+                        </p>
+                        <p className="mt-1.5 text-sm leading-relaxed text-white/82">
+                          {rec.reason}
+                        </p>
+                        {rec.tracks ? (
+                          <ul className="mt-2.5 space-y-0.5 border-t border-white/10 pt-2.5">
+                            {rec.tracks
+                              .split(/[\n,，]/)
+                              .map((t) => t.trim())
+                              .filter(Boolean)
+                              .map((t) => (
+                                <li
+                                  key={t}
+                                  className="text-[12px] text-white/58 before:mr-1.5 before:text-white/25 before:content-['·']"
+                                >
+                                  {t}
+                                </li>
+                              ))}
+                          </ul>
+                        ) : null}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void act(item.release_id, "approve")}
+                    className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-100 ring-1 ring-emerald-400/35 transition hover:bg-emerald-500/28 disabled:opacity-50"
+                  >
+                    {busy ? "处理中…" : "通过上架"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void act(item.release_id, "reject")}
+                    className="rounded-full bg-rose-500/12 px-4 py-2 text-sm text-rose-100/90 ring-1 ring-rose-400/25 transition hover:bg-rose-500/18 disabled:opacity-50"
+                  >
+                    拒绝
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
+  );
+}
+
+function RefreshIcon({ spin }: { spin?: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className={spin ? "animate-spin" : undefined}
+    >
+      <path
+        d="M19.5 12a7.5 7.5 0 1 1-2.1-5.2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19.5 5v4.5H15"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

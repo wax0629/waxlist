@@ -39,7 +39,7 @@ export default function RootLayout({
       className={`${inter.variable} ${notoSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body
-        className="flex min-h-full flex-col text-white"
+        className="flex min-h-full flex-col pb-16 text-white sm:pb-20 md:pb-24"
         style={{
           fontFamily:
             "var(--font-sans), var(--font-cjk), Inter, 'Noto Sans SC', system-ui, sans-serif",

@@ -46,6 +46,8 @@ export interface Release {
   rating_count?: number;
   /** Cached track titles from NetEase resolve */
   tracklist?: string[];
+  /** Album release date (ISO), from NetEase publishTime when known */
+  released_at?: string;
 }
 
 export interface CreateReleaseInput {
@@ -64,4 +66,5 @@ export interface CreateReleaseInput {
   sort_order?: number;
   created_by?: string;
   tracklist?: string[];
+  released_at?: string;
 }
