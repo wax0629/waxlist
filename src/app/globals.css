@@ -79,6 +79,10 @@ body {
   background: #000000;
   overflow: hidden;
   pointer-events: none;
+  /* Limit repaint/composite work to this layer */
+  contain: paint;
+  isolation: isolate;
+  transform: translateZ(0);
 }
 
 /* Atmosphere: keep top-left dark; light only along diagonal zones */
@@ -116,10 +120,16 @@ body {
       #000000 0%,
       transparent 50%
     );
-  filter: blur(48px);
+  /* Static layer — no animation. Slightly lower blur = much cheaper, look almost same */
+  filter: blur(40px);
 }
 
-/* Diagonal ribbons ~45°, normal blend (no screen = no milky wash) */
+/*
+  Ribbons: same look, lighter paint.
+  - No permanent will-change (was forcing extra GPU layers 24/7)
+  - Only 2 bands animate (1 + 3); cores / 2 / 4 / 5 stay static
+    (motion was already hard to see under heavy blur)
+*/
 .aurora-ribbon {
   --rot: -45deg;
   --blur: 90px;
@@ -135,9 +145,13 @@ body {
   transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--rot));
   filter: blur(var(--blur));
   opacity: var(--op);
-  mix-blend-mode: normal;
-  will-change: transform, opacity;
-  animation: aurora-drift 18s infinite alternate ease-in-out;
+  animation: none;
+}
+
+/* Only these two slowly drift — enough life, half the animated blur layers */
+.ribbon-1,
+.ribbon-3 {
+  animation: aurora-drift 22s infinite alternate ease-in-out;
 }
 
 /* Copper band — sits mid-left, leaves top-left black */
@@ -168,8 +182,6 @@ body {
   --dy: 10%;
   top: 18%;
   height: 12vh;
-  animation-delay: -2s;
-  animation-duration: 12s;
   background: linear-gradient(
     90deg,
     transparent 20%,
@@ -183,14 +195,12 @@ body {
 /* Magenta mid band — spaced */
 .ribbon-2 {
   --rot: -48deg;
-  --blur: 100px;
+  --blur: 90px;
   --op: 0.88;
   --dx: 4%;
   --dy: 0;
   top: 32%;
   height: 34vh;
-  animation-delay: -5s;
-  animation-duration: 17s;
   background: linear-gradient(
     90deg,
     transparent 10%,
@@ -209,8 +219,6 @@ body {
   --dy: -2%;
   top: 40%;
   height: 8vh;
-  animation-delay: -6s;
-  animation-duration: 13s;
   background: linear-gradient(
     90deg,
     transparent 25%,
@@ -223,14 +231,13 @@ body {
 /* Deep purple lower-right */
 .ribbon-3 {
   --rot: -42deg;
-  --blur: 110px;
+  --blur: 100px;
   --op: 0.9;
   --dx: 14%;
   --dy: 6%;
   top: 55%;
   height: 48vh;
   animation-delay: -8s;
-  animation-duration: 20s;
   background: linear-gradient(
     90deg,
     transparent 25%,
@@ -250,8 +257,6 @@ body {
   --dy: 4%;
   top: -5%;
   height: 26vh;
-  animation-delay: -3s;
-  animation-duration: 14s;
   background: linear-gradient(
     90deg,
     transparent 5%,
@@ -264,15 +269,13 @@ body {
 /* Cool violet right edge */
 .ribbon-5 {
   --rot: -40deg;
-  --blur: 120px;
+  --blur: 100px;
   --op: 0.65;
   --dx: 20%;
   --dy: 0;
   top: 5%;
   left: 5%;
   height: 50vh;
-  animation-delay: -10s;
-  animation-duration: 22s;
   background: linear-gradient(
     90deg,
     transparent 40%,
@@ -310,9 +313,14 @@ body {
   }
 }
 
+/* Tab in background: pause CSS animations (no visual impact while using the tab) */
+.aurora-bg.is-paused .aurora-ribbon {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .aurora-ribbon {
-    animation: none;
+    animation: none !important;
   }
 }
 

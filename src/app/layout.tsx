@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
+import { AuroraPerf } from "@/components/aurora-perf";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -56,6 +57,7 @@ export default function RootLayout({
           <div className="aurora-ribbon ribbon-5" />
           <div className="aurora-vignette" />
         </div>
+        <AuroraPerf />
         <Providers>{children}</Providers>
       </body>
     </html>
