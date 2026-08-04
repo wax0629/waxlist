@@ -61,7 +61,7 @@ DATABASE_URL='你的Neon连接串' npx prisma db push
 |------|------|------|
 | `DATABASE_URL` | ✅ | Neon 连接串 |
 | `AUTH_SECRET` | ✅ | 上面 `openssl` 生成的值 |
-| `AUTH_URL` | ✅ | 部署后的站点 URL，如 `https://xxx.vercel.app` |
+| `AUTH_URL` | ✅ | **必须带 https://**，如 `https://waxlist-nu.vercel.app`（不要只写域名） |
 | `AUTH_TRUST_HOST` | 建议 | 填 `true` |
 | `OWNER_EMAILS` | 建议 | 你的站主邮箱，如 `xux9278@gmail.com` |
 | `YOUTUBE_API_KEY` | 可选 | 找伴奏真检索 |

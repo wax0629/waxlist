@@ -7,6 +7,28 @@ import {
 } from "./user-store";
 import { normalizeEmail } from "./identifiers";
 
+/**
+ * Auth.js needs an absolute URL (with protocol).
+ * Vercel users often set AUTH_URL=waxlist-nu.vercel.app (no https) → ERR_INVALID_URL.
+ * Fallbacks: NEXTAUTH_URL, then VERCEL_URL (host only, always https).
+ */
+function normalizeAuthBaseUrl(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  const t = raw.trim().replace(/\/+$/, "");
+  if (!t) return undefined;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t}`;
+}
+
+const authUrl =
+  normalizeAuthBaseUrl(process.env.AUTH_URL) ||
+  normalizeAuthBaseUrl(process.env.NEXTAUTH_URL) ||
+  normalizeAuthBaseUrl(process.env.VERCEL_URL);
+if (authUrl) {
+  process.env.AUTH_URL = authUrl;
+  process.env.NEXTAUTH_URL = authUrl;
+}
+
 class NeedPasswordSetup extends CredentialsSignin {
   code = "NEED_PASSWORD_SETUP";
 }

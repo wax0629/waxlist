@@ -1,21 +1,39 @@
 import Link from "next/link";
+import type { Session } from "next-auth";
 import { AppRail } from "@/components/app-rail";
 import { ReleaseCard } from "@/components/release-card";
 import { auth } from "@/lib/auth";
 import { favoritedReleaseIds } from "@/lib/favorites/store";
 import { listReleases } from "@/lib/releases/store";
+import type { Release } from "@/lib/releases/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function ExplorePage() {
-  const session = await auth();
-  const items = await listReleases({ status: "published" });
-  const mine = session?.user?.id
-    ? await favoritedReleaseIds(
+  let session: Session | null = null;
+  let items: Release[] = [];
+  let mine = new Set<string>();
+  let loadError: string | null = null;
+
+  try {
+    session = await auth();
+  } catch (err) {
+    console.error("[explore] auth()", err);
+  }
+
+  try {
+    items = await listReleases({ status: "published" });
+    if (session?.user?.id) {
+      mine = await favoritedReleaseIds(
         session.user.id,
         items.map((i) => i.id),
-      )
-    : new Set<string>();
+      );
+    }
+  } catch (err) {
+    console.error("[explore] database", err);
+    loadError =
+      "数据库连接失败。请检查 Vercel 环境变量 DATABASE_URL，并对生产库执行 prisma db push。";
+  }
 
   return (
     <div className="flex min-h-dvh flex-1 text-white">
@@ -55,7 +73,11 @@ export default async function ExplorePage() {
           aria-hidden
         />
 
-        {items.length === 0 ? (
+        {loadError ? (
+          <div className="mt-10 rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-6 text-center">
+            <p className="text-sm text-rose-100/90">{loadError}</p>
+          </div>
+        ) : items.length === 0 ? (
           <div className="mt-10 text-center">
             <p className="text-sm text-white/58">暂无专辑</p>
             <Link
