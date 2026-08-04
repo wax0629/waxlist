@@ -33,7 +33,7 @@ export function SearchMeta({
     <div className="glass-frame overflow-hidden rounded-2xl">
       {intentSummary ? (
         <div className="px-4 py-3">
-          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white/40">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white/58">
             我的理解
           </p>
           <p className="mt-1.5 text-[13px] leading-relaxed text-white/80">
@@ -44,7 +44,7 @@ export function SearchMeta({
               {active.map((label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] text-white/70"
+                  className="rounded-full border border-white/28 px-2.5 py-1 text-[11px] text-white/70"
                 >
                   {label}
                 </span>
@@ -57,7 +57,7 @@ export function SearchMeta({
       {onRefine && actions.length > 0 ? (
         <div
           className={
-            intentSummary ? "border-t border-white/10 px-4 py-3" : "px-4 py-3"
+            intentSummary ? "border-t border-white/18 px-4 py-3" : "px-4 py-3"
           }
         >
           <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-white/35">
@@ -80,11 +80,11 @@ export function SearchMeta({
       ) : null}
 
       {queriesUsed && queriesUsed.length > 0 ? (
-        <div className="border-t border-white/10">
+        <div className="border-t border-white/18">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-[12px] text-white/50 transition hover:bg-white/5 hover:text-white/80"
+            className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-[12px] text-white/68 transition hover:bg-white/5 hover:text-white/80"
           >
             <span>
               本轮检索词
@@ -97,11 +97,11 @@ export function SearchMeta({
             </span>
           </button>
           {open ? (
-            <ul className="flex flex-wrap gap-1.5 border-t border-white/10 px-4 py-3">
+            <ul className="flex flex-wrap gap-1.5 border-t border-white/18 px-4 py-3">
               {queriesUsed.map((q) => (
                 <li
                   key={q}
-                  className="max-w-full truncate rounded-lg border border-white/10 px-2.5 py-1 font-mono text-[11px] text-white/65"
+                  className="max-w-full truncate rounded-lg border border-white/18 px-2.5 py-1 font-mono text-[11px] text-white/65"
                   title={q}
                 >
                   {q}

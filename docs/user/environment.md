@@ -14,7 +14,14 @@ cp .env.example .env.local
 | `LLM_MODEL` | 可选 | 模型名 |
 | `RATE_LIMIT_PER_MIN` | 可选 | 每 IP 每分钟请求上限，默认约 20 |
 | `AUTH_SECRET` | 登录需要 | Auth.js 会话加密密钥，可用 `openssl rand -base64 32` 生成 |
-| `OWNER_EMAILS` | 可选 | 站主邮箱列表（逗号分隔）；库为空时**第一个注册用户**也会成为站主 |
+| `AUTH_OTP_DEV` | 可选 | 仅 `1` 时接口返回 `dev_code`；**生产勿开** |
+| `RESEND_API_KEY` | 邮箱登录二选一 | [Resend](https://resend.com) API Key，真发邮件 |
+| `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` | 邮箱登录二选一 | SMTP 发信（163/QQ 等）；见 `docs/user/email-auth.md` |
+| `SMTP_PORT` / `SMTP_SECURE` | 可选 | 默认 465 / 按端口推断 secure |
+| `EMAIL_FROM` | 推荐 | 发件人展示名，如 `Waxlist <you@domain.com>` |
+| `SMS_WEBHOOK_URL` | 手机登录需要 | 短信 Webhook；未配置时请用邮箱 |
+| `OWNER_EMAILS` | 可选 | 站主邮箱列表（逗号分隔）。**每次用该邮箱验证码登录时**会升为站主；库为空时第一个用户也是站主 |
+| `OWNER_PHONES` | 可选 | 站主手机号列表；登录时同样会同步为站主 |
 | `DATABASE_URL` | 社区功能需要 | Postgres 连接串；本机见下方 Docker |
 
 密钥只放在服务端环境（`.env.local` / 托管平台 Secret），**不要**提交到 Git，也不要写进前端代码。
@@ -54,4 +61,6 @@ Settings → Resources → 建议 **CPU 2～4、Memory 2～4 GB**。
 | `admin` | 管理：审核、运营工具 |
 | `user` | 普通用户：推荐、打分 |
 
-登录 / 注册页：`/login`、`/register`。精选：`/explore`。
+登录页：`/login`（邮箱 + 密码）。注册页：`/register`（邮箱 + 密码）。精选：`/explore`。
+
+邮件相关（可选，当前登录不依赖验证码）：[`email-auth.md`](./email-auth.md)

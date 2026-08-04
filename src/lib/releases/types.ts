@@ -44,6 +44,8 @@ export interface Release {
   /** Aggregates — filled when ratings exist */
   rating_avg?: number;
   rating_count?: number;
+  /** Cached track titles from NetEase resolve */
+  tracklist?: string[];
 }
 
 export interface CreateReleaseInput {
@@ -61,4 +63,5 @@ export interface CreateReleaseInput {
   links?: ReleaseLink[];
   sort_order?: number;
   created_by?: string;
+  tracklist?: string[];
 }

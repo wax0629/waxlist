@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HeartIcon } from "@/components/action-icons";
+import { StarsDisplay } from "@/components/star-rating";
 import type { Release } from "@/lib/releases/types";
 
 export function ReleaseCard({
@@ -60,7 +62,7 @@ export function ReleaseCard({
   return (
     <Link
       href={`/explore/${release.id}`}
-      className="group relative block overflow-hidden rounded-2xl border border-white/14 transition hover:border-white/30"
+      className="glass-rim group relative block overflow-hidden rounded-2xl transition hover:border-white/50"
     >
       <div className="relative aspect-square bg-white/[0.04]">
         {release.cover_url ? (
@@ -71,51 +73,66 @@ export function ReleaseCard({
             className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs text-white/25">
+          <div className="flex h-full items-center justify-center text-xs text-white/45">
             无封面
           </div>
         )}
 
-        {/* 站主爱听：仅当站主把该专加入自己红心时展示 */}
+        {/* 站主爱听：封面左上角斜向下角标 */}
         {ownerLoved ? (
-          <span className="absolute left-2 top-2 z-10 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-lg shadow-rose-500/30">
-            站主爱听
-          </span>
+          <div
+            className="pointer-events-none absolute left-0 top-0 z-10 h-[4.5rem] w-[4.5rem] overflow-hidden rounded-tl-2xl"
+            aria-label="站主爱听"
+          >
+            <span
+              className="absolute left-[-38%] top-[18%] w-[140%] rotate-[-45deg] bg-gradient-to-r from-rose-600 via-rose-500 to-pink-500 py-[3px] text-center text-[9px] font-bold tracking-wide text-white shadow-[0_2px_8px_rgba(244,63,94,0.45)]"
+            >
+              站主爱听
+            </span>
+          </div>
         ) : null}
-
-        {/* 红心：所有人可点 → 个人红心列表；站主点了会额外出「站主爱听」 */}
+      </div>
+      {/* 文案区：左专辑名/艺人（原间距），右红心相对整块文案垂直居中 */}
+      <div className="flex items-center gap-2 p-2.5">
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-white">
+            {release.title}
+          </p>
+          <p className="truncate text-[11px] text-white/65">
+            {release.artists.join(" / ")}
+          </p>
+          <div className="flex items-center gap-1 pt-0.5">
+            <StarsDisplay
+              score={
+                release.rating_count && release.rating_avg != null
+                  ? release.rating_avg
+                  : 0
+              }
+              size={12}
+            />
+            <span className="text-[10px] tabular-nums text-white/45">
+              {release.rating_count && release.rating_avg != null
+                ? release.rating_avg.toFixed(1)
+                : "0.0"}
+            </span>
+          </div>
+        </div>
         <button
           type="button"
           onClick={toggleHeart}
           disabled={busy}
           title={
             favorited
-              ? "取消红心（移出我的列表）"
+              ? "取消收藏"
               : loggedIn
-                ? "加入我的红心"
+                ? "收藏进我的红心"
                 : "登录后收藏"
           }
-          className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/45 text-lg backdrop-blur-sm transition hover:scale-105 hover:bg-black/60 disabled:opacity-60"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.06] p-0 text-[15px] leading-none transition hover:border-rose-400/40 hover:bg-rose-500/10 disabled:opacity-60"
           aria-label={favorited ? "已收藏" : "收藏"}
         >
-          <span
-            className={
-              favorited
-                ? "text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.8)]"
-                : "text-white/50"
-            }
-          >
-            {favorited ? "♥" : "♡"}
-          </span>
+          <HeartIcon filled={favorited} />
         </button>
-      </div>
-      <div className="space-y-0.5 p-2.5">
-        <p className="line-clamp-2 text-[13px] font-medium leading-snug text-white">
-          {release.title}
-        </p>
-        <p className="truncate text-[11px] text-white/45">
-          {release.artists.join(" / ")}
-        </p>
       </div>
     </Link>
   );

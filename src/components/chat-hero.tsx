@@ -30,10 +30,10 @@ export function ChatHero({
       {/* Touri feature cards: pure transparent + border only */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {STEPS.map((s) => (
-          <div key={s.n} className="glass-frame p-5 transition hover:border-white/22">
+          <div key={s.n} className="glass-frame p-5 transition hover:border-white/40">
             <div className="mb-3 text-xl opacity-80">{s.icon}</div>
             <h3 className="m-0 text-[13px] font-semibold text-white">{s.t}</h3>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-white/50">
+            <p className="mt-1.5 text-[11px] leading-relaxed text-white/68">
               {s.d}
             </p>
           </div>
@@ -41,7 +41,7 @@ export function ChatHero({
       </div>
 
       <div className="space-y-3">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-white/40">
+        <p className="text-[11px] font-medium uppercase tracking-wider text-white/58">
           试试这样问
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -51,7 +51,7 @@ export function ChatHero({
               type="button"
               disabled={disabled}
               onClick={() => onPick(s)}
-              className="rounded-full border border-white/12 bg-transparent px-4 py-2.5 text-left text-[13px] font-medium text-white/75 transition hover:border-white/25 hover:text-white disabled:opacity-50"
+              className="rounded-full border border-white/24 bg-transparent px-4 py-2.5 text-left text-[13px] font-medium text-white/75 transition hover:border-white/25 hover:text-white disabled:opacity-50"
             >
               {s}
             </button>

@@ -265,7 +265,7 @@ export function ChatClient() {
               <p className="font-display text-[14px] font-semibold text-white">
                 Beat Hunter
               </p>
-              <p className="text-[10px] text-white/40">Waxlist · 找伴奏</p>
+              <p className="text-[10px] text-white/58">Waxlist · 找伴奏</p>
             </div>
             <div className="touri-pills max-md:hidden">
               <span className="touri-pill touri-pill-active">✨ Beat Hunter</span>
@@ -329,18 +329,18 @@ export function ChatClient() {
           {/* LEFT: chat glass card */}
           <section className="liquid-glass flex min-h-0 min-w-0 flex-1 flex-col lg:flex-[11]">
             {!isFresh ? (
-              <div className="flex shrink-0 items-center justify-end border-b border-white/[0.08] px-3.5 py-2.5 sm:px-4">
+              <div className="flex shrink-0 items-center justify-end border-b border-white/18 px-3.5 py-2.5 sm:px-4">
                 <button
                   type="button"
                   onClick={newChat}
-                  className="rounded-full border border-white/15 bg-transparent px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:border-white/30 hover:text-white"
+                  className="rounded-full border border-white/28 bg-transparent px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:border-white/30 hover:text-white"
                 >
                   + 新会话
                 </button>
               </div>
             ) : null}
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
-            {restoring && <p className="text-xs text-white/40">恢复会话…</p>}
+            {restoring && <p className="text-xs text-white/58">恢复会话…</p>}
 
             {isFresh && (
               <ChatHero
@@ -406,7 +406,7 @@ export function ChatClient() {
             {error && (
               <div className="glass-panel rounded-2xl border-rose-300/25 px-4 py-3">
                 <p className="text-[13px] font-medium text-rose-200">请求失败</p>
-                <p className="mt-1 text-[12px] text-white/55">{error}</p>
+                <p className="mt-1 text-[12px] text-white/72">{error}</p>
                 {lastFailedText ? (
                   <button
                     type="button"
@@ -423,7 +423,7 @@ export function ChatClient() {
 
           <form
             onSubmit={onSend}
-            className="border-t border-white/[0.1] bg-transparent p-3 sm:p-4"
+            className="border-t border-white/20 bg-transparent p-3 sm:p-4"
           >
             <div className="touri-input-shell">
               <div className="touri-input-inner flex items-end gap-2 px-3 py-2.5 sm:px-4">
@@ -433,7 +433,7 @@ export function ChatClient() {
                   onChange={(e) => setInput(e.target.value)}
                   rows={2}
                   placeholder="✨ 描述气质，或粘贴 YouTube 链接…"
-                  className="max-h-36 min-h-[40px] flex-1 resize-none bg-transparent py-1.5 text-[16px] text-white placeholder:text-white/40 focus:outline-none sm:text-[14px]"
+                  className="max-h-36 min-h-[40px] flex-1 resize-none bg-transparent py-1.5 text-[16px] text-white placeholder:text-white/58 focus:outline-none sm:text-[14px]"
                   onKeyDown={(e) => {
                     if (e.nativeEvent.isComposing || e.keyCode === 229) return;
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -470,7 +470,7 @@ export function ChatClient() {
                 </button>
               </div>
             </div>
-            <p className="mt-2 px-1 text-[10px] text-white/35">
+            <p className="mt-2 px-1 text-[10px] text-white/55">
               试听参考 · 商用以源站为准
             </p>
           </form>
@@ -478,7 +478,7 @@ export function ChatClient() {
 
           {/* RIGHT: discover glass card — ~48% */}
           <aside className="liquid-glass hidden min-h-0 min-w-0 flex-col lg:flex lg:flex-[10]">
-            <div className="flex items-end justify-between gap-3 border-b border-white/[0.08] px-4 py-3.5">
+            <div className="flex items-end justify-between gap-3 border-b border-white/18 px-4 py-3.5">
               <div>
                 <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#ff8fb3]/90">
                   Discover
@@ -515,14 +515,14 @@ export function ChatClient() {
 
                   {latestShortlist.queries_used?.length ? (
                     <div className="pt-1">
-                      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
+                      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/55">
                         Search strategy
                       </p>
                       <ul className="flex flex-wrap gap-1.5">
                         {latestShortlist.queries_used.map((q) => (
                           <li
                             key={q}
-                            className="glass rounded-full px-2.5 py-1 font-mono text-[10px] text-white/60"
+                            className="glass rounded-full px-2.5 py-1 font-mono text-[10px] text-white/78"
                             title={q}
                           >
                             {q}
@@ -537,7 +537,7 @@ export function ChatClient() {
                   <p className="font-display text-[1rem] font-semibold text-white/90">
                     等待短名单
                   </p>
-                  <p className="mt-2 max-w-[14rem] text-[12px] leading-relaxed text-white/45">
+                  <p className="mt-2 max-w-[14rem] text-[12px] leading-relaxed text-white/62">
                     左侧描述需求后，这里会列出统一样式的可试听结果。
                   </p>
                 </div>

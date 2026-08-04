@@ -12,18 +12,43 @@ datasource db {
 
 model User {
   id           String   @id
-  email        String   @unique
+  /// 邮箱登录；与 phone 至少填一个
+  email        String?  @unique
+  /// 手机号（国内 11 位规范化存储）
+  phone        String?  @unique
   name         String
-  passwordHash String   @map("password_hash")
+  /// 可选：旧版密码登录遗留字段，新流程不再使用
+  passwordHash String?  @map("password_hash")
   /// owner | admin | user
   role         String   @default("user")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  releases     Release[]   @relation("ReleaseCreator")
-  favorites    Favorite[]
+  releases         Release[]         @relation("ReleaseCreator")
+  favorites        Favorite[]
+  recommendations  Recommendation[]
+  trackRecs        TrackRecommendation[]
+  ratings          Rating[]
+  comments         ReleaseComment[]
 
   @@map("users")
+}
+
+/// 登录/注册验证码（邮箱或手机）
+model AuthOtp {
+  id         String    @id
+  /// email | phone
+  channel    String
+  /// 规范化后的邮箱或手机号
+  target     String
+  codeHash   String    @map("code_hash")
+  expiresAt  DateTime  @map("expires_at")
+  attempts   Int       @default(0)
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([channel, target, createdAt])
+  @@map("auth_otps")
 }
 
 model Release {
@@ -53,12 +78,95 @@ model Release {
   updatedAt       DateTime @updatedAt @map("updated_at")
   ratingAvg       Float?   @map("rating_avg")
   ratingCount     Int      @default(0) @map("rating_count")
+  /// 曲目名列表（解析网易云时缓存）
+  tracklist       String[] @default([])
   favorites       Favorite[]
+  recommendations Recommendation[]
+  trackRecs       TrackRecommendation[]
+  ratings         Rating[]
+  comments        ReleaseComment[]
 
   @@unique([neteaseId])
   @@index([status, source])
   @@index([ownerLoved])
   @@map("releases")
+}
+
+/// 专辑评论（可附带评分快照；IP 字段预留）
+model ReleaseComment {
+  id        String   @id
+  releaseId String   @map("release_id")
+  userId    String   @map("user_id")
+  body      String
+  /// 发表时的 1–10 分（可选）
+  score     Int?
+  /// 预留：展示用 IP 脱敏，后续再采
+  ipMasked  String?  @map("ip_masked")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([releaseId, createdAt])
+  @@index([userId])
+  @@map("release_comments")
+}
+
+/// 专辑评分 1–10（每人每专一条，可改分）
+model Rating {
+  id        String   @id
+  releaseId String   @map("release_id")
+  userId    String   @map("user_id")
+  /// 1–10 整数
+  score     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, releaseId])
+  @@index([releaseId])
+  @@map("ratings")
+}
+
+/// 用户推荐：首推理由 + 可选曲目；后续可再推
+model Recommendation {
+  id          String   @id
+  releaseId   String   @map("release_id")
+  userId      String   @map("user_id")
+  /// 推荐理由（必填）
+  reason      String
+  /// 推荐曲目，换行或逗号分隔曲名
+  tracks      String?
+  /// 是否该发行的首条推荐
+  isFirst     Boolean  @default(false) @map("is_first")
+  /// pending | published | rejected
+  status      String   @default("pending")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([releaseId, status])
+  @@index([userId])
+  @@index([status])
+  @@map("recommendations")
+}
+
+/// 单曲推荐（详情页曲目列表点赞）
+model TrackRecommendation {
+  id        String   @id
+  releaseId String   @map("release_id")
+  userId    String   @map("user_id")
+  /// 曲名（与 release.tracklist 对齐）
+  trackName String   @map("track_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, releaseId, trackName])
+  @@index([releaseId, trackName])
+  @@map("track_recommendations")
 }
 
 /// 个人红心列表：任何登录用户可收藏

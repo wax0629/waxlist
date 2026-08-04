@@ -11,13 +11,13 @@
   --ink: #050505;
   --ink-2: #0a0a0a;
   --ink-elevated: rgba(20, 20, 20, 0.4);
-  --surface-soft: rgba(255, 255, 255, 0.03);
+  --surface-soft: rgba(255, 255, 255, 0.05);
   --cream: #ffffff;
-  --cream-soft: rgba(255, 255, 255, 0.85);
-  --cream-muted: rgba(255, 255, 255, 0.6);
-  --cream-faint: rgba(255, 255, 255, 0.4);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.12);
+  --cream-soft: rgba(255, 255, 255, 0.92);
+  --cream-muted: rgba(255, 255, 255, 0.72);
+  --cream-faint: rgba(255, 255, 255, 0.52);
+  --line: rgba(255, 255, 255, 0.16);
+  --line-strong: rgba(255, 255, 255, 0.26);
 
   /* Primary gradient: pink → purple */
   --grad-a: #ff6b9e;
@@ -55,10 +55,12 @@ body {
 body {
   margin: 0;
   background: #050505;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.96);
   font-family: var(--font-sans), "Inter", "Noto Sans SC", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-weight: 400;
 }
 
 .font-display {
@@ -322,8 +324,18 @@ body {
 }
 
 /*
-  Pure transparent pane — soft rim only (not heavy/deliberate).
-  No fill, no blur, no gradient pseudo ring.
+  Cool metallic rim — ice/steel specular.
+  Specular layers sit ABOVE content (pointer-events: none) so top-right
+  reads on cover images; bottom depth is kept subtle so upper half wins.
+*/
+:root {
+  --metal-hi: rgba(240, 248, 255, 0.75);
+  --metal-mid: rgba(186, 214, 240, 0.45);
+  --metal-edge: rgba(195, 218, 240, 0.42);
+}
+
+/*
+  Glass panes — cool metal rim + restrained top-right specular.
 */
 .liquid-glass {
   position: relative;
@@ -332,37 +344,214 @@ body {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--metal-edge);
+  box-shadow:
+    inset 0 0 0 1px rgba(170, 205, 240, 0.07),
+    inset 0 1px 0 rgba(235, 245, 255, 0.48),
+    inset 0 2px 8px -2px rgba(160, 200, 245, 0.1),
+    inset -1px 0 0 rgba(160, 200, 240, 0.26),
+    inset 0 -1px 0 rgba(40, 55, 80, 0.14),
+    inset 1px 0 0 rgba(20, 30, 50, 0.12);
+  color: rgba(255, 255, 255, 0.98);
 }
 
-.liquid-glass::before,
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 20;
+  background:
+    radial-gradient(
+      ellipse 62% 48% at 100% 0%,
+      rgba(245, 250, 255, 0.32) 0%,
+      rgba(185, 220, 250, 0.16) 32%,
+      rgba(130, 180, 230, 0.06) 52%,
+      transparent 68%
+    ),
+    linear-gradient(
+      215deg,
+      rgba(220, 238, 255, 0.14) 0%,
+      rgba(150, 195, 235, 0.05) 28%,
+      transparent 50%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
 .liquid-glass::after {
-  content: none !important;
-  display: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 21;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 12%,
+      rgba(150, 200, 240, 0.18) 48%,
+      rgba(215, 235, 255, 0.5) 78%,
+      rgba(245, 250, 255, 0.72) 100%
+    )
+    top / 100% 1.5px no-repeat,
+    linear-gradient(
+      180deg,
+      rgba(245, 250, 255, 0.7) 0%,
+      rgba(185, 220, 250, 0.4) 16%,
+      rgba(130, 180, 225, 0.14) 40%,
+      transparent 58%
+    )
+    right / 1.5px 100% no-repeat,
+    radial-gradient(
+      circle 14px at 100% 0%,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(190, 225, 255, 0.18) 45%,
+      transparent 72%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.9;
 }
 
-/* Inner mini cards — quiet border */
+/* Shared rim for album / beat tiles */
+.glass-rim {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--metal-edge) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(160, 200, 240, 0.07),
+    inset 0 1px 0 rgba(235, 245, 255, 0.48),
+    inset 0 3px 10px -3px rgba(160, 205, 250, 0.12),
+    inset -1px 0 0 rgba(155, 200, 240, 0.26),
+    inset 0 -1px 0 rgba(30, 45, 70, 0.14) !important;
+}
+
+.glass-rim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 20;
+  background:
+    radial-gradient(
+      ellipse 68% 52% at 100% 0%,
+      rgba(245, 250, 255, 0.34) 0%,
+      rgba(180, 220, 250, 0.16) 34%,
+      rgba(120, 175, 225, 0.05) 54%,
+      transparent 68%
+    ),
+    linear-gradient(
+      210deg,
+      rgba(220, 240, 255, 0.12) 0%,
+      transparent 40%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.82;
+}
+
+.glass-rim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 21;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 10%,
+      rgba(145, 195, 240, 0.2) 50%,
+      rgba(220, 240, 255, 0.55) 82%,
+      rgba(245, 250, 255, 0.7) 100%
+    )
+    top / 100% 1.5px no-repeat,
+    linear-gradient(
+      180deg,
+      rgba(245, 250, 255, 0.68) 0%,
+      rgba(185, 220, 250, 0.38) 18%,
+      rgba(130, 180, 225, 0.12) 42%,
+      transparent 58%
+    )
+    right / 1.5px 100% no-repeat,
+    radial-gradient(
+      circle 13px at 100% 0%,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(185, 220, 250, 0.16) 48%,
+      transparent 72%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.88;
+}
+
+/* Inner mini cards */
 .glass-frame {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(180, 212, 238, 0.4);
   border-radius: 16px;
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(230, 242, 255, 0.42),
+    inset -1px 0 0 rgba(150, 195, 235, 0.2),
+    inset 0 -1px 0 rgba(40, 55, 80, 0.14);
   backdrop-filter: none !important;
 }
 
-/* Legacy glass utils — transparent frames */
+.glass-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(
+    ellipse 65% 50% at 100% 0%,
+    rgba(240, 248, 255, 0.26) 0%,
+    rgba(160, 200, 240, 0.1) 40%,
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+/* Legacy glass utils */
 .glass,
 .glass-strong,
 .glass-panel {
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(180, 212, 238, 0.4);
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: none;
-  color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(230, 242, 255, 0.4),
+    inset -1px 0 0 rgba(145, 190, 230, 0.2),
+    inset 0 -1px 0 rgba(35, 50, 75, 0.14);
+  color: rgba(255, 255, 255, 0.98);
+}
+
+.glass::before,
+.glass-strong::before,
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(
+    ellipse 70% 52% at 100% 0%,
+    rgba(240, 248, 255, 0.28) 0%,
+    rgba(150, 195, 235, 0.09) 42%,
+    transparent 64%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.85;
 }
 
 /* Circular user orb — transparent center, bright ring only */
@@ -444,17 +633,17 @@ body {
 .touri-pills {
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   padding: 6px;
   border-radius: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 .touri-pill {
   padding: 8px 16px;
   border-radius: 30px;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.82);
   transition: all 0.3s ease;
 }
 .touri-pill:hover {

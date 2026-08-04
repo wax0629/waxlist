@@ -24,6 +24,7 @@ function mapRow(r: {
   updatedAt: Date;
   ratingAvg: number | null;
   ratingCount: number;
+  tracklist?: string[];
 }): Release {
   return {
     id: r.id,
@@ -46,6 +47,7 @@ function mapRow(r: {
     updated_at: r.updatedAt.toISOString(),
     rating_avg: r.ratingAvg ?? undefined,
     rating_count: r.ratingCount,
+    tracklist: r.tracklist?.length ? r.tracklist : undefined,
   };
 }
 
@@ -117,6 +119,7 @@ export async function createRelease(
       links: (input.links ?? []) as unknown as Prisma.InputJsonValue,
       sortOrder: input.sort_order ?? null,
       createdById: input.created_by || null,
+      tracklist: input.tracklist ?? [],
     },
   });
   return mapRow(row);
@@ -142,6 +145,7 @@ export async function updateRelease(
       | "rating_count"
       | "netease_url"
       | "netease_id"
+      | "tracklist"
     >
   >,
 ): Promise<Release> {
@@ -175,6 +179,7 @@ export async function updateRelease(
       ...(patch.rating_count !== undefined
         ? { ratingCount: patch.rating_count }
         : {}),
+      ...(patch.tracklist !== undefined ? { tracklist: patch.tracklist } : {}),
       ...(patch.netease_url !== undefined
         ? { neteaseUrl: patch.netease_url || null }
         : {}),

@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HeartIcon } from "@/components/action-icons";
 
+/** 专辑收藏（红心）→ 我的红心；站主收藏额外「站主爱听」 */
 export function DetailHeart({
   releaseId,
   initialFavorited,
@@ -50,23 +52,23 @@ export function DetailHeart({
     }
   }
 
+  // ownerLoved 由站主点收藏后 router.refresh 更新标题旁标签
+  void ownerLoved;
+
   return (
     <button
       type="button"
       onClick={toggle}
       disabled={busy}
-      className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-sm transition hover:border-white/35"
-      title={favorited ? "取消红心" : "加入我的红心"}
+      className={
+        favorited
+          ? "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-rose-400/45 bg-rose-500/15 p-0 transition hover:bg-rose-500/25 disabled:opacity-50"
+          : "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 p-0 transition hover:border-rose-400/40 hover:bg-rose-500/10 disabled:opacity-50"
+      }
+      title={favorited ? "取消收藏" : "收藏进我的红心"}
+      aria-label={favorited ? "取消收藏" : "收藏"}
     >
-      <span className={favorited ? "text-rose-400" : "text-white/45"}>
-        {favorited ? "♥" : "♡"}
-      </span>
-      <span className="text-white/70">
-        {favorited ? "已在红心" : "红心"}
-      </span>
-      {ownerLoved ? (
-        <span className="ml-1 text-[10px] text-rose-300/90">· 站主爱听</span>
-      ) : null}
+      <HeartIcon filled={favorited} />
     </button>
   );
 }

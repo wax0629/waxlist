@@ -22,22 +22,18 @@ export default async function FavoritesPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <Link
           href="/explore"
-          className="text-sm text-white/45 hover:text-white/80"
+          className="text-sm text-white/62 hover:text-white/80"
         >
           ← 返回精选
         </Link>
         <h1 className="mt-4 font-display text-2xl font-semibold">我的红心</h1>
-        <p className="mt-2 text-sm text-white/50">
-          你点过 ♥ 的专辑。站主点过的仍会带「站主爱听」标签。
-        </p>
 
         {items.length === 0 ? (
-          <p className="mt-12 text-center text-sm text-white/40">
-            还没有收藏。去{" "}
+          <p className="mt-12 text-center text-sm text-white/58">
+            还没有收藏。{" "}
             <Link href="/explore" className="text-white/70 underline">
-              精选
-            </Link>{" "}
-            点红心吧。
+              去精选看看
+            </Link>
           </p>
         ) : (
           <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">

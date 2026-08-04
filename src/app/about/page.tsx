@@ -12,10 +12,10 @@ export default function AboutPage() {
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white">
           关于 Waxlist
         </h1>
-        <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-white/60">
+        <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-white/78">
           <p>
             <strong className="font-medium text-white/85">Waxlist</strong>{" "}
-            是听专、荐专与口碑沉淀的社区（一期偏中文地下发行 / 网易云外链）：红心、站主爱听标签、后续评分与推荐理由。
+            是听专、荐专与口碑沉淀的社区（一期偏中文地下发行 / 网易云外链）：红心、站主爱听、1–10 评分与推荐理由。
           </p>
           <p>
             站内找伴奏模块仍叫{" "}

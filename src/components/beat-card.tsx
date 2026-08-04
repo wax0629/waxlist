@@ -25,7 +25,7 @@ export function BeatCard({
         delay: Math.min(index, 6) * 0.04,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group flex w-full flex-col overflow-hidden rounded-2xl border border-white/14 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-white/28"
+      className="glass-rim group flex w-full flex-col overflow-hidden rounded-2xl bg-transparent transition duration-300 hover:-translate-y-0.5 hover:border-white/50"
     >
       {/* YouTube-style 16:9 thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden">
@@ -41,7 +41,7 @@ export function BeatCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         <div className="absolute left-2 top-2 flex items-start justify-between gap-2">
-          <span className="rounded-full border border-white/15 bg-black/40 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-sm">
+          <span className="rounded-full border border-white/28 bg-black/50 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
             {beat.source}
           </span>
         </div>
@@ -55,10 +55,10 @@ export function BeatCard({
         <h3 className="line-clamp-2 font-display text-[13px] font-semibold leading-snug tracking-tight text-white">
           {beat.title}
         </h3>
-        <p className="truncate text-[11px] text-white/50">
+        <p className="truncate text-[11px] text-white/70">
           {beat.channel_title || "未知频道"}
         </p>
-        <p className="line-clamp-2 text-[11px] leading-relaxed text-white/60">
+        <p className="line-clamp-2 text-[11px] leading-relaxed text-white/75">
           {beat.reason || "点开试听，判断是否合拍。"}
         </p>
       </div>
