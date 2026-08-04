@@ -106,25 +106,17 @@
 
 ### 发版步骤（香港机）
 
+生产目录当前用 **rsync 同步代码**（保留服务器上的 `.env` 与 `ecosystem.config.cjs`），不是服务器上 `git pull`。
+
 ```bash
-# 本机
+# 1. 代码进 GitHub
 git push origin main
 
-# 服务器
-cd /var/www/waxlist
-git pull origin main
-npm ci
-npx prisma generate
-npx prisma db push   # 仅 schema 有变更时
-npm run build
-pm2 restart waxlist --update-env
-curl -sS https://waxlist.cn/health
-```
-
-也可用仓库内脚本（在已配置 SSH 的机器上）：
-
-```bash
+# 2. 本机一键部署（需 SSH → ubuntu@43.161.255.64）
 ./scripts/deploy-prod.sh
+
+# 3. 验收
+curl -sS https://waxlist.cn/health
 ```
 
 ### 数据库同步
