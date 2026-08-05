@@ -11,6 +11,7 @@
 |------|------|
 | **[HANDOFF.md](./HANDOFF.md)** | **项目交接总览（先看这个）** |
 | [使用与运维](./docs/user/README.md) | 启动、环境变量、部署、数据库 |
+| [日常发版](./docs/user/release.md) | GitHub → 生产、验收与回滚 |
 | [内测计划](./docs/user/beta-and-dev.md) | 发版节奏与邀请清单 |
 | [docs/archive/](./docs/archive/) | 旧构思归档（非现行） |
 
@@ -32,24 +33,36 @@ npm run dev
 | 模块 | 路径 | 说明 |
 |------|------|------|
 | 优质发行 | `/explore` | 列表、搜索、筛选、排序、列表评分/红心 |
-| 专辑盲盒 | `/explore/today` | 加权随机开盒 |
+| 专辑盲盒 | `/explore/today` | 加权随机开盒、发行日期、评分与红心 |
 | 推荐专辑 | `/explore/submit` | 登录后提交 |
 | 我的红心 | `/explore?filter=heart` | 同页筛选 |
 | 后台 | `/admin` | 概览（站主/管理） |
 | 账号角色 | `/admin/users` | 站主分配管理 |
-| 审核 | `/moderation` | 内容管理 |
+| 内容管理 | `/moderation` | 浏览近期荐专、事后下架、清理遗留待审 |
 | Beat Hunter | `/chat` | 找伴奏（Beta） |
 | 关于 / 反馈 | `/about` | 版本信息 + 邮件反馈表单 |
 
 ## 发版（生产）
 
+合并并同步 GitHub `main` 后运行：
+
 ```bash
-git push origin main
+git switch main
+git pull --ff-only origin main
 ./scripts/deploy-prod.sh
 ```
 
 服务器：`ubuntu@43.161.255.64` → `/var/www/waxlist`（pm2）。  
-rsync **不覆盖** 服务器 `.env`。
+rsync **不覆盖**服务器 `.env`。完整流程见
+[日常发版](./docs/user/release.md)。
+
+## 检查
+
+```bash
+npm test        # Vitest 单元测试
+npm run lint    # ESLint（当前仍有存量 React 19 规则问题，见 HANDOFF）
+npm run build   # Prisma generate + production build + TypeScript
+```
 
 ## 合规
 

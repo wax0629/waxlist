@@ -5,21 +5,26 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { HeartIcon } from "@/components/action-icons";
+import { RatingPanel } from "@/components/rating-panel";
 import type { DailyPickPayload } from "@/lib/releases/daily-pick";
+import { formatReleasedAt } from "@/lib/releases/format";
 
 export function DailyPickExperience({
   initial,
   loggedIn,
   initialFavorited,
+  initialMineScore,
 }: {
   initial: DailyPickPayload;
   loggedIn: boolean;
   initialFavorited: boolean;
+  initialMineScore: number | null;
 }) {
   const router = useRouter();
   const [pick, setPick] = useState(initial);
   const [opened, setOpened] = useState(false);
   const [favorited, setFavorited] = useState(initialFavorited);
+  const [mineScore, setMineScore] = useState<number | null>(initialMineScore);
   const [busyHeart, setBusyHeart] = useState(false);
   const [busyNext, setBusyNext] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +45,28 @@ export function DailyPickExperience({
         error?: string;
       };
       if (!res.ok) throw new Error(data.error || "加载失败");
+
+      let nextFavorited = false;
+      let nextMineScore: number | null = null;
+      if (loggedIn) {
+        const [favoriteRes, ratingRes] = await Promise.all([
+          fetch(`/api/releases/${data.release.id}/favorite`),
+          fetch(`/api/releases/${data.release.id}/rate`),
+        ]);
+        if (favoriteRes.ok) {
+          const favoriteData = (await favoriteRes.json()) as {
+            favorited?: boolean;
+          };
+          nextFavorited = Boolean(favoriteData.favorited);
+        }
+        if (ratingRes.ok) {
+          const ratingData = (await ratingRes.json()) as {
+            score?: number | null;
+          };
+          nextMineScore = ratingData.score ?? null;
+        }
+      }
+
       setPick(data);
       setSeen((prev) => {
         const next = [...prev, data.release.id];
@@ -48,15 +75,9 @@ export function DailyPickExperience({
         return next;
       });
       setOpened(false);
-      setFavorited(false);
+      setFavorited(nextFavorited);
+      setMineScore(nextMineScore);
       setRound((n) => n + 1);
-      if (loggedIn) {
-        const f = await fetch(`/api/releases/${data.release.id}/favorite`);
-        if (f.ok) {
-          const j = (await f.json()) as { favorited?: boolean };
-          setFavorited(Boolean(j.favorited));
-        }
-      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "加载失败");
     } finally {
@@ -99,9 +120,10 @@ export function DailyPickExperience({
 
   const r = pick.release;
   const artists = r.artists.join(" / ");
+  const releaseDate = formatReleasedAt(r.released_at);
 
   return (
-    <div className="mx-auto w-full max-w-md px-0.5">
+    <div className="mx-auto w-full max-w-3xl px-0.5">
       {/* 页顶文案可以有；黑胶本体不放字 */}
       <div className="text-center">
         <h1 className="font-display text-[1.45rem] font-semibold tracking-tight text-white sm:text-3xl">
@@ -113,7 +135,7 @@ export function DailyPickExperience({
         </p>
       </div>
 
-      <div className="mx-auto mt-6 w-full max-w-[min(100%,360px)] sm:mt-8">
+      <div className="mx-auto mt-6 w-full max-w-[760px] sm:mt-8">
         <AnimatePresence mode="wait">
           {!opened ? (
             <motion.button
@@ -163,14 +185,14 @@ export function DailyPickExperience({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="glass-rim overflow-hidden rounded-2xl"
+              className="glass-rim relative grid overflow-hidden rounded-2xl md:grid-cols-2"
             >
               <div className="relative aspect-square w-full bg-black">
                 {r.cover_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={r.cover_url}
-                    alt=""
+                    alt={`${r.title} 专辑封面`}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -178,71 +200,125 @@ export function DailyPickExperience({
                     无封面
                   </div>
                 )}
-                {r.owner_loved ? (
-                  <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-[#ffc2d6] ring-1 ring-[#ff6b9e]/40 backdrop-blur-sm">
-                    站主爱听
-                  </span>
-                ) : null}
+                <span
+                  className="pointer-events-none absolute inset-y-0 right-0 hidden w-8 bg-gradient-to-l from-black/60 to-transparent md:block"
+                  aria-hidden
+                />
               </div>
-              <div className="flex items-center gap-2 border-t border-white/10 bg-black/30 px-3 py-2.5">
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-white">
+
+              <div
+                className="pointer-events-none absolute inset-y-2 left-1/2 z-20 hidden w-8 -translate-x-1/2 md:block"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.68) 38%, rgba(255,255,255,0.08) 49%, rgba(255,255,255,0.18) 50%, rgba(0,0,0,0.64) 58%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent)",
+                  maskImage:
+                    "linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent)",
+                }}
+                aria-hidden
+              >
+                <span className="absolute inset-y-[3%] left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/25 to-transparent shadow-[0_0_5px_rgba(255,255,255,0.12)]" />
+              </div>
+
+              <div
+                className="flex min-w-0 flex-col border-t border-white/10 p-4 md:border-t-0 md:py-4 md:pr-5 md:pl-7"
+                style={{
+                  background:
+                    "linear-gradient(100deg, rgba(255,255,255,0.045) 0%, rgba(5,5,6,0.34) 17%, rgba(5,5,6,0.3) 100%)",
+                }}
+              >
+                <div className="flex min-h-8 items-center justify-between gap-3">
+                  {r.owner_loved ? (
+                    <span className="rounded-full bg-rose-400/10 px-2.5 py-1 text-[10px] font-medium text-[#ffc2d6] ring-1 ring-inset ring-[#ff6b9e]/35">
+                      站主爱听
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-white/35">今日开盒</span>
+                  )}
+                  <button
+                    type="button"
+                    disabled={busyHeart}
+                    onClick={() => void toggleHeart()}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.06] transition hover:border-rose-400/40 hover:bg-rose-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/60 disabled:opacity-60"
+                    aria-label={favorited ? "已收藏" : "收藏"}
+                  >
+                    <HeartIcon filled={favorited} />
+                  </button>
+                </div>
+
+                <div className="mt-4 min-w-0">
+                  <h2 className="text-balance font-display text-xl font-semibold leading-tight tracking-tight text-white">
                     {r.title}
-                  </p>
-                  <p className="mt-0.5 truncate text-[11px] text-white/60">
+                  </h2>
+                  <p className="mt-1.5 truncate text-[13px] text-white/65">
                     {artists}
                   </p>
+                  {releaseDate ? (
+                    <p className="mt-2 text-[11px] tabular-nums text-white/45">
+                      发行于 {releaseDate}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-[11px] text-white/35">
+                      发行日期暂未收录
+                    </p>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  disabled={busyHeart}
-                  onClick={() => void toggleHeart()}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.06] transition hover:border-rose-400/40 hover:bg-rose-500/10 disabled:opacity-60"
-                  aria-label={favorited ? "已收藏" : "收藏"}
-                >
-                  <HeartIcon filled={favorited} />
-                </button>
+
+                <div className="mt-5 border-t border-white/10 pt-4">
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-medium text-white/70">
+                      给这张专辑打分
+                    </p>
+                    <span className="text-[10px] text-white/40">1–10 分</span>
+                  </div>
+                  <RatingPanel
+                    key={r.id}
+                    releaseId={r.id}
+                    initialAvg={r.rating_avg ?? 0}
+                    initialCount={r.rating_count ?? 0}
+                    initialMine={mineScore}
+                    loggedIn={loggedIn}
+                    callbackUrl="/explore/today"
+                    compact
+                  />
+                </div>
+
+                {pick.quote ? (
+                  <blockquote className="mt-5 border-t border-white/10 pt-4 text-[12px] leading-relaxed text-white/70">
+                    <p className="line-clamp-4 text-pretty">
+                      「{pick.quote.reason}」
+                    </p>
+                    <footer className="mt-1.5 text-[10px] text-white/40">
+                      — {pick.quote.user_name}
+                    </footer>
+                  </blockquote>
+                ) : null}
+
+                <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
+                  <Link
+                    href={`/explore/${r.id}`}
+                    className="glass-btn inline-flex px-4 py-2.5 text-sm font-medium"
+                  >
+                    去听这张 →
+                  </Link>
+                  <button
+                    type="button"
+                    disabled={busyNext || pick.pool_size <= 1}
+                    onClick={() => void loadNext()}
+                    className="rounded-full border border-white/15 px-4 py-2.5 text-sm text-white/70 transition hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 disabled:opacity-40"
+                  >
+                    {busyNext ? "…" : "再开一张"}
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {opened && pick.quote ? (
-        <motion.blockquote
-          className="mx-auto mt-5 max-w-[min(100%,360px)] border-l-2 border-[#ff6b9e]/45 pl-3 text-[13px] leading-relaxed text-white/80"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          <span className="line-clamp-3">「{pick.quote.reason}」</span>
-          <footer className="mt-1 text-[11px] text-white/45">
-            — {pick.quote.user_name}
-          </footer>
-        </motion.blockquote>
-      ) : null}
-
       {error ? (
         <p className="mt-4 text-center text-sm text-rose-300/90">{error}</p>
-      ) : null}
-
-      {opened ? (
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <Link
-            href={`/explore/${r.id}`}
-            className="glass-btn inline-flex px-5 py-2.5 text-sm font-medium"
-          >
-            去听这张 →
-          </Link>
-          <button
-            type="button"
-            disabled={busyNext || pick.pool_size <= 1}
-            onClick={() => void loadNext()}
-            className="rounded-full border border-white/15 px-4 py-2.5 text-sm text-white/70 transition hover:border-white/30 hover:text-white disabled:opacity-40"
-          >
-            {busyNext ? "…" : "再开一张"}
-          </button>
-        </div>
       ) : null}
     </div>
   );

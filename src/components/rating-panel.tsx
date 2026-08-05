@@ -10,12 +10,16 @@ export function RatingPanel({
   initialCount,
   initialMine,
   loggedIn,
+  callbackUrl,
+  compact = false,
 }: {
   releaseId: string;
   initialAvg?: number | null;
   initialCount?: number;
   initialMine?: number | null;
   loggedIn: boolean;
+  callbackUrl?: string;
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [avg, setAvg] = useState<number | null>(initialAvg ?? null);
@@ -27,7 +31,8 @@ export function RatingPanel({
 
   async function pick(score: number) {
     if (!loggedIn) {
-      router.push(`/login?callbackUrl=/explore/${releaseId}`);
+      const returnTo = callbackUrl ?? `/explore/${releaseId}`;
+      router.push(`/login?callbackUrl=${encodeURIComponent(returnTo)}`);
       return;
     }
     if (busy) return;
@@ -59,6 +64,36 @@ export function RatingPanel({
   }
 
   const hoverStars = hover != null ? scoreToStars(hover) : null;
+
+  if (compact) {
+    return (
+      <div>
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
+          <StarsPicker
+            value={mine}
+            hover={hover}
+            onHover={setHover}
+            onPick={(s) => void pick(s)}
+            disabled={busy}
+            size={20}
+          />
+          <span className="shrink-0 text-[11px] tabular-nums text-amber-100/80">
+            {hover != null
+              ? `${hover} 分`
+              : mine != null
+                ? `我的 ${mine} 分`
+                : "点击评分"}
+          </span>
+          <span className="ml-auto shrink-0 text-[10px] tabular-nums text-white/45">
+            {avg != null && count > 0
+              ? `均分 ${avg.toFixed(1)} · ${count} 人`
+              : "暂无评分"}
+          </span>
+        </div>
+        {error ? <p className="mt-1.5 text-xs text-rose-300">{error}</p> : null}
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -1,9 +1,9 @@
-# Waxlist 上线部署（Vercel + Neon）
+# 历史 / 海外备选部署（Vercel + Neon）
 
 适合 **海外可访问** 的小流量内测。全程约 30–60 分钟。
 
-> **用户几乎全在国内、Vercel 打不开时：** 不要用本文。  
-> 请改用 → [阿里云域名 + 香港轻量服务器](./deploy-aliyun-hk.md)
+> 这不是 Waxlist 当前生产方案。当前生产使用腾讯云香港机，并从本机运行 `./scripts/deploy-prod.sh`。
+> 仅在需要独立的海外备选环境时使用本文；香港机参考见 [deploy-aliyun-hk.md](./deploy-aliyun-hk.md)。
 
 ## 0. 本地准备
 
@@ -83,7 +83,7 @@ DATABASE_URL='你的Neon连接串' npx prisma db push
 2. `/register` 注册（或登录）  
 3. 确认账号旁是 **站主**（`OWNER_EMAILS` 或首个用户）  
 4. `/explore/submit` 推一张专  
-5. `/moderation` 审核通过  
+5. 确认荐专默认上架；管理员可在 `/moderation` 查看并下架
 6. 详情页：评分、红心、曲目点赞  
 7. `/chat` 找伴奏（有 YouTube key 时）
 

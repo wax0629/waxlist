@@ -16,7 +16,7 @@
 | **荐专** `/explore/submit` | 登录后贴网易云链接提交；默认上架，可后审下架 |
 | **专辑盲盒** `/explore/today` | 加权随机开一盒（非死规则队列） |
 | **后台** `/admin` | 概览、用户角色（站主分配管理） |
-| **审核** `/moderation` | 内容管理 / 下架等 |
+| **内容管理** `/moderation` | 浏览近期荐专、事后下架、清理遗留待审 |
 | **关于** `/about` | 故事、版本、**反馈表单**（邮件） |
 | **Beat Hunter** `/chat` | 找伴奏 Agent（**Beta，不抢主线**） |
 
@@ -41,7 +41,7 @@
 | 层 | 选型 |
 |----|------|
 | 框架 | Next.js 16 App Router · React 19 · TypeScript |
-| 鉴权 | Auth.js (NextAuth v5) JWT · 邮箱密码 / OTP |
+| 鉴权 | Auth.js (NextAuth v5) JWT · 当前入口为邮箱密码；OTP 后端能力保留、未接入当前登录页 |
 | 数据库 | Prisma 6 + Postgres（本地 Docker / 生产 Neon） |
 | 邮件 | Resend（生产已配）；可选 SMTP |
 | 部署 | `scripts/deploy-prod.sh` → rsync + `npm ci` + `prisma db push` + build + pm2 |
@@ -51,7 +51,7 @@
 
 - 应用代码：`src/`
 - Schema：`prisma/schema.prisma`
-- 运维文档：**只维护 `docs/user/`**
+- 运维文档：**只维护 `docs/user/`**；当前生产口径以本文件和 `docs/user/README.md` 为准
 - 早期构思草稿：`docs/archive/`（历史参考，勿当现行规格）
 
 ---
@@ -63,13 +63,16 @@
 - [x] 优质发行主路径：列表 / 详情 / 红心 / 评分 / 荐专  
 - [x] 列表内点星评分、搜索栏、顶栏账号在搜索旁  
 - [x] 移动端底部 Tab（发行 / 盲盒 / 找伴奏 / 关于）  
-- [x] 专辑盲盒（加权随机 + 本轮去重）  
+- [x] 专辑盲盒（加权随机 + 本轮去重 + 开盒后评分 / 发行日期）
+- [x] 盲盒桌面端等宽书页布局；移动端上下排列
+- [x] Waxlist 标签页图标（浅色 / 深色浏览器背景均可辨识）
 - [x] 后台两期雏形 + 待审角标  
 - [x] 推荐默认上架、可下架（事后审核）  
 - [x] Neon 从 US 迁到 **新加坡**；香港机保活进程  
 - [x] HTTPS + `/health`  
 - [x] 关于页版本信息 + 反馈邮件 API  
 - [x] 反馈收件：`FEEDBACK_TO=xux9278@gmail.com`（见下限制）
+- [x] Vitest 基线：网易云解析、认证规则、角色权限、友情标签、荐专发布与日期格式（22 条）
 
 ### 已知限制 / 坑
 
@@ -79,6 +82,15 @@
 3. **无站内播放**：只外链网易云。  
 4. **Beat Hunter** 依赖 YouTube API / LLM，配额与延迟需单独看。  
 5. 内容量仍少，内测靠站主铺专 + 熟人推。
+6. **Lint 尚未清零**：React 19 effect/state 新规则等现有 16 个错误、4 个警告；production build 不受影响。
+7. **依赖审计待升级**：`npm audit --omit=dev` 当前报告 Next.js/PostCSS/Sharp 与 Auth.js/Nodemailer 链上的 6 个 high，自动修复会跨当前版本范围，需单独升级验证。
+
+### 当前业务口径（交接时不要混用旧流程）
+
+- 登录 / 注册：当前页面使用**邮箱 + 密码**；OTP API 与邮件发送代码仍保留，但不是当前用户入口。
+- 荐专：普通用户和员工提交后均**默认上架**；`/moderation` 用于浏览近期内容、事后下架，以及清理旧版遗留待审记录。
+- 发版：GitHub `main` 是唯一事实来源；当前生产机使用 `scripts/deploy-prod.sh` 从本机 **rsync**，不是在服务器执行 `git pull`。
+- 部署文档：香港机是当前生产方案；Vercel、Zeabur 文档仅供备选或历史参考。
 
 ### 建议下一步（产品）
 
@@ -107,8 +119,8 @@
 # 本地
 npm run db:up && npm run db:push && npm run dev
 
-# 生产发版
-git push origin main
+# 生产发版（先在 GitHub 合并 PR）
+git switch main && git pull --ff-only origin main
 ./scripts/deploy-prod.sh
 
 # 服务器
@@ -136,8 +148,8 @@ curl -sS https://waxlist.cn/health
 
 | 角色 | 能力 |
 |------|------|
-| owner 站主 | 后台、用户角色、审核、友情标签、站主爱听 |
-| admin 管理 | 审核与管理能力（由站主分配） |
+| owner 站主 | 后台、用户角色、内容管理、友情标签、站主爱听 |
+| admin 管理 | 内容管理与事后下架（由站主分配） |
 | user | 荐专、红心、评分、评论 |
 
 详见 `docs/user/admin-accounts.md`。
@@ -152,8 +164,11 @@ curl -sS https://waxlist.cn/health
 | `docs/user/README.md` | 使用与本地启动 |
 | `docs/user/beta-and-dev.md` | 内测节奏 |
 | `docs/user/database-workflow.md` | Neon × 本地、迁区 |
-| `docs/user/deploy-aliyun-hk.md` | 香港机部署参考 |
-| `docs/user/email-auth.md` | 邮件 / OTP |
+| `docs/user/release.md` | **日常发版、线上验收与回滚** |
+| `docs/user/deploy-aliyun-hk.md` | 香港机部署参考（当前生产类型） |
+| `docs/user/deploy-zeabur.md` | Zeabur 备选试用 |
+| `docs/user/deploy.md` | Vercel 历史 / 海外备选 |
+| `docs/user/email-auth.md` | 可选 OTP / 邮件发送（当前登录页不用 OTP） |
 | `docs/user/environment.md` | 环境变量表 |
 | `docs/user/admin-accounts.md` | 角色分发 |
 | `docs/archive/` | 旧构思 / 旧规格（**非现行**） |

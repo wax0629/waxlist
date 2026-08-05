@@ -1,6 +1,8 @@
-# 国内可访问部署：阿里云域名 + 香港轻量服务器
+# 香港轻量服务器部署参考（阿里云 / 腾讯云）
 
-适用：**用户几乎全在国内**，Vercel / `*.vercel.app` 完全打不开时。
+适用：**用户几乎全在国内**，Vercel / `*.vercel.app` 完全打不开时。阿里云和腾讯云香港机的 Node.js、Nginx、pm2 部署方式相同。
+
+> 当前生产是腾讯云香港 `43.161.255.64`。本文前半部分保留“新购阿里云机器”的初始化示例；已有生产环境的日常发版统一使用仓库根目录 `./scripts/deploy-prod.sh`。
 
 ## 为什么是香港（先定死）
 
@@ -246,18 +248,17 @@ pm2 restart waxlist
 
 ## 9. 上线后怎么更新代码
 
-在服务器：
+当前 Waxlist 生产环境从 GitHub `main` 的干净提交发版：
 
 ```bash
-cd /var/www/waxlist
-git pull
-npm ci
-npm run build
-pm2 restart waxlist
+git switch main
+git pull --ff-only origin main
+./scripts/deploy-prod.sh
 ```
 
-本地改完 → push GitHub → 服务器再 `pull` 即可。  
-**不再依赖 Vercel Redeploy。** 旧 Vercel 项目可停用，避免用户还打开旧链接。
+脚本会拒绝非 `main`、脏工作区或尚未推到 `origin/main` 的提交；通过 rsync 同步代码，保留服务器 `.env` 与 `ecosystem.config.cjs`，随后在服务器执行安装、Prisma schema 同步、构建和 pm2 重启，并把 commit 写入 `DEPLOYED_COMMIT`。生产目录不要求是 Git 仓库，也不要再把服务器 `git pull` 当作当前发版方式。
+
+日常检查、验收与回滚以 [release.md](./release.md) 为准。
 
 ---
 
@@ -299,10 +300,10 @@ pm2 restart waxlist
 
 ## 和旧 Vercel 方案的关系
 
-| | Vercel（旧） | 阿里云香港（现主推） |
+| | Vercel（备选/历史） | 香港轻量（当前生产类型） |
 |--|--------------|----------------------|
 | 国内打开 | 你已失败 | 目标方案 |
-| 部署方式 | push 自动 | `git pull` + build + pm2 |
+| 部署方式 | push 自动 | 本机 `deploy-prod.sh` → rsync + build + pm2 |
 | 域名 | `*.vercel.app` 或自定义指 Vercel | 自定义域名 A 记录指香港 IP |
 
 详细环境变量说明见 [environment.md](./environment.md)。  
