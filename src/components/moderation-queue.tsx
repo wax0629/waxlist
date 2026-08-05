@@ -20,7 +20,10 @@ export function ModerationQueue({
     setItems(initialItems);
   }, [initialItems]);
 
-  async function act(id: string, action: "approve" | "reject") {
+  async function act(
+    id: string,
+    action: "approve" | "reject" | "takedown",
+  ) {
     setBusyId(id);
     setError(null);
     try {
@@ -45,7 +48,7 @@ export function ModerationQueue({
     setRefreshing(true);
     setError(null);
     try {
-      const res = await fetch("/api/recommendations?queue=pending");
+      const res = await fetch("/api/recommendations?queue=moderation");
       const data = (await res.json()) as {
         error?: string;
         items?: PendingReleaseRow[];
@@ -60,22 +63,27 @@ export function ModerationQueue({
     }
   }
 
+  const pendingItems = items.filter((i) => i.status === "pending");
+  const liveItems = items.filter((i) => i.status === "published");
+
   return (
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-white/55">
-          {items.length > 0
-            ? `队列中 ${items.length} 条`
-            : "当前没有待审提交"}
+          荐专默认上架；这里浏览新内容，有问题再下架。
+          {pendingItems.length > 0
+            ? ` · 遗留待审 ${pendingItems.length}`
+            : ""}
+          {liveItems.length > 0 ? ` · 近期上架 ${liveItems.length}` : ""}
         </p>
         <button
           type="button"
           onClick={() => void refresh()}
           disabled={refreshing}
-          className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.05] px-4 py-2 text-[13px] text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/30 hover:bg-white/[0.09] hover:text-white disabled:cursor-not-allowed disabled:opacity-55"
+          className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.05] px-4 py-2 text-[13px] text-white/75 transition hover:border-white/30 hover:bg-white/[0.09] hover:text-white disabled:opacity-55"
         >
           <RefreshIcon spin={refreshing} />
-          {refreshing ? "刷新中…" : "刷新队列"}
+          {refreshing ? "刷新中…" : "刷新"}
         </button>
       </div>
 
@@ -87,10 +95,7 @@ export function ModerationQueue({
 
       {items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 px-4 py-16 text-center">
-          <p className="text-sm text-white/55">暂无待审</p>
-          <p className="mt-2 text-[12px] text-white/35">
-            用户推荐专辑后会出现在这里
-          </p>
+          <p className="text-sm text-white/55">暂无新上架与待审</p>
           <Link
             href="/explore"
             className="mt-5 inline-block text-sm text-[#ff8fb3] hover:underline"
@@ -115,6 +120,7 @@ export function ModerationQueue({
                     ]
                   : [];
             const busy = busyId === item.release_id;
+            const isPending = item.status === "pending";
 
             return (
               <li
@@ -122,7 +128,10 @@ export function ModerationQueue({
                 className="flex flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-5"
               >
                 <div className="flex gap-4">
-                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/10 sm:h-28 sm:w-28">
+                  <Link
+                    href={`/explore/${item.release_id}`}
+                    className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/10 sm:h-28 sm:w-28"
+                  >
                     {item.cover_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -135,18 +144,25 @@ export function ModerationQueue({
                         无封面
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate text-base font-medium text-white sm:text-[17px]">
+                      <Link
+                        href={`/explore/${item.release_id}`}
+                        className="truncate text-base font-medium text-white hover:underline sm:text-[17px]"
+                      >
                         {item.title}
-                      </p>
-                      {item.type ? (
-                        <span className="rounded-full border border-white/18 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white/50">
-                          {item.type}
-                        </span>
-                      ) : null}
+                      </Link>
+                      <span
+                        className={
+                          isPending
+                            ? "rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] text-amber-100 ring-1 ring-amber-400/30"
+                            : "rounded-full bg-emerald-500/12 px-2 py-0.5 text-[10px] text-emerald-100/90 ring-1 ring-emerald-400/25"
+                        }
+                      >
+                        {isPending ? "遗留待审" : "已上架"}
+                      </span>
                       {item.rec_count > 1 ? (
                         <span className="rounded-full bg-[#ff6b9e]/12 px-2 py-0.5 text-[10px] text-[#ffb3cc] ring-1 ring-[#ff6b9e]/25">
                           {item.rec_count} 条推荐
@@ -157,7 +173,6 @@ export function ModerationQueue({
                       {item.artists.join(" / ")}
                     </p>
                     <p className="mt-2 text-[12px] text-white/38">
-                      提交于{" "}
                       {new Date(item.created_at).toLocaleString("zh-CN")}
                     </p>
                     {item.netease_url ? (
@@ -165,9 +180,9 @@ export function ModerationQueue({
                         href={item.netease_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-1.5 inline-flex text-[12px] text-[#ff8fb3] transition hover:text-[#ffb3cc] hover:underline"
+                        className="mt-1.5 inline-flex text-[12px] text-[#ff8fb3] hover:underline"
                       >
-                        在网易云打开 →
+                        网易云 →
                       </a>
                     ) : null}
                   </div>
@@ -193,44 +208,47 @@ export function ModerationQueue({
                         <p className="mt-1.5 text-sm leading-relaxed text-white/82">
                           {rec.reason}
                         </p>
-                        {rec.tracks ? (
-                          <ul className="mt-2.5 space-y-0.5 border-t border-white/10 pt-2.5">
-                            {rec.tracks
-                              .split(/[\n,，]/)
-                              .map((t) => t.trim())
-                              .filter(Boolean)
-                              .map((t) => (
-                                <li
-                                  key={t}
-                                  className="text-[12px] text-white/58 before:mr-1.5 before:text-white/25 before:content-['·']"
-                                >
-                                  {t}
-                                </li>
-                              ))}
-                          </ul>
-                        ) : null}
                       </div>
                     ))
                   )}
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-4">
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void act(item.release_id, "approve")}
-                    className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-100 ring-1 ring-emerald-400/35 transition hover:bg-emerald-500/28 disabled:opacity-50"
+                  {isPending ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void act(item.release_id, "approve")}
+                        className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-100 ring-1 ring-emerald-400/35 transition hover:bg-emerald-500/28 disabled:opacity-50"
+                      >
+                        {busy ? "…" : "通过上架"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void act(item.release_id, "reject")}
+                        className="rounded-full bg-rose-500/12 px-4 py-2 text-sm text-rose-100/90 ring-1 ring-rose-400/25 transition hover:bg-rose-500/18 disabled:opacity-50"
+                      >
+                        拒绝
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void act(item.release_id, "takedown")}
+                      className="rounded-full bg-rose-500/12 px-4 py-2 text-sm text-rose-100/90 ring-1 ring-rose-400/25 transition hover:bg-rose-500/18 disabled:opacity-50"
+                    >
+                      {busy ? "…" : "下架"}
+                    </button>
+                  )}
+                  <Link
+                    href={`/explore/${item.release_id}`}
+                    className="rounded-full border border-white/15 px-4 py-2 text-sm text-white/65 transition hover:border-white/30 hover:text-white"
                   >
-                    {busy ? "处理中…" : "通过上架"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void act(item.release_id, "reject")}
-                    className="rounded-full bg-rose-500/12 px-4 py-2 text-sm text-rose-100/90 ring-1 ring-rose-400/25 transition hover:bg-rose-500/18 disabled:opacity-50"
-                  >
-                    拒绝
-                  </button>
+                    前台查看
+                  </Link>
                 </div>
               </li>
             );

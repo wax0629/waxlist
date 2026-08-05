@@ -4,9 +4,9 @@ import { BackLink } from "@/components/back-link";
 
 const PILLARS = [
   {
-    key: "dig",
-    label: "dig",
-    title: "挖到",
+    key: "find",
+    label: "find",
+    title: "发现",
     desc: "从散落的发行里捞出值得打开的一张，而不是再刷一遍脸熟的歌。",
   },
   {
@@ -27,7 +27,7 @@ export default function AboutPage() {
   return (
     <div className="flex min-h-dvh flex-1 text-white">
       <AppRail />
-      <main className="w-full min-w-0 flex-1 px-4 pt-8 pb-20 sm:px-6 sm:pb-24 md:px-8 lg:px-10 xl:px-12">
+      <main className="w-full min-w-0 flex-1 px-3 pt-5 pb-16 sm:px-6 sm:pt-8 md:px-8 md:pb-28 lg:px-10 xl:px-12">
         <div className="mx-auto w-full max-w-[1600px]">
           <div className="mb-6">
             <BackLink href="/explore" label="返回优质发行" />
@@ -64,7 +64,7 @@ export default function AboutPage() {
                   为此而建：听专、荐专、红心与口碑——让好发行被看见。
                 </p>
                 <p className="mt-3 font-mono text-[12px] tracking-[0.14em] text-white/65">
-                  dig · rec · heart
+                  find · rec · heart
                 </p>
               </div>
 
@@ -137,7 +137,7 @@ export default function AboutPage() {
                   </p>
                   <p>
                     做这个站的起点很朴素。很多时候不是不爱听，而是不知道下一张该听什么——
-                    算法还在推脸熟的歌，扎实、有态度的发行却散落各处。我们想在歌荒时仍能挖到{" "}
+                    算法还在推脸熟的歌，扎实、有态度的发行却散落各处。我们想在歌荒时仍能遇见{" "}
                     <strong className="font-medium text-white">优质发行</strong>
                     ：有人推、有人写为什么推、有人打分、有人红心——让「好听」留下痕迹。
                     也对创作者开放：独立音乐人可以把作品递上来，让更多人听到、留下一句认真的话。
@@ -167,10 +167,11 @@ export default function AboutPage() {
                     主线是{" "}
                     <strong className="font-medium text-white">优质发行</strong>
                     ：浏览封面与详情、红心与「站主爱听」、荐专与评分评论；一期优先网易云外链。
-                    dig · rec · heart，比堆数量更重要。
+                    还有专辑盲盒，随手开一张今天的专。find · rec ·
+                    heart，比堆数量更重要。
                   </p>
                   <p>
-                    往后会随大家怎么用而长，包括但不限于：今日 / 近期发行收集、荐专
+                    往后会随大家怎么用而长，包括但不限于：近期发行收集、荐专
                     Agent、分类索引与听单沉淀、创作者侧更清晰的上架与反馈。
                     先把「一张专被认真推上来」做踏实。
                   </p>
@@ -288,7 +289,7 @@ export default function AboutPage() {
 
                 <div className="rounded-2xl border border-dashed border-white/22 px-5 py-5 text-center">
                   <p className="text-[13px] text-white/80">
-                    内测 / 想一起挖专？
+                    内测 / 想一起听专荐专？
                   </p>
                   <p className="mt-1 text-[12px] text-white/65">
                     加微信备注「Waxlist」即可

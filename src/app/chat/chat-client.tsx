@@ -257,9 +257,9 @@ export function ChatClient() {
     <div className="flex min-h-dvh flex-1 text-[var(--cream)]">
       <AppRail onNewChat={newChat} showNewChat={!isFresh} />
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-3.5 md:px-5 md:pb-5 md:pt-4">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-3 pb-2 pt-2 sm:px-4 sm:pb-4 sm:pt-3.5 md:px-5 md:pb-5 md:pt-4">
         {/* Top nav — outside liquid glass panes */}
-        <header className="mb-3 flex shrink-0 items-center justify-between gap-3 px-0.5 sm:mb-4">
+        <header className="mb-2 flex shrink-0 items-center justify-between gap-3 pr-12 sm:mb-4 sm:pr-0">
           <div className="flex min-w-0 items-center gap-3">
             <div className="md:hidden">
               <div className="flex items-center gap-2">

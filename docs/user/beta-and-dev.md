@@ -121,9 +121,13 @@ curl -sS https://waxlist.cn/health
 
 ### 数据库同步
 
-- **线上 → 本地**：需要真实数据时再 dump（勿把生产密码写进仓库）
-- **本地 → 线上**：默认**不要**整库覆盖生产；用 Prisma 迁移/字段补齐即可
-- 用户与内容以 **Neon 生产库** 为准
+完整规范：**[database-workflow.md](./database-workflow.md)**
+
+- **权威库**：Neon（真实注册 / 上传）
+- **日常 dev**：本地 Docker，`DATABASE_URL=localhost`
+- **要对齐内容**：`npm run db:pull-prod`（Neon → 本地，单向）
+- **改表结构上生产**：发版时 `prisma db push` 或 `npm run db:push-schema-prod`
+- **禁止**：本地 dump 覆盖 Neon
 
 ### Issue 约定
 

@@ -22,7 +22,10 @@ function createClient() {
 
 function getClient(): PrismaClient {
   if (process.env.NODE_ENV === "production") {
-    return globalForPrisma.__waxlistPrisma ?? createClient();
+    if (!globalForPrisma.__waxlistPrisma) {
+      globalForPrisma.__waxlistPrisma = createClient();
+    }
+    return globalForPrisma.__waxlistPrisma;
   }
 
   // Dev: replace client if epoch changed (new schema after generate)

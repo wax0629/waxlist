@@ -17,13 +17,14 @@
 
 ```bash
 npm install
-cp .env.example .env.local   # 配置 AUTH_SECRET、DATABASE_URL 等
+cp .env.example .env.local   # 配置 AUTH_SECRET；DATABASE_URL 用本地 Docker
 npm run db:up
 npm run db:push
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。
+打开 [http://localhost:3000](http://localhost:3000)。  
+数据库规范（Neon 生产 × 本地）：[docs/user/database-workflow.md](./docs/user/database-workflow.md)。
 
 ## 功能概览
 
@@ -32,6 +33,8 @@ npm run dev
 | 优质发行 | `/explore` | 列表、筛选、排序、详情 |
 | 推荐专辑 | `/explore/submit` | 登录后提交 |
 | 我的红心 | `/explore?filter=heart` | 同页筛选（旧 `/favorites` 会跳转） |
+| 后台 | `/admin` | 概览 + 待审提示（站主 / 管理） |
+| 账号角色 | `/admin/users` | 站主分配管理 |
 | 审核 | `/moderation` | 站主 / 管理 |
 | Beat Hunter | `/chat` | 找伴奏（Beta） |
 | 关于 | `/about` | 故事与联系 |

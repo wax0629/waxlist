@@ -1,7 +1,8 @@
 /** Shared action icons: ❤️ 收藏 · 👍 推荐 — fixed optical center in circle buttons */
 
+/** 勿用 h-full/w-full：与文字并排时会把文案挤成竖排 */
 const emojiShell =
-  "inline-flex h-full w-full items-center justify-center leading-none select-none";
+  "inline-flex shrink-0 items-center justify-center leading-none select-none";
 
 /** Rounded heart — favorite / 收藏 */
 export function HeartIcon({
@@ -15,7 +16,6 @@ export function HeartIcon({
     <span
       className={`${emojiShell} ${className}`}
       style={{
-        // emoji often sits slightly high/low; nudge for visual center
         transform: "translateY(0.5px)",
         fontSize: "1.05em",
       }}

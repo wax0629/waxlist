@@ -40,21 +40,24 @@ function isNeteaseLink(label: string, url: string): boolean {
 
 export default async function ReleaseDetailPage({ params }: Props) {
   const { id } = await params;
-  const release = await getRelease(id);
+  const [release, session] = await Promise.all([
+    getRelease(id),
+    auth().catch(() => null),
+  ]);
   if (!release || release.status !== "published") notFound();
-  const session = await auth();
-  const favorited = session?.user?.id
-    ? await isFavorited(session.user.id, id)
+
+  const uid = session?.user?.id;
+  const [favorited, recommendations, tracks, myRating, comments] =
+    await Promise.all([
+      uid ? isFavorited(uid, id) : Promise.resolve(false),
+      listPublishedRecommendations(id),
+      listTracksWithStats(id, uid),
+      uid ? getUserRating(id, uid) : Promise.resolve(null),
+      listComments(id),
+    ]);
+  const alreadyRecd = uid
+    ? recommendations.some((r) => r.user_id === uid)
     : false;
-  const recommendations = await listPublishedRecommendations(id);
-  const alreadyRecd = session?.user?.id
-    ? recommendations.some((r) => r.user_id === session.user!.id)
-    : false;
-  const tracks = await listTracksWithStats(id, session?.user?.id);
-  const myRating = session?.user?.id
-    ? await getUserRating(id, session.user.id)
-    : null;
-  const comments = await listComments(id);
 
   const netease =
     release.netease_url ||
@@ -73,7 +76,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
     <div className="flex min-h-dvh flex-1 text-white">
       <AppRail />
       {/* 加宽内容区，少居中挤压；侧栏外尽量铺开 */}
-      <main className="w-full min-w-0 flex-1 px-4 pt-8 pb-20 sm:px-6 sm:pb-24 md:px-8 lg:px-10 xl:px-12">
+      <main className="w-full min-w-0 flex-1 px-3 pt-5 pb-4 sm:px-6 sm:pt-8 md:px-8 lg:px-10 xl:px-12">
         <div className="mx-auto w-full max-w-[1500px]">
           <BackLink href="/explore" label="返回优质发行" />
 
@@ -82,10 +85,10 @@ export default async function ReleaseDetailPage({ params }: Props) {
             不用 row-span，避免左栏被曲目高度撑开大片空白
             手机：信息 → 曲目 → 评分 → 推荐 → 评论
           */}
-          <div className="mt-6 grid grid-cols-1 items-start gap-x-10 gap-y-3 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-3 xl:gap-x-16">
+          <div className="mt-4 grid grid-cols-1 items-start gap-x-10 gap-y-3 sm:mt-6 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-3 xl:gap-x-16">
             {/* 封面 + 标题 */}
-            <header className="order-1 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5 lg:col-span-5">
-              <div className="glass-rim relative mx-auto w-full max-w-[280px] shrink-0 overflow-hidden rounded-2xl sm:mx-0 sm:w-[240px] sm:max-w-none md:w-[260px] lg:w-[280px]">
+            <header className="order-1 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-5 lg:col-span-5">
+              <div className="glass-rim relative mx-auto w-full max-w-[min(100%,320px)] shrink-0 overflow-hidden rounded-2xl sm:mx-0 sm:w-[240px] sm:max-w-none md:w-[260px] lg:w-[280px]">
                 <div className="relative aspect-square bg-white/[0.04]">
                   {release.cover_url ? (
                     // eslint-disable-next-line @next/next/no-img-element

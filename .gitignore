@@ -49,3 +49,6 @@ next-env.d.ts
 /docs/*
 !/docs/user/
 !/docs/user/**
+
+# Neon prod URL for local scripts only
+.env.neon.local

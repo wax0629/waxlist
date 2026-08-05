@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 type Ctx = { params: Promise<{ id: string }> };
 
 const Body = z.object({
-  action: z.enum(["approve", "reject"]),
+  action: z.enum(["approve", "reject", "takedown"]),
 });
 
 export async function POST(req: Request, ctx: Ctx) {

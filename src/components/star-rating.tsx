@@ -114,10 +114,13 @@ export function StarsPicker({
 }) {
   // value/hover are scores 1–10; convert to 0–5 stars for fill
   const stars = scoreToStars(hover ?? value);
+  // 列表小星：热区略放大但不撑开行高；详情大星保持原尺寸
+  const hitH = size <= 16 ? size + 4 : size;
+  const hitW = size;
 
   return (
     <div
-      className="inline-flex items-center gap-0.5"
+      className="inline-flex items-center gap-px sm:gap-0.5"
       onMouseLeave={() => onHover(null)}
     >
       {[0, 1, 2, 3, 4].map((i) => {
@@ -130,8 +133,8 @@ export function StarsPicker({
         return (
           <span
             key={i}
-            className="relative inline-flex cursor-pointer text-amber-300/90 transition hover:text-amber-200"
-            style={{ width: size, height: size }}
+            className="relative inline-flex cursor-pointer touch-manipulation items-center justify-center text-amber-300/90 transition hover:text-amber-200 active:text-amber-100"
+            style={{ width: hitW, height: hitH }}
           >
             <StarIcon fill={fill} size={size} className="pointer-events-none" />
             {/* left half → odd scores (half star) */}
@@ -140,9 +143,13 @@ export function StarsPicker({
               disabled={disabled}
               aria-label={`${leftScore} 分`}
               title={`${leftScore} 分`}
-              className="absolute left-0 top-0 z-10 h-full w-1/2 disabled:cursor-default"
+              className="absolute left-0 top-0 z-10 h-full w-1/2 touch-manipulation disabled:cursor-default"
               onMouseEnter={() => onHover(leftScore)}
-              onClick={() => onPick(leftScore)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onPick(leftScore);
+              }}
             />
             {/* right half → even scores (full star) */}
             <button
@@ -150,9 +157,13 @@ export function StarsPicker({
               disabled={disabled}
               aria-label={`${rightScore} 分`}
               title={`${rightScore} 分`}
-              className="absolute right-0 top-0 z-10 h-full w-1/2 disabled:cursor-default"
+              className="absolute right-0 top-0 z-10 h-full w-1/2 touch-manipulation disabled:cursor-default"
               onMouseEnter={() => onHover(rightScore)}
-              onClick={() => onPick(rightScore)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onPick(rightScore);
+              }}
             />
           </span>
         );

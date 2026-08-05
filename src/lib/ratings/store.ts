@@ -14,6 +14,19 @@ export async function getUserRating(
   return row?.score ?? null;
 }
 
+/** 列表页批量取「我的评分」 */
+export async function userRatingsForReleases(
+  userId: string,
+  releaseIds: string[],
+): Promise<Map<string, number>> {
+  if (!releaseIds.length) return new Map();
+  const rows = await prisma.rating.findMany({
+    where: { userId, releaseId: { in: releaseIds } },
+    select: { releaseId: true, score: true },
+  });
+  return new Map(rows.map((r) => [r.releaseId, r.score]));
+}
+
 async function recomputeAggregates(releaseId: string): Promise<{
   avg: number | null;
   count: number;

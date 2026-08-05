@@ -1,10 +1,14 @@
 import { redirect } from "next/navigation";
+import { AdminShell } from "@/components/admin-shell";
 import { AppRail } from "@/components/app-rail";
 import { BackLink } from "@/components/back-link";
 import { ModerationQueue } from "@/components/moderation-queue";
 import { auth } from "@/lib/auth";
-import { canModerate } from "@/lib/auth/roles";
-import { listPendingReleases } from "@/lib/recommendations/store";
+import { canModerate, isOwner } from "@/lib/auth/roles";
+import {
+  countPendingReleases,
+  listModerationFeed,
+} from "@/lib/recommendations/store";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +27,7 @@ export default async function ModerationPage() {
           <div className="mx-auto w-full max-w-[1600px]">
             <BackLink href="/explore" label="返回优质发行" />
             <header className="mt-6 max-w-xl">
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
-                Moderation
-              </p>
-              <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                审核队列
-              </h1>
+              <h1 className="font-display text-2xl font-semibold">审核</h1>
               <p className="mt-2 text-sm text-white/55">无权限访问此页面。</p>
             </header>
           </div>
@@ -37,53 +36,27 @@ export default async function ModerationPage() {
     );
   }
 
-  const items = await listPendingReleases();
+  const [items, leftoverPending] = await Promise.all([
+    listModerationFeed(),
+    countPendingReleases(),
+  ]);
+  const owner = isOwner(session.user.role);
 
   return (
-    <div className="flex min-h-dvh flex-1 text-white">
-      <AppRail />
-      <main className="w-full min-w-0 flex-1 px-4 pt-8 pb-20 sm:px-6 sm:pb-24 md:px-8 lg:px-10 xl:px-12">
-        <div className="mx-auto w-full max-w-[1600px]">
-          <div className="mb-6">
-            <BackLink href="/explore" label="返回优质发行" />
-          </div>
-
-          <header className="flex flex-wrap items-end justify-between gap-4 pr-12 sm:pr-14">
-            <div className="min-w-0 max-w-2xl">
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/50">
-                Moderation
-              </p>
-              <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                审核队列
-              </h1>
-              <p className="mt-2 text-sm leading-relaxed text-white/55">
-                审阅用户提交的专辑：通过后上架到优质发行，拒绝则从队列移除。
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[13px] text-white/70">
-                待审{" "}
-                <span className="tabular-nums font-medium text-white">
-                  {items.length}
-                </span>
-              </span>
-            </div>
-          </header>
-
-          <div
-            className="mt-6 h-px w-full"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, rgba(200,225,255,0.12) 8%, rgba(230,242,255,0.4) 50%, rgba(200,225,255,0.12) 92%, transparent 100%)",
-            }}
-            aria-hidden
-          />
-
-          <div className="mt-8">
-            <ModerationQueue initialItems={items} />
-          </div>
+    <AdminShell
+      title="内容管理"
+      subtitle="用户荐专默认上架。这里浏览近期新内容，有问题再下架；曾被拒绝的专辑不能再推。"
+      isOwner={owner}
+      active="moderation"
+      pending={leftoverPending}
+    >
+      {leftoverPending > 0 ? (
+        <div className="mb-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-50/95">
+          仍有 {leftoverPending}{" "}
+          条旧版「待审」记录，请通过上架或拒绝清掉。新提交不会再进待审。
         </div>
-      </main>
-    </div>
+      ) : null}
+      <ModerationQueue initialItems={items} />
+    </AdminShell>
   );
 }

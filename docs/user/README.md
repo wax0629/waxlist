@@ -34,6 +34,8 @@ npm run dev
 - [YouTube API](./youtube-api.md)
 - [**试用：Zeabur**](./deploy-zeabur.md)（类 Vercel，先测国内能否打开）
 - [**内测计划与开发模式**](./beta-and-dev.md)
+- [**管理账号怎么分发**](./admin-accounts.md)
+- [**数据库规范（Neon × 本地）**](./database-workflow.md)
 - [**国内部署：阿里云域名 + 香港轻量**](./deploy-aliyun-hk.md)（生产可参考；现网为腾讯云香港）
 - [海外试用：Vercel + Neon](./deploy.md)
 

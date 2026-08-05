@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { canModerate } from "@/lib/auth/roles";
 import {
-  listPendingReleases,
+  listModerationFeed,
   submitRecommendation,
 } from "@/lib/recommendations/store";
 import { z } from "zod";
@@ -45,15 +45,12 @@ export async function POST(req: Request) {
       tags: body.tags,
       friend: body.friend,
     });
-    const pending = result.status === "pending";
     return NextResponse.json(
       {
         ...result,
-        message: pending
-          ? "已提交，等待站主/管理审核"
-          : result.is_new_release
-            ? "推荐已发布，专辑已上架"
-            : "推荐已发布",
+        message: result.is_new_release
+          ? "推荐已发布，专辑已上架"
+          : "推荐已发布",
       },
       { status: 201 },
     );
@@ -63,16 +60,20 @@ export async function POST(req: Request) {
   }
 }
 
-/** Pending queue for moderators */
+/** 管理侧：遗留待审 + 近期上架（事后下架） */
 export async function GET(req: Request) {
   const session = await auth();
   if (!session?.user?.id || !canModerate(session.user.role)) {
     return NextResponse.json({ error: "需要管理权限" }, { status: 403 });
   }
   const url = new URL(req.url);
-  if (url.searchParams.get("queue") !== "pending") {
-    return NextResponse.json({ error: "请使用 ?queue=pending" }, { status: 400 });
+  const queue = url.searchParams.get("queue");
+  if (queue !== "pending" && queue !== "moderation") {
+    return NextResponse.json(
+      { error: "请使用 ?queue=moderation 或 ?queue=pending" },
+      { status: 400 },
+    );
   }
-  const items = await listPendingReleases();
+  const items = await listModerationFeed();
   return NextResponse.json({ items });
 }

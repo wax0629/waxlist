@@ -95,9 +95,80 @@ export async function countPendingReleases(): Promise<number> {
   return prisma.release.count({ where: { status: "pending" } });
 }
 
+/** 近 N 天新上架（供管理浏览 / 事后下架） */
+export async function countRecentPublished(days = 7): Promise<number> {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  return prisma.release.count({
+    where: { status: "published", createdAt: { gte: since } },
+  });
+}
+
+/**
+ * 管理侧：待审（遗留）+ 近期已上架社区专辑，便于事后下架。
+ */
+export async function listModerationFeed(opts?: {
+  recentDays?: number;
+  limit?: number;
+}): Promise<PendingReleaseRow[]> {
+  const recentDays = opts?.recentDays ?? 14;
+  const limit = opts?.limit ?? 40;
+  const since = new Date(Date.now() - recentDays * 24 * 60 * 60 * 1000);
+
+  const pending = await listPendingReleases();
+
+  const published = await prisma.release.findMany({
+    where: {
+      status: "published",
+      createdAt: { gte: since },
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    include: {
+      recommendations: {
+        where: { status: "published" },
+        orderBy: [{ isFirst: "desc" }, { createdAt: "asc" }],
+        take: 5,
+        include: { user: { select: { name: true } } },
+      },
+      _count: { select: { recommendations: true } },
+    },
+  });
+
+  const publishedRows: PendingReleaseRow[] = published.map((r) => {
+    const recs = r.recommendations.map((rec) => ({
+      user_name: rec.user.name,
+      reason: rec.reason,
+      tracks: rec.tracks ?? undefined,
+      created_at: rec.createdAt.toISOString(),
+    }));
+    const first = recs[0];
+    return {
+      release_id: r.id,
+      title: r.title,
+      artists: r.artists,
+      cover_url: r.coverUrl ?? undefined,
+      netease_url: r.neteaseUrl ?? undefined,
+      type: r.type,
+      status: r.status,
+      created_at: r.createdAt.toISOString(),
+      first_reason: first?.reason,
+      first_user_name: first?.user_name,
+      first_tracks: first?.tracks,
+      rec_count: r._count.recommendations,
+      recommendations: recs,
+    };
+  });
+
+  // 待审在前，再按时间并集去重
+  const seen = new Set(pending.map((p) => p.release_id));
+  const rest = publishedRows.filter((p) => !seen.has(p.release_id));
+  return [...pending, ...rest];
+}
+
 /**
  * Submit a recommendation (same form for everyone).
- * - New album → pending release + pending rec (needs staff review)
+ * - 默认立即上架；管理事后可下架
+ * - 曾被拒绝的专辑仍不可再推
  * - Existing published → rec published immediately
  * - Existing pending → rec stays pending with the release
  * - Owner: skip review — new/pending releases go live, rec always published
@@ -130,12 +201,11 @@ export async function submitRecommendation(opts: {
     throw new Error("推荐理由至少 4 个字");
   }
 
-  const skipReview = isOwner(opts.role);
-  /** Only owner may attach 友情 badge */
-  const wantFriend = Boolean(opts.friend) && skipReview;
+  // 正常荐专默认上架；友情标签仍仅站主
+  const wantFriend = Boolean(opts.friend) && isOwner(opts.role);
   let releaseId = opts.releaseId;
   let isNew = false;
-  let recStatus: "pending" | "published" = "pending";
+  const recStatus: "published" = "published";
   let releaseNeedsPublish = false;
 
   if (releaseId) {
@@ -144,11 +214,8 @@ export async function submitRecommendation(opts: {
     if (existing.status === "rejected") {
       throw new Error("该专辑已被拒绝，无法继续推荐");
     }
-    if (existing.status === "published") {
-      recStatus = "published";
-    } else {
-      recStatus = skipReview ? "published" : "pending";
-      if (skipReview) releaseNeedsPublish = true;
+    if (existing.status !== "published") {
+      releaseNeedsPublish = true;
     }
     if (wantFriend) {
       await updateRelease(existing.id, {
@@ -211,11 +278,8 @@ export async function submitRecommendation(opts: {
         if (Object.keys(patch).length) {
           await updateRelease(dup.id, patch);
         }
-        if (dup.status === "published") {
-          recStatus = "published";
-        } else {
-          recStatus = skipReview ? "published" : "pending";
-          if (skipReview) releaseNeedsPublish = true;
+        if (dup.status !== "published") {
+          releaseNeedsPublish = true;
         }
       }
     }
@@ -236,7 +300,7 @@ export async function submitRecommendation(opts: {
         cover_url: cover,
         tags,
         source: "community",
-        status: skipReview ? "published" : "pending",
+        status: "published",
         created_by: opts.userId,
         links: [{ label: "网易云", url: neteaseUrl }],
         tracklist,
@@ -244,7 +308,6 @@ export async function submitRecommendation(opts: {
       });
       releaseId = created.id;
       isNew = true;
-      recStatus = skipReview ? "published" : "pending";
     }
   }
 
@@ -263,7 +326,6 @@ export async function submitRecommendation(opts: {
 
   if (releaseNeedsPublish) {
     await updateRelease(releaseId!, { status: "published" });
-    // Owner go-live also surfaces any earlier pending recs on this album
     await prisma.recommendation.updateMany({
       where: { releaseId: releaseId!, status: "pending" },
       data: { status: "published" },
@@ -316,23 +378,27 @@ export async function submitRecommendation(opts: {
   };
 }
 
+/**
+ * 管理操作：
+ * - approve：遗留 pending → 上架
+ * - reject / takedown：下架（published 或 pending → rejected），禁止再推
+ */
 export async function moderateRelease(
   releaseId: string,
-  action: "approve" | "reject",
+  action: "approve" | "reject" | "takedown",
 ): Promise<void> {
   const release = await getRelease(releaseId);
   if (!release) throw new Error("专辑不存在");
-  if (release.status !== "pending") {
-    throw new Error("仅待审条目可操作");
-  }
 
   if (action === "approve") {
+    if (release.status !== "pending") {
+      throw new Error("仅遗留的待审条目需要通过");
+    }
     await updateRelease(releaseId, { status: "published" });
     await prisma.recommendation.updateMany({
       where: { releaseId, status: "pending" },
       data: { status: "published" },
     });
-    // Promote selected tracks from recs into track-level counts
     const recs = await prisma.recommendation.findMany({
       where: { releaseId, status: "published" },
       select: { userId: true, tracks: true },
@@ -361,11 +427,16 @@ export async function moderateRelease(
         });
       }
     }
-  } else {
-    await updateRelease(releaseId, { status: "rejected" });
-    await prisma.recommendation.updateMany({
-      where: { releaseId, status: "pending" },
-      data: { status: "rejected" },
-    });
+    return;
   }
+
+  // reject / takedown
+  if (release.status === "rejected") {
+    throw new Error("已下架");
+  }
+  await updateRelease(releaseId, { status: "rejected" });
+  await prisma.recommendation.updateMany({
+    where: { releaseId, status: { in: ["pending", "published"] } },
+    data: { status: "rejected" },
+  });
 }

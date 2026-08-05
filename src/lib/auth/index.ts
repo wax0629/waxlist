@@ -114,22 +114,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return token;
       }
 
-      // 库被替换/恢复后 JWT 里的 userId 可能失效；按邮箱或 id 回表并对齐
-      // 约 60s 校验一次，避免每个请求都打库
+      // 库被替换后 JWT 可能失效；有 id 时 15 分钟回表一次即可（原先 60s 太勤，Neon 往返会拖慢每个页面）
       const syncedAt =
         typeof token.userSyncedAt === "number" ? token.userSyncedAt : 0;
-      if (Date.now() - syncedAt < 60_000 && token.id) {
+      const hasId = Boolean(token.id ?? token.sub);
+      if (hasId && Date.now() - syncedAt < 15 * 60_000) {
         return token;
       }
 
       try {
+        const id = String(token.id ?? token.sub ?? "");
         const email =
           typeof token.email === "string"
             ? normalizeEmail(token.email)
             : "";
-        const id = String(token.id ?? token.sub ?? "");
-        let row = email ? await findUserByEmail(email) : null;
-        if (!row && id) row = await findUserById(id);
+        // 优先 id 单次查询
+        let row = id ? await findUserById(id) : null;
+        if (!row && email) row = await findUserByEmail(email);
         if (row) {
           token.id = row.id;
           token.role = row.role;
@@ -138,7 +139,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.name = row.name;
           token.userSyncedAt = Date.now();
         } else {
-          // 会话用户已不在库中：清空 id，需重新登录
           token.id = undefined;
           token.userSyncedAt = Date.now();
         }

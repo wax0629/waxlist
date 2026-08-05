@@ -14,6 +14,10 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:stats": "docker stats --no-stream beat-hunter-db-1 2>/dev/null || docker stats --no-stream",
+    "db:pull-prod": "./scripts/db-pull-prod.sh",
+    "db:push-schema-prod": "./scripts/db-push-schema-prod.sh",
+    "db:migrate-neon-region": "./scripts/db-migrate-neon-region.sh",
+    "db:cutover-neon-prod": "./scripts/db-cutover-neon-prod.sh",
     "postinstall": "prisma generate"
   },
   "dependencies": {

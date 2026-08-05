@@ -22,36 +22,29 @@ cp .env.example .env.local
 | `SMS_WEBHOOK_URL` | 手机登录需要 | 短信 Webhook；未配置时请用邮箱 |
 | `OWNER_EMAILS` | 可选 | 站主邮箱列表（逗号分隔）。**每次用该邮箱验证码登录时**会升为站主；库为空时第一个用户也是站主 |
 | `OWNER_PHONES` | 可选 | 站主手机号列表；登录时同样会同步为站主 |
-| `DATABASE_URL` | 社区功能需要 | Postgres 连接串；本机见下方 Docker |
+| `DATABASE_URL` | 社区功能需要 | 本机 Docker 串；**生产 Neon 只放服务器 .env** |
 
 密钥只放在服务端环境（`.env.local` / 托管平台 Secret），**不要**提交到 Git，也不要写进前端代码。
 
-### 本机数据库
+### 数据库规范（必读）
+
+真实用户与上传在 **Neon 生产库**。本地默认 Docker，需要时再从 Neon 拉快照。
+
+完整流程：**[database-workflow.md](./database-workflow.md)**
 
 ```bash
-# 启动轻量 Postgres（容器上限约 1 CPU / 512MB）
-npm run db:up
-
-# .env.local / .env：
-# DATABASE_URL=postgresql://waxlist:waxlist@localhost:5432/waxlist
-
-npm run db:push
+npm run db:up          # 本地 Postgres
+npm run db:push        # schema → 当前 DATABASE_URL（本地）
+npm run db:pull-prod   # Neon 快照 → 覆盖本地（需 DATABASE_URL_PROD）
+npm run db:push-schema-prod  # 仅结构 → Neon（需 DATABASE_URL_PROD）
 ```
 
-不用库时关掉容器更省内存：
+| 变量 / 文件 | 用途 |
+|-------------|------|
+| `DATABASE_URL` | 当前进程连哪库（dev = localhost） |
+| `DATABASE_URL_PROD` 或 `.env.neon.local` | 仅脚本拉快照 / 推结构，**勿提交** |
 
-```bash
-npm run db:down
-```
-
-**Docker Desktop 整机配额**（和容器限制不同）：  
-Settings → Resources → 建议 **CPU 2～4、Memory 2～4 GB**。  
-默认常给虚拟机很多核/约 8GB，开发机会明显卡；改完 Apply & Restart。
-
-| 路径 | 用途 |
-|------|------|
-| `.data/sessions/` | 找伴奏聊天会话（仍为 JSON） |
-| Postgres `users` / `releases` / `favorites` | 账号与精选 |
+不用库时：`npm run db:down`。Docker Desktop 资源建议 CPU 2～4、Memory 2～4 GB。
 
 ### 角色说明
 

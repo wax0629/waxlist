@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { usePendingReviewCount } from "@/components/pending-review-badge";
 
 function roleLabel(role?: string | null): string {
   if (role === "owner") return "站主";
@@ -37,6 +38,8 @@ export function UserMenu() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  // 必须在任何 early return 之前调用（Rules of Hooks）
+  const pending = usePendingReviewCount();
 
   // Hide on auth screens
   const hideOnAuth =
@@ -114,8 +117,8 @@ export function UserMenu() {
         onClick={() => setOpen((v) => !v)}
         className={
           open
-            ? "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-2 ring-white/35"
-            : "flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-1 ring-white/25 transition hover:ring-white/45"
+            ? "flex h-10 w-10 touch-manipulation items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-2 ring-white/35"
+            : "flex h-10 w-10 touch-manipulation items-center justify-center rounded-full bg-gradient-to-br from-[#FF6B9E] to-[#9B51E0] text-sm font-semibold text-white ring-1 ring-white/25 transition hover:ring-white/45"
         }
       >
         {initials}
@@ -144,9 +147,24 @@ export function UserMenu() {
             推荐专辑
           </MenuLink>
           {staff ? (
-            <MenuLink href="/moderation" onNavigate={() => setOpen(false)}>
-              审核队列
-            </MenuLink>
+            <>
+              <MenuLink href="/admin" onNavigate={() => setOpen(false)}>
+                后台
+                {pending > 0 ? (
+                  <span className="ml-auto rounded-full bg-amber-400/90 px-1.5 py-0.5 text-[10px] font-bold text-black">
+                    {pending > 99 ? "99+" : pending}
+                  </span>
+                ) : null}
+              </MenuLink>
+              <MenuLink href="/moderation" onNavigate={() => setOpen(false)}>
+                内容管理
+                {pending > 0 ? (
+                  <span className="ml-1.5 text-[11px] text-amber-200/90">
+                    {pending}
+                  </span>
+                ) : null}
+              </MenuLink>
+            </>
           ) : null}
 
           <div className="my-1 border-t border-white/18" />
@@ -166,10 +184,27 @@ export function UserMenu() {
   );
 }
 
-/** Fixed top-right shell used site-wide (single instance in Providers) */
+/**
+ * Fixed top-right shell site-wide.
+ * Explore 顶栏已内嵌 UserMenu（搜索右侧），此处隐藏避免重复。
+ */
 export function UserAccountCorner() {
+  const path = usePathname();
+  if (
+    path === "/explore" ||
+    path.startsWith("/explore/") ||
+    path.startsWith("/favorites")
+  ) {
+    return null;
+  }
+
   return (
-    <div className="pointer-events-none fixed right-3 top-3 z-[60] isolate sm:right-5 sm:top-4">
+    <div
+      className="pointer-events-none fixed right-3 z-[60] isolate sm:right-5"
+      style={{
+        top: "max(0.75rem, env(safe-area-inset-top, 0px))",
+      }}
+    >
       <div className="pointer-events-auto">
         <UserMenu />
       </div>
@@ -191,7 +226,7 @@ function MenuLink({
       href={href}
       role="menuitem"
       onClick={onNavigate}
-      className="flex w-full items-center px-3 py-2.5 text-sm text-white/80 transition hover:bg-white/[0.06] hover:text-white"
+      className="flex w-full items-center gap-2 px-3 py-3 text-sm text-white/80 transition hover:bg-white/[0.06] hover:text-white active:bg-white/[0.08] sm:py-2.5"
     >
       {children}
     </Link>
