@@ -4,6 +4,7 @@ import { BackLink } from "@/components/back-link";
 import { DailyPickExperience } from "@/components/daily-pick-experience";
 import { auth } from "@/lib/auth";
 import { isFavorited } from "@/lib/favorites/store";
+import { getUserRating } from "@/lib/ratings/store";
 import { getDailyPick } from "@/lib/releases/daily-pick";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,12 @@ export default async function TodayPickPage() {
   const pick = await getDailyPick();
 
   let favorited = false;
+  let myRating: number | null = null;
   if (session?.user?.id && pick) {
-    favorited = await isFavorited(session.user.id, pick.release.id);
+    [favorited, myRating] = await Promise.all([
+      isFavorited(session.user.id, pick.release.id),
+      getUserRating(pick.release.id, session.user.id),
+    ]);
   }
 
   return (
@@ -31,6 +36,7 @@ export default async function TodayPickPage() {
               initial={pick}
               loggedIn={Boolean(session?.user)}
               initialFavorited={favorited}
+              initialMineScore={myRating}
             />
           ) : (
             <div className="mx-auto max-w-md rounded-2xl border border-dashed border-white/15 px-6 py-14 text-center">

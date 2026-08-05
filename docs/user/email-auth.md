@@ -1,6 +1,8 @@
-# 邮件验证码（真实发信）
+# 可选邮件验证码与邮件发送
 
-登录走邮箱验证码时，**必须**配置发信服务，否则接口会直接报错（不会再静默打日志冒充已发送）。
+> 当前 `/login` 与 `/register` 使用**邮箱 + 密码**，不依赖验证码。OTP API 与邮件发送能力仍保留，供以后重新接入验证码登录；关于页反馈邮件也复用同一套 Resend / SMTP 配置。
+
+只有调用 OTP 发信接口时才必须配置发信服务；未配置时接口会直接报错（不会静默打日志冒充已发送）。关于页要发送反馈邮件也需要配置 Resend 或 SMTP。
 
 二选一：
 
@@ -22,7 +24,7 @@ EMAIL_FROM=Waxlist <onboarding@resend.dev>
 EMAIL_FROM=Waxlist <noreply@yourdomain.com>
 ```
 
-4. 重启 `npm run dev`，打开 `/login` → 邮箱 → 获取验证码 → 查邮件。
+4. 重启 `npm run dev`。当前登录页没有验证码入口；需要通过 OTP API 或未来重新接入的界面测试发信。
 
 ## 方案 B：SMTP（163 / QQ / 企业邮 / Gmail 等）
 
@@ -57,6 +59,12 @@ SMTP_SECURE=false
 - 仅当显式设置 `AUTH_OTP_DEV=1` 时，接口带 `dev_code`（生产勿开）。  
 - 服务端日志成功时类似：`[auth-otp:email] sent via Resend to=...`
 
+## 与当前密码登录的关系
+
+- 当前注册会保存密码哈希，登录使用邮箱 + 密码。
+- `AUTH_SECRET` 是当前登录会话必需配置。
+- `AUTH_OTP_DEV`、邮件和短信变量仅影响可选 OTP 流程，不影响当前密码登录。
+
 ## 与手机短信
 
-手机通道仍依赖 `SMS_WEBHOOK_URL`。未配置短信时，请用邮箱登录。
+OTP 手机通道仍依赖 `SMS_WEBHOOK_URL`。当前页面未提供手机号登录入口。
