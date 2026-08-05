@@ -44,11 +44,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Development / product design docs (local only; not published to GitHub)
-# Keep user-facing docs under docs/user/
+# Product drafts default ignored; track user ops docs + archive explicitly
 /docs/*
 !/docs/user/
 !/docs/user/**
+!/docs/archive/
+!/docs/archive/**
 
 # Neon prod URL for local scripts only
 .env.neon.local
