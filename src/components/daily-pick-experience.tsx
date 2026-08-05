@@ -123,7 +123,7 @@ export function DailyPickExperience({
   const releaseDate = formatReleasedAt(r.released_at);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-0.5">
+    <div className="mx-auto w-full max-w-4xl px-0.5">
       {/* 页顶文案可以有；黑胶本体不放字 */}
       <div className="text-center">
         <h1 className="font-display text-[1.45rem] font-semibold tracking-tight text-white sm:text-3xl">
@@ -135,7 +135,7 @@ export function DailyPickExperience({
         </p>
       </div>
 
-      <div className="mx-auto mt-6 w-full max-w-[760px] sm:mt-8">
+      <div className="mx-auto mt-6 w-full max-w-[880px] sm:mt-8">
         <AnimatePresence mode="wait">
           {!opened ? (
             <motion.button
@@ -149,7 +149,7 @@ export function DailyPickExperience({
               exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.2 } }}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              className="relative mx-auto block aspect-square w-full max-w-[300px] outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="relative mx-auto block aspect-square w-[calc(100%-2px)] outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-black md:w-[calc(50%-1px)]"
             >
               {/* 纯黑胶：无封面、无文字 */}
               <span
@@ -185,9 +185,9 @@ export function DailyPickExperience({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="glass-rim relative grid overflow-hidden rounded-2xl md:grid-cols-2"
+              className="glass-rim relative grid overflow-hidden rounded-2xl md:aspect-[2/1] md:grid-cols-2"
             >
-              <div className="relative aspect-square w-full bg-black">
+              <div className="relative aspect-square w-full bg-black md:aspect-auto md:h-full">
                 {r.cover_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -222,7 +222,7 @@ export function DailyPickExperience({
               </div>
 
               <div
-                className="flex min-w-0 flex-col border-t border-white/10 p-4 md:border-t-0 md:py-4 md:pr-5 md:pl-7"
+                className="flex min-w-0 flex-col border-t border-white/10 p-4 md:min-h-0 md:overflow-y-auto md:overscroll-contain md:border-t-0 md:py-5 md:pr-5 md:pl-7 md:[scrollbar-gutter:stable]"
                 style={{
                   background:
                     "linear-gradient(100deg, rgba(255,255,255,0.045) 0%, rgba(5,5,6,0.34) 17%, rgba(5,5,6,0.3) 100%)",
@@ -286,7 +286,7 @@ export function DailyPickExperience({
 
                 {pick.quote ? (
                   <blockquote className="mt-5 border-t border-white/10 pt-4 text-[12px] leading-relaxed text-white/70">
-                    <p className="line-clamp-4 text-pretty">
+                    <p className="text-pretty">
                       「{pick.quote.reason}」
                     </p>
                     <footer className="mt-1.5 text-[10px] text-white/40">
