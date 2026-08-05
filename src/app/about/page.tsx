@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { AppRail } from "@/components/app-rail";
 import { BackLink } from "@/components/back-link";
+import { FeedbackForm } from "@/components/feedback-form";
+import packageJson from "../../../package.json";
+
+/** 与 package.json 同步；展示用 v 前缀 */
+const APP_VERSION = `v${packageJson.version}`;
+const RELEASE_STAGE = "内测";
 
 const PILLARS = [
   {
@@ -50,8 +56,11 @@ export default function AboutPage() {
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/70">
                     About
                   </p>
-                  <span className="rounded-full border border-[#ff6b9e]/45 bg-[#ff6b9e]/18 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#ffc2d6]">
-                    Beta
+                  <span className="rounded-full border border-[#ff6b9e]/45 bg-[#ff6b9e]/18 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.08em] text-[#ffc2d6]">
+                    {RELEASE_STAGE}
+                  </span>
+                  <span className="rounded-full border border-white/20 bg-white/[0.06] px-2.5 py-0.5 font-mono text-[10px] tabular-nums tracking-wide text-white/75">
+                    {APP_VERSION}
                   </span>
                 </div>
                 <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -84,6 +93,48 @@ export default function AboutPage() {
               </div>
             </div>
           </header>
+
+          {/* —— Version / stage —— */}
+          <section className="mt-6 rounded-2xl border border-white/12 bg-white/[0.03] px-5 py-5 sm:px-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-white/65">
+                  Version
+                </p>
+                <h2 className="mt-1 font-display text-lg font-semibold text-white">
+                  版本信息
+                </h2>
+                <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-white/75">
+                  当前为<strong className="font-medium text-white/90">内测阶段</strong>
+                  ，功能与界面会持续调整；欢迎反馈问题与想听的专。正式公开前不保证接口与数据格式长期稳定。
+                </p>
+              </div>
+              <dl className="grid shrink-0 grid-cols-2 gap-x-6 gap-y-2 text-[13px] sm:text-sm">
+                <div>
+                  <dt className="text-[11px] text-white/45">阶段</dt>
+                  <dd className="mt-0.5 font-medium text-[#ffc2d6]">
+                    {RELEASE_STAGE}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] text-white/45">版本号</dt>
+                  <dd className="mt-0.5 font-mono tabular-nums text-white">
+                    {APP_VERSION}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] text-white/45">主线</dt>
+                  <dd className="mt-0.5 text-white/85">优质发行</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] text-white/45">找伴奏</dt>
+                  <dd className="mt-0.5 text-white/85">
+                    Beat Hunter · Beta
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </section>
 
           {/* —— Pillars —— */}
           <section className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
@@ -210,6 +261,8 @@ export default function AboutPage() {
                   ))}
                 </ul>
               </section>
+
+              <FeedbackForm />
 
               <section className="rounded-2xl border border-white/12 bg-white/[0.03] px-5 py-5 sm:px-6">
                 <h2 className="font-display text-base font-semibold text-white">

@@ -78,34 +78,67 @@ function otpEmailContent(code: string): { subject: string; text: string; html: s
   return { subject, text, html };
 }
 
-async function sendEmail(to: string, code: string): Promise<void> {
-  if (!isEmailDeliveryConfigured()) {
-    throw new Error(
-      "邮件服务未配置：请在 .env.local 设置 RESEND_API_KEY，或 SMTP_HOST / SMTP_USER / SMTP_PASS",
-    );
-  }
-
-  const { subject, text, html } = otpEmailContent(code);
-  const from =
+function defaultFromAddress(): string {
+  return (
     process.env.EMAIL_FROM?.trim() ||
     (process.env.RESEND_API_KEY?.trim()
       ? "Waxlist <onboarding@resend.dev>"
-      : process.env.SMTP_USER?.trim() || "noreply@waxlist.local");
+      : process.env.SMTP_USER?.trim() || "noreply@waxlist.local")
+  );
+}
+
+async function sendEmail(to: string, code: string): Promise<void> {
+  const { subject, text, html } = otpEmailContent(code);
+  await sendMail({ to, subject, text, html });
+}
+
+/** 通用发信（OTP / 反馈等）；需已配置 Resend 或 SMTP */
+export async function sendMail(opts: {
+  to: string | string[];
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+}): Promise<void> {
+  if (!isEmailDeliveryConfigured()) {
+    throw new Error(
+      "邮件服务未配置：请设置 RESEND_API_KEY，或 SMTP_HOST / SMTP_USER / SMTP_PASS",
+    );
+  }
+
+  const from = defaultFromAddress();
+  const toList = Array.isArray(opts.to) ? opts.to : [opts.to];
+  const html = opts.html ?? opts.text.replace(/\n/g, "<br/>");
 
   if (process.env.RESEND_API_KEY?.trim()) {
-    await sendViaResend({ to, from, subject, text, html });
+    await sendViaResend({
+      to: toList,
+      from,
+      subject: opts.subject,
+      text: opts.text,
+      html,
+      replyTo: opts.replyTo,
+    });
     return;
   }
 
-  await sendViaSmtp({ to, from, subject, text, html });
+  await sendViaSmtp({
+    to: toList.join(", "),
+    from,
+    subject: opts.subject,
+    text: opts.text,
+    html,
+    replyTo: opts.replyTo,
+  });
 }
 
 async function sendViaResend(opts: {
-  to: string;
+  to: string | string[];
   from: string;
   subject: string;
   text: string;
   html: string;
+  replyTo?: string;
 }): Promise<void> {
   const key = process.env.RESEND_API_KEY!.trim();
   const res = await fetch("https://api.resend.com/emails", {
@@ -116,10 +149,11 @@ async function sendViaResend(opts: {
     },
     body: JSON.stringify({
       from: opts.from,
-      to: [opts.to],
+      to: Array.isArray(opts.to) ? opts.to : [opts.to],
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
+      ...(opts.replyTo ? { reply_to: opts.replyTo } : {}),
     }),
   });
 
@@ -168,6 +202,7 @@ async function sendViaSmtp(opts: {
   subject: string;
   text: string;
   html: string;
+  replyTo?: string;
 }): Promise<void> {
   const host = process.env.SMTP_HOST!.trim();
   const port = Number(process.env.SMTP_PORT || "465");
@@ -194,10 +229,11 @@ async function sendViaSmtp(opts: {
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
+      ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
     });
-    console.info(`[auth-otp:email] sent via SMTP host=${host} to=${opts.to}`);
+    console.info(`[mail] sent via SMTP host=${host} to=${opts.to}`);
   } catch (err) {
-    console.error("[auth-otp:email] SMTP failed", err);
+    console.error("[mail] SMTP failed", err);
     throw new Error("邮件发送失败，请检查 SMTP 配置");
   }
 }

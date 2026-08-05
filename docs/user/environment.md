@@ -19,6 +19,7 @@ cp .env.example .env.local
 | `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` | 邮箱登录二选一 | SMTP 发信（163/QQ 等）；见 `docs/user/email-auth.md` |
 | `SMTP_PORT` / `SMTP_SECURE` | 可选 | 默认 465 / 按端口推断 secure |
 | `EMAIL_FROM` | 推荐 | 发件人展示名，如 `Waxlist <you@domain.com>` |
+| `FEEDBACK_TO` | 可选 | 关于页反馈表单收件邮箱；默认 `OWNER_EMAILS` 首个或站主公开邮箱 |
 | `SMS_WEBHOOK_URL` | 手机登录需要 | 短信 Webhook；未配置时请用邮箱 |
 | `OWNER_EMAILS` | 可选 | 站主邮箱列表（逗号分隔）。**每次用该邮箱验证码登录时**会升为站主；库为空时第一个用户也是站主 |
 | `OWNER_PHONES` | 可选 | 站主手机号列表；登录时同样会同步为站主 |

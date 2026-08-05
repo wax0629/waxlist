@@ -1,60 +1,55 @@
-# Waxlist 使用说明
+# Waxlist 使用与运维
 
-**Waxlist**：听专、荐专、红心与口碑（主入口：**优质发行**；一期：网易云外链）。  
-**Beat Hunter**（站内模块）：帮歌手用自然语言或参考曲链接，拿到可试听的伴奏短名单。
+**Waxlist**：听专、荐专、红心与口碑（主入口：**优质发行**）。  
+**Beat Hunter**：找伴奏（Beta）。
+
+更完整的交接说明见仓库根目录 **[HANDOFF.md](../../HANDOFF.md)**。
 
 ## 能做什么
 
-### 优质发行（Waxlist）
-- 浏览专辑封面列表；筛选（红心 / 站主爱听 / 友情）与排序
-- 登录后点红心收藏；「我的红心」在 explore 内筛选
-- 站主点过红心的专会显示 **站主爱听** 标签
+### 优质发行
+- 列表：搜索、筛选（红心 / 站主爱听 / 友情）、排序
+- 卡片上直接评分、红心
+- 详情：推荐理由、曲目、评论；外链网易云
+- 专辑盲盒：`/explore/today`
+- 荐专：登录后提交；默认上架，可后审
 
-### 找伴奏（Beat Hunter）
-- 描述风格、情绪、人声向、速度
-- 提到国内说唱歌手气质（如法老）
-- 粘贴 YouTube 参考链接
-- 点选修正 chips 再搜
+### 关于
+- 版本（内测 · v0.x）
+- 反馈表单 → 邮件到 `FEEDBACK_TO`
 
-## 快速开始（自托管）
+### 找伴奏
+- 自然语言 / 参考链接 → 可试听短名单（依赖 YouTube API + LLM）
+
+## 本地启动
 
 ```bash
 npm install
 cp .env.example .env.local
-# 编辑密钥与 DATABASE_URL
-
-npm run db:up
-npm run db:push
+npm run db:up && npm run db:push
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。
+## 文档索引
 
-- [环境变量](./environment.md)
-- [YouTube API](./youtube-api.md)
-- [**试用：Zeabur**](./deploy-zeabur.md)（类 Vercel，先测国内能否打开）
-- [**内测计划与开发模式**](./beta-and-dev.md)
-- [**管理账号怎么分发**](./admin-accounts.md)
-- [**数据库规范（Neon × 本地）**](./database-workflow.md)
-- [**国内部署：阿里云域名 + 香港轻量**](./deploy-aliyun-hk.md)（生产可参考；现网为腾讯云香港）
-- [海外试用：Vercel + Neon](./deploy.md)
-
-## 页面
-
-| 页面 | 路径 |
+| 文档 | 内容 |
 |------|------|
-| 优质发行 | `/explore` |
-| 推荐专辑 | `/explore/submit`（登录后） |
-| 我的红心 | `/explore?filter=heart` |
-| 审核队列 | `/moderation`（站主 / 管理；侧栏盾牌图标） |
-| 找伴奏 Beat Hunter | `/chat` |
-| 登录 / 注册 | `/login` `/register` |
-| 关于 | `/about` |
+| [environment.md](./environment.md) | 环境变量 |
+| [database-workflow.md](./database-workflow.md) | Neon × 本地、迁区、保活 |
+| [email-auth.md](./email-auth.md) | 邮件 / OTP / Resend |
+| [beta-and-dev.md](./beta-and-dev.md) | 内测节奏 |
+| [admin-accounts.md](./admin-accounts.md) | 角色分发 |
+| [deploy-aliyun-hk.md](./deploy-aliyun-hk.md) | 香港机部署参考 |
+| [deploy-zeabur.md](./deploy-zeabur.md) | Zeabur 试用 |
+| [deploy.md](./deploy.md) | Vercel + Neon 海外试用 |
+| [youtube-api.md](./youtube-api.md) | YouTube API |
 
-**推荐流程**：人人走同一推荐表单。普通用户推的新专进审核；**站主**推荐直接上架，不经审核。已上架专辑的再推（所有人）立即展示。
+## 生产
 
-**账号**：邮箱注册并设置密码；之后登录只需邮箱 + 密码（无验证码）。用户库为空时第一个账号为**站主**；也可设 `OWNER_EMAILS`。
+- 域名：https://waxlist.cn  
+- 发版：`./scripts/deploy-prod.sh`  
+- 健康：`/health`  
 
 ## 合规
 
-试听与发现参考，商用授权以源站为准。不提供未授权下载。
+试听与发现参考，商用授权以源站为准。

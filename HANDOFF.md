@@ -1,0 +1,188 @@
+# Waxlist 项目交接
+
+> 最后更新：2026-08-05 · 版本 **v0.1.0** · 阶段 **内测**  
+> 生产：**https://waxlist.cn**
+
+---
+
+## 1. 项目是做什么的
+
+**Waxlist** 是一个 **听专 / 荐专 / 口碑** 社区（偏网易云外链），解决「歌荒时不知道下一张听什么」：
+
+| 能力 | 说明 |
+|------|------|
+| **优质发行** `/explore` | 专辑列表、筛选、排序、搜索、列表内评分与红心 |
+| **详情** `/explore/[id]` | 封面、推荐理由、曲目、评分评论、跳转网易云 |
+| **荐专** `/explore/submit` | 登录后贴网易云链接提交；默认上架，可后审下架 |
+| **专辑盲盒** `/explore/today` | 加权随机开一盒（非死规则队列） |
+| **后台** `/admin` | 概览、用户角色（站主分配管理） |
+| **审核** `/moderation` | 内容管理 / 下架等 |
+| **关于** `/about` | 故事、版本、**反馈表单**（邮件） |
+| **Beat Hunter** `/chat` | 找伴奏 Agent（**Beta，不抢主线**） |
+
+**不做（当前）**：站内播放网易云正版流、大规模投放、完整分类体系。
+
+品牌话术：**find · rec · heart**（发现 / 推出去 / 放进心里），避免「挖」类旧文案。
+
+---
+
+## 2. 技术栈与架构
+
+```
+用户浏览器
+    ↓ HTTPS
+腾讯云香港 43.161.255.64
+    Nginx (443) → Next.js 16 (pm2: waxlist) :3000
+                      ↓
+              Neon Postgres（新加坡 ap-southeast-1）
+              pm2: waxlist-db-keepalive（防 Neon 休眠）
+```
+
+| 层 | 选型 |
+|----|------|
+| 框架 | Next.js 16 App Router · React 19 · TypeScript |
+| 鉴权 | Auth.js (NextAuth v5) JWT · 邮箱密码 / OTP |
+| 数据库 | Prisma 6 + Postgres（本地 Docker / 生产 Neon） |
+| 邮件 | Resend（生产已配）；可选 SMTP |
+| 部署 | `scripts/deploy-prod.sh` → rsync + `npm ci` + `prisma db push` + build + pm2 |
+| 仓库 | `github.com:wax0629/waxlist.git` |
+
+**路径约定**
+
+- 应用代码：`src/`
+- Schema：`prisma/schema.prisma`
+- 运维文档：**只维护 `docs/user/`**
+- 早期构思草稿：`docs/archive/`（历史参考，勿当现行规格）
+
+---
+
+## 3. 现在进行到哪
+
+### 已完成（内测可用）
+
+- [x] 优质发行主路径：列表 / 详情 / 红心 / 评分 / 荐专  
+- [x] 列表内点星评分、搜索栏、顶栏账号在搜索旁  
+- [x] 移动端底部 Tab（发行 / 盲盒 / 找伴奏 / 关于）  
+- [x] 专辑盲盒（加权随机 + 本轮去重）  
+- [x] 后台两期雏形 + 待审角标  
+- [x] 推荐默认上架、可下架（事后审核）  
+- [x] Neon 从 US 迁到 **新加坡**；香港机保活进程  
+- [x] HTTPS + `/health`  
+- [x] 关于页版本信息 + 反馈邮件 API  
+- [x] 反馈收件：`FEEDBACK_TO=xux9278@gmail.com`（见下限制）
+
+### 已知限制 / 坑
+
+1. **Resend 测试模式**：未验证域名时 **只能发到注册邮箱** `xux9278@gmail.com`。  
+   要同时收 `3106731940@qq.com`：验证域名并改 `EMAIL_FROM`，或改 SMTP。  
+2. **Explore SSR 仍偏慢**（约 1s 级）：Neon 冷启动 + 多查询；保活已缓解冷启动。  
+3. **无站内播放**：只外链网易云。  
+4. **Beat Hunter** 依赖 YouTube API / LLM，配额与延迟需单独看。  
+5. 内容量仍少，内测靠站主铺专 + 熟人推。
+
+### 建议下一步（产品）
+
+1. 小范围内测邀请（话术见 `docs/user/beta-and-dev.md`）  
+2. 收集反馈（站内表单 / 微信 Wackox）  
+3. 性能：列表缓存、减串行查库  
+4. 分类（UDG / 近期）从占位变真筛  
+5. Resend 域名或 SMTP，反馈可抄送 QQ  
+
+---
+
+## 4. 关键环境速查
+
+| 项 | 值 |
+|----|-----|
+| 生产域名 | https://waxlist.cn |
+| SSH | `ubuntu@43.161.255.64` |
+| 应用目录 | `/var/www/waxlist` |
+| 进程 | `pm2 list` → `waxlist` + `waxlist-db-keepalive` |
+| 数据库 | Neon Singapore pooler（连接串在服务器 `.env`，**勿提交 Git**） |
+| 发版 | `./scripts/deploy-prod.sh`（rsync **排除** `.env`） |
+
+### 常用命令
+
+```bash
+# 本地
+npm run db:up && npm run db:push && npm run dev
+
+# 生产发版
+git push origin main
+./scripts/deploy-prod.sh
+
+# 服务器
+ssh ubuntu@43.161.255.64
+cd /var/www/waxlist && pm2 logs waxlist --lines 50
+curl -sS https://waxlist.cn/health
+```
+
+### 环境变量（生产必有）
+
+见 `docs/user/environment.md` 与 `.env.example`。关键：
+
+- `DATABASE_URL` — Neon  
+- `AUTH_SECRET` / `AUTH_URL=https://waxlist.cn`  
+- `RESEND_API_KEY` / `EMAIL_FROM`  
+- `FEEDBACK_TO` — 反馈收件  
+- `OWNER_EMAILS` — 站主邮箱  
+- Beat Hunter：`YOUTUBE_API_KEY`、`XAI_API_KEY` 等（可选）  
+
+本地密钥：`.env` / `.env.local` / `.env.neon.local`（均 gitignore）。
+
+---
+
+## 5. 角色
+
+| 角色 | 能力 |
+|------|------|
+| owner 站主 | 后台、用户角色、审核、友情标签、站主爱听 |
+| admin 管理 | 审核与管理能力（由站主分配） |
+| user | 荐专、红心、评分、评论 |
+
+详见 `docs/user/admin-accounts.md`。
+
+---
+
+## 6. 文档地图（清理后）
+
+| 文档 | 用途 |
+|------|------|
+| **本文件 `HANDOFF.md`** | 交接总览 |
+| `docs/user/README.md` | 使用与本地启动 |
+| `docs/user/beta-and-dev.md` | 内测节奏 |
+| `docs/user/database-workflow.md` | Neon × 本地、迁区 |
+| `docs/user/deploy-aliyun-hk.md` | 香港机部署参考 |
+| `docs/user/email-auth.md` | 邮件 / OTP |
+| `docs/user/environment.md` | 环境变量表 |
+| `docs/user/admin-accounts.md` | 角色分发 |
+| `docs/archive/` | 旧构思 / 旧规格（**非现行**） |
+
+---
+
+## 7. 目录结构（精简）
+
+```
+waxlist/
+├── HANDOFF.md              ← 你在这里
+├── README.md
+├── package.json            # version 0.1.0
+├── prisma/schema.prisma
+├── scripts/                # deploy / db / neon-keepalive
+├── docs/user/              # 现行运维文档
+├── docs/archive/           # 历史草稿
+├── src/app/                # 页面与 API
+├── src/components/
+├── src/lib/                # auth / releases / agent / mail…
+└── public/waxlist-mark.png
+```
+
+---
+
+## 8. 联系
+
+- 站主微信：**Wackox**（备注 Waxlist）  
+- 邮箱：**xux9278@gmail.com**  
+- 站内：关于页反馈表单  
+
+交接时请确认：服务器 SSH 权限、Neon 控制台、Resend、GitHub 仓库权限、域名 DNS。
