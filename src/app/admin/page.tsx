@@ -60,7 +60,7 @@ export default async function AdminHomePage() {
   return (
     <AdminShell
       title="后台"
-      subtitle="一期：概览与待审入口 · 二期：账号角色"
+      subtitle="内容、分类与账号角色的维护入口"
       isOwner={owner}
       active="overview"
       pending={pending}
@@ -119,6 +119,15 @@ export default async function AdminHomePage() {
             常用入口
           </h2>
           <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <Link
+                href="/admin/categories"
+                className="text-[#ff9fbc] hover:underline"
+              >
+                分类维护
+              </Link>
+              <span className="text-white/40"> — 补充专辑地区</span>
+            </li>
             <li>
               <Link
                 href="/moderation"

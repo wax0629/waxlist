@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { canModerate, isOwner } from "@/lib/auth/roles";
 import { mergeFriendFlag } from "@/lib/releases/friend-tag";
+import { CATALOG_REGION_KEYS } from "@/lib/releases/catalog";
 import { getRelease, updateRelease } from "@/lib/releases/store";
 import { z } from "zod";
 
@@ -29,6 +30,7 @@ const PatchBody = z.object({
   curatorial_note: z.string().optional(),
   cover_url: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  regions: z.array(z.enum(CATALOG_REGION_KEYS)).max(4).optional(),
   sort_order: z.number().optional(),
   /** Owner: set/clear pink「友情」badge */
   friend: z.boolean().optional(),
@@ -65,6 +67,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
       curatorial_note: body.curatorial_note,
       cover_url: body.cover_url,
       tags,
+      regions: body.regions,
       sort_order: body.sort_order,
     });
     return NextResponse.json({ release });

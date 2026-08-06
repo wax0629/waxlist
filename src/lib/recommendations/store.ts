@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { resolveNeteaseMeta } from "@/lib/netease/fetch-meta";
 import { parseNeteaseUrl } from "@/lib/netease/parse";
 import { mergeFriendFlag } from "@/lib/releases/friend-tag";
+import type { CatalogRegion } from "@/lib/releases/catalog";
 import {
   createRelease,
   findByNeteaseId,
@@ -188,6 +189,8 @@ export async function submitRecommendation(opts: {
   cover_url?: string;
   type?: "single" | "ep" | "album" | "other";
   tags?: string[];
+  /** Optional contributor-provided regions; empty means awaiting moderation. */
+  regions?: CatalogRegion[];
   /** Owner-only: attach pink「友情」badge (e.g. mixing clients). */
   friend?: boolean;
 }): Promise<{
@@ -205,7 +208,7 @@ export async function submitRecommendation(opts: {
   const wantFriend = Boolean(opts.friend) && isOwner(opts.role);
   let releaseId = opts.releaseId;
   let isNew = false;
-  const recStatus: "published" = "published";
+  const recStatus = "published" as const;
   let releaseNeedsPublish = false;
 
   if (releaseId) {
@@ -299,6 +302,7 @@ export async function submitRecommendation(opts: {
         netease_url: neteaseUrl,
         cover_url: cover,
         tags,
+        regions: opts.regions,
         source: "community",
         status: "published",
         created_by: opts.userId,

@@ -58,6 +58,7 @@ describe("recommendation publishing", () => {
       netease_url: "https://music.163.com/album?id=123",
       title: "Test Album",
       artists: ["Test Artist"],
+      regions: ["jp"],
     });
 
     expect(mocks.createRelease).toHaveBeenCalledWith(
@@ -65,6 +66,7 @@ describe("recommendation publishing", () => {
         source: "community",
         status: "published",
         created_by: "user-1",
+        regions: ["jp"],
       }),
     );
     expect(mocks.recommendation.create).toHaveBeenCalledWith({

@@ -1,3 +1,5 @@
+import type { CatalogRegion } from "./catalog";
+
 /**
  * Release = curated / community album or single (Phase 1.5 community).
  * Platform limited to NetEase Cloud Music for v1.
@@ -29,6 +31,8 @@ export interface Release {
   netease_url?: string;
   cover_url?: string;
   tags: string[];
+  /** Curated regions; an empty list means not classified yet. */
+  regions: CatalogRegion[];
   description?: string;
   /** 站主或策展长评 */
   curatorial_note?: string;
@@ -58,6 +62,7 @@ export interface CreateReleaseInput {
   netease_url?: string;
   cover_url?: string;
   tags?: string[];
+  regions?: CatalogRegion[];
   description?: string;
   curatorial_note?: string;
   source: ReleaseSource;

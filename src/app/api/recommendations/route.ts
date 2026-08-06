@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { canModerate } from "@/lib/auth/roles";
+import { CATALOG_REGION_KEYS } from "@/lib/releases/catalog";
 import {
   listModerationFeed,
   submitRecommendation,
@@ -19,6 +20,7 @@ const SubmitBody = z.object({
   cover_url: z.string().optional(),
   type: z.enum(["single", "ep", "album", "other"]).optional(),
   tags: z.array(z.string()).optional(),
+  regions: z.array(z.enum(CATALOG_REGION_KEYS)).max(4).optional(),
   /** Owner-only: pink「友情」badge */
   friend: z.boolean().optional(),
 });
@@ -43,6 +45,7 @@ export async function POST(req: Request) {
       cover_url: body.cover_url,
       type: body.type,
       tags: body.tags,
+      regions: body.regions,
       friend: body.friend,
     });
     return NextResponse.json(

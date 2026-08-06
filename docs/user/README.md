@@ -8,11 +8,11 @@
 ## 能做什么
 
 ### 优质发行
-- 列表：搜索、筛选（红心 / 站主爱听 / 友情）、排序
+- 列表：搜索、浏览条件、年代筛选、排序；地区补录达到 90% 后自动开放
 - 卡片上直接评分、红心
 - 详情：推荐理由、曲目、评论；外链网易云
 - 专辑盲盒：`/explore/today`；桌面端 880px 等宽书页布局，长信息在右页滚动；含发行日期、评分与红心
-- 荐专：登录后提交；普通用户与员工均默认上架，管理在 `/moderation` 事后下架
+- 荐专：登录后提交；可选填写地区，普通用户与员工均默认上架，管理在 `/moderation` 事后下架
 
 ### 关于
 - 版本（内测 · v0.x）
@@ -37,6 +37,7 @@ npm run dev
 | [environment.md](./environment.md) | 环境变量 |
 | [database-workflow.md](./database-workflow.md) | Neon × 本地、迁区、保活 |
 | [release.md](./release.md) | **日常发版、线上验收与回滚** |
+| [catalog-filter-design.md](./catalog-filter-design.md) | **地区 / 年代分类规则、后台补录与前台交互** |
 | [email-auth.md](./email-auth.md) | 可选 OTP / 邮件发送（当前登录页不用 OTP） |
 | [beta-and-dev.md](./beta-and-dev.md) | 内测节奏 |
 | [admin-accounts.md](./admin-accounts.md) | 角色分发 |

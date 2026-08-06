@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { canModerate } from "@/lib/auth/roles";
 import { parseNeteaseUrl } from "@/lib/netease/parse";
+import { CATALOG_REGION_KEYS } from "@/lib/releases/catalog";
 import { createRelease, listReleases } from "@/lib/releases/store";
 import type { ReleaseSource, ReleaseStatus } from "@/lib/releases/types";
 import { z } from "zod";
@@ -41,6 +42,7 @@ const CreateBody = z.object({
   netease_url: z.string().optional(),
   cover_url: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  regions: z.array(z.enum(CATALOG_REGION_KEYS)).max(4).optional(),
   description: z.string().optional(),
   curatorial_note: z.string().optional(),
   source: z.enum(["owner", "community"]),
@@ -72,7 +74,7 @@ export async function POST(req: Request) {
     }
 
     let netease_id = body.netease_id?.trim() || undefined;
-    let netease_url = body.netease_url?.trim() || undefined;
+    const netease_url = body.netease_url?.trim() || undefined;
     if (netease_url) {
       const parsed = parseNeteaseUrl(netease_url);
       if (parsed.id && !netease_id) netease_id = parsed.id;
@@ -89,6 +91,7 @@ export async function POST(req: Request) {
       netease_url,
       cover_url: body.cover_url?.trim() || undefined,
       tags: body.tags,
+      regions: body.regions,
       description: body.description,
       curatorial_note: body.curatorial_note,
       source: body.source,

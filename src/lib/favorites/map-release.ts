@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { normalizeRegions } from "@/lib/releases/catalog";
 import type { Release, ReleaseLink, ReleaseStatus } from "@/lib/releases/types";
 
 /** Shared mapper for Prisma Release rows (used by favorites list). */
@@ -11,6 +12,7 @@ export function mapRow(r: {
   neteaseUrl: string | null;
   coverUrl: string | null;
   tags: string[];
+  regions: string[];
   description: string | null;
   curatorialNote: string | null;
   source: string;
@@ -35,6 +37,7 @@ export function mapRow(r: {
     netease_url: r.neteaseUrl ?? undefined,
     cover_url: r.coverUrl ?? undefined,
     tags: r.tags,
+    regions: normalizeRegions(r.regions),
     description: r.description ?? undefined,
     curatorial_note: r.curatorialNote ?? undefined,
     source: r.source as Release["source"],

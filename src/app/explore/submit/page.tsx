@@ -7,6 +7,10 @@ import { FormEvent, useCallback, useRef, useState } from "react";
 import { AppRail } from "@/components/app-rail";
 import { BackLink } from "@/components/back-link";
 import {
+  CATALOG_REGIONS,
+  type CatalogRegion,
+} from "@/lib/releases/catalog";
+import {
   formatSelectedTracks,
   TrackSelectList,
 } from "@/components/track-select-list";
@@ -35,6 +39,7 @@ export default function SubmitReleasePage() {
   const [trackList, setTrackList] = useState<string[]>([]);
   const [selectedTrackIdx, setSelectedTrackIdx] = useState<number[]>([]);
   const [type, setType] = useState<ReleaseType>("album");
+  const [regions, setRegions] = useState<CatalogRegion[]>([]);
   const [meta, setMeta] = useState<ResolvedMeta | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [resolving, setResolving] = useState(false);
@@ -114,6 +119,7 @@ export default function SubmitReleasePage() {
           type,
           reason,
           tracks: formatSelectedTracks(trackList, selectedTrackIdx),
+          regions,
           ...(isOwner && friend ? { friend: true } : {}),
         }),
       });
@@ -136,6 +142,7 @@ export default function SubmitReleasePage() {
       setTrackList([]);
       setSelectedTrackIdx([]);
       setFriend(false);
+      setRegions([]);
       setMeta(null);
       lastResolved.current = "";
     } catch (err) {
@@ -297,6 +304,38 @@ export default function SubmitReleasePage() {
               <option value="other">其他</option>
             </select>
           </label>
+          <fieldset className="block text-sm text-white/70">
+            <legend>地区（可多选，可留空）</legend>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {CATALOG_REGIONS.map((region) => {
+                const selected = regions.includes(region.key);
+                return (
+                  <button
+                    key={region.key}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() =>
+                      setRegions((current) =>
+                        selected
+                          ? current.filter((value) => value !== region.key)
+                          : [...current, region.key],
+                      )
+                    }
+                    className={
+                      selected
+                        ? "min-h-11 rounded-xl bg-[#ff6b9e]/18 px-3 text-[13px] text-[#ffc2d6] ring-1 ring-[#ff6b9e]/35"
+                        : "min-h-11 rounded-xl border border-white/15 px-3 text-[13px] text-white/60 hover:border-white/30 hover:text-white"
+                    }
+                  >
+                    {region.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[12px] leading-relaxed text-white/40">
+              目前网易云数据没有稳定的地区字段，无法可靠判断时请留空，由后台补录。
+            </p>
+          </fieldset>
           <label className="block text-sm text-white/70">
             推荐理由
             <textarea

@@ -1,5 +1,6 @@
 import { createId } from "@/lib/id";
 import { prisma } from "@/lib/db";
+import { normalizeRegions } from "./catalog";
 import type { CreateReleaseInput, Release, ReleaseLink, ReleaseStatus } from "./types";
 import type { Prisma } from "@prisma/client";
 
@@ -12,6 +13,7 @@ function mapRow(r: {
   neteaseUrl: string | null;
   coverUrl: string | null;
   tags: string[];
+  regions: string[];
   description: string | null;
   curatorialNote: string | null;
   source: string;
@@ -36,6 +38,7 @@ function mapRow(r: {
     netease_url: r.neteaseUrl ?? undefined,
     cover_url: r.coverUrl ?? undefined,
     tags: r.tags,
+    regions: normalizeRegions(r.regions),
     description: r.description ?? undefined,
     curatorial_note: r.curatorialNote ?? undefined,
     source: r.source as Release["source"],
@@ -175,6 +178,7 @@ export async function createRelease(
       neteaseUrl: input.netease_url || null,
       coverUrl: input.cover_url || null,
       tags: input.tags ?? [],
+      regions: input.regions ?? [],
       description: input.description || null,
       curatorialNote: input.curatorial_note || null,
       source: input.source,
@@ -201,6 +205,7 @@ export async function updateRelease(
       | "type"
       | "cover_url"
       | "tags"
+      | "regions"
       | "description"
       | "curatorial_note"
       | "status"
@@ -224,6 +229,7 @@ export async function updateRelease(
       ...(patch.type !== undefined ? { type: patch.type } : {}),
       ...(patch.cover_url !== undefined ? { coverUrl: patch.cover_url || null } : {}),
       ...(patch.tags !== undefined ? { tags: patch.tags } : {}),
+      ...(patch.regions !== undefined ? { regions: patch.regions } : {}),
       ...(patch.description !== undefined
         ? { description: patch.description || null }
         : {}),

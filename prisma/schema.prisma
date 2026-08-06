@@ -61,6 +61,8 @@ model Release {
   neteaseUrl      String?  @map("netease_url")
   coverUrl        String?  @map("cover_url")
   tags            String[] @default([])
+  /// cn | jp | western | other; empty means not classified yet
+  regions         String[] @default([])
   description     String?
   curatorialNote  String?  @map("curatorial_note")
   /// owner | community — who first added the entry

@@ -5,6 +5,7 @@ import { BackLink } from "@/components/back-link";
 const NAV: { href: string; label: string; ownerOnly?: boolean }[] = [
   { href: "/admin", label: "概览" },
   { href: "/moderation", label: "内容管理" },
+  { href: "/admin/categories", label: "分类维护" },
   { href: "/admin/users", label: "账号与角色", ownerOnly: true },
 ];
 
@@ -19,7 +20,7 @@ export function AdminShell({
   title: string;
   subtitle?: string;
   isOwner: boolean;
-  active: "overview" | "moderation" | "users";
+  active: "overview" | "moderation" | "categories" | "users";
   children: React.ReactNode;
   pending?: number;
 }) {
@@ -75,6 +76,7 @@ export function AdminShell({
               const isActive =
                 (active === "overview" && item.href === "/admin") ||
                 (active === "moderation" && item.href === "/moderation") ||
+                (active === "categories" && item.href === "/admin/categories") ||
                 (active === "users" && item.href === "/admin/users");
               return (
                 <Link
