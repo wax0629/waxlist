@@ -2,13 +2,22 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, requireOwner } from "@/lib/auth/guards";
 import type { UserRole } from "@/lib/auth/roles";
-import { setUserRole } from "@/lib/auth/user-store";
+import {
+  setUserInteractionBeta,
+  setUserRole,
+} from "@/lib/auth/user-store";
 
 export const runtime = "nodejs";
 
-const bodySchema = z.object({
-  role: z.enum(["user", "admin", "owner"]),
-});
+const bodySchema = z
+  .object({
+    role: z.enum(["user", "admin", "owner"]).optional(),
+    interaction_beta: z.boolean().optional(),
+  })
+  .refine(
+    (body) => body.role !== undefined || body.interaction_beta !== undefined,
+    { message: "没有可修改的字段" },
+  );
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -20,18 +29,27 @@ export async function PATCH(req: Request, ctx: Ctx) {
     const json = await req.json();
     const body = bodySchema.parse(json);
 
-    if (id === actor.id && body.role !== "owner") {
+    if (id === actor.id && body.role && body.role !== "owner") {
       return NextResponse.json(
         { error: "不能取消自己的站主身份" },
         { status: 400 },
       );
     }
 
-    const user = await setUserRole(
-      id,
-      body.role as UserRole,
-      actor.role as UserRole,
-    );
+    let user;
+    if (body.role) {
+      user = await setUserRole(
+        id,
+        body.role as UserRole,
+        actor.role as UserRole,
+      );
+    } else {
+      user = await setUserInteractionBeta(
+        id,
+        body.interaction_beta!,
+        actor.role as UserRole,
+      );
+    }
     return NextResponse.json({ user });
   } catch (err) {
     if (err instanceof AuthError) {

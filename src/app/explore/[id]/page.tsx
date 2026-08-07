@@ -13,7 +13,10 @@ import {
 import { RecommendAgainForm } from "@/components/recommend-again-form";
 import { TrackRecommendList } from "@/components/track-recommend-list";
 import { auth } from "@/lib/auth";
-import { isOwner } from "@/lib/auth/roles";
+import {
+  canUseCommunityInteractions,
+  isOwner,
+} from "@/lib/auth/roles";
 import { listComments } from "@/lib/comments/store";
 import { isFavorited } from "@/lib/favorites/store";
 import { getUserRating } from "@/lib/ratings/store";
@@ -47,12 +50,21 @@ export default async function ReleaseDetailPage({ params }: Props) {
   if (!release || release.status !== "published") notFound();
 
   const uid = session?.user?.id;
+  const interactionsEnabled = Boolean(
+    session?.user &&
+      canUseCommunityInteractions(
+        session.user.role,
+        session.user.interactionBeta,
+      ),
+  );
   const [favorited, recommendations, tracks, myRating, comments] =
     await Promise.all([
       uid ? isFavorited(uid, id) : Promise.resolve(false),
       listPublishedRecommendations(id),
       listTracksWithStats(id, uid),
-      uid ? getUserRating(id, uid) : Promise.resolve(null),
+      uid && interactionsEnabled
+        ? getUserRating(id, uid)
+        : Promise.resolve(null),
       listComments(id),
     ]);
   const alreadyRecd = uid
@@ -81,9 +93,9 @@ export default async function ReleaseDetailPage({ params }: Props) {
           <BackLink href="/explore" label="返回优质发行" />
 
           {/*
-            桌面：左信息（封面+评分+推荐紧凑叠放）| 右曲目
+            桌面：左信息（封面+推荐紧凑叠放）| 右曲目
             不用 row-span，避免左栏被曲目高度撑开大片空白
-            手机：信息 → 曲目 → 评分 → 推荐 → 评论
+            手机：信息 → 曲目 → 评分 → 推荐 → 评论；发布控件按互动内测权限开放
           */}
           <div className="mt-4 grid grid-cols-1 items-start gap-x-10 gap-y-3 sm:mt-6 lg:grid-cols-12 lg:gap-x-14 lg:gap-y-3 xl:gap-x-16">
             {/* 封面 + 标题 */}
@@ -232,7 +244,6 @@ export default async function ReleaseDetailPage({ params }: Props) {
               </section>
             </aside>
 
-            {/* 评分：与封面区纵向更紧 */}
             <section className="order-3 min-w-0 lg:col-span-5 lg:col-start-1">
               <h2 className="mb-1.5 font-display text-[15px] font-semibold text-white/90">
                 评分
@@ -243,6 +254,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
                 initialCount={release.rating_count ?? 0}
                 initialMine={myRating}
                 loggedIn={Boolean(session?.user)}
+                canRate={interactionsEnabled}
               />
             </section>
 
@@ -282,6 +294,7 @@ export default async function ReleaseDetailPage({ params }: Props) {
               initialComments={comments}
               initialMineScore={myRating}
               loggedIn={Boolean(session?.user)}
+              canComment={interactionsEnabled}
             />
           </div>
         </div>

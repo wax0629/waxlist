@@ -15,6 +15,7 @@ export async function GET() {
       phone: session.user.phone,
       name: session.user.name,
       role: session.user.role,
+      interaction_beta: session.user.interactionBeta,
     },
   });
 }

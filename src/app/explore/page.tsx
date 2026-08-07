@@ -8,6 +8,7 @@ import { ExploreSidebar } from "@/components/explore-sidebar";
 import { ReleaseCard } from "@/components/release-card";
 import { UserMenu } from "@/components/user-menu";
 import { auth } from "@/lib/auth";
+import { canUseCommunityInteractions } from "@/lib/auth/roles";
 import { favoritedReleaseIds } from "@/lib/favorites/store";
 import { userRatingsForReleases } from "@/lib/ratings/store";
 import {
@@ -19,31 +20,30 @@ import {
   type CatalogRegion,
   type ReleasePeriod,
 } from "@/lib/releases/catalog";
-import {
-  listReleases,
-  type ReleaseSort,
-} from "@/lib/releases/store";
+import { listReleases, type ReleaseSort } from "@/lib/releases/store";
 import type { Release } from "@/lib/releases/types";
+import { hasUdgTag } from "@/lib/releases/udg";
 
 export const dynamic = "force-dynamic";
 
-type FilterKey = "all" | "heart" | "loved" | "friend";
+type FilterKey = "all" | "udg" | "heart" | "loved" | "friend";
 
 const SORT_OPTIONS: { key: ReleaseSort; label: string }[] = [
   { key: "rec", label: "推荐先后" },
   { key: "released", label: "发行时间" },
-  { key: "rating", label: "评分" },
 ];
 
 function parseFilter(raw: string | string[] | undefined): FilterKey {
   const v = Array.isArray(raw) ? raw[0] : raw;
-  if (v === "heart" || v === "loved" || v === "friend") return v;
+  if (v === "udg" || v === "heart" || v === "loved" || v === "friend") {
+    return v;
+  }
   return "all";
 }
 
 function parseSort(raw: string | string[] | undefined): ReleaseSort {
   const v = Array.isArray(raw) ? raw[0] : raw;
-  if (v === "released" || v === "rating" || v === "rec") return v;
+  if (v === "released" || v === "rec") return v;
   return "rec";
 }
 
@@ -114,9 +114,15 @@ export default async function ExplorePage({
     items = listResult;
     if (session?.user?.id) {
       const ids = items.map((i) => i.id);
+      const interactionsEnabled = canUseCommunityInteractions(
+        session.user.role,
+        session.user.interactionBeta,
+      );
       const [fav, scores] = await Promise.all([
         favoritedReleaseIds(session.user.id, ids),
-        userRatingsForReleases(session.user.id, ids),
+        interactionsEnabled
+          ? userRatingsForReleases(session.user.id, ids)
+          : Promise.resolve(new Map<string, number>()),
       ]);
       mine = fav;
       myScores = scores;
@@ -128,6 +134,7 @@ export default async function ExplorePage({
   }
 
   const heartCount = mine.size;
+  const udgCount = items.filter((r) => hasUdgTag(r.tags)).length;
   const lovedCount = items.filter((r) => r.owner_loved).length;
   const friendCount = items.filter(hasFriendTag).length;
   const catalogStats = getCatalogFilterStats(items);
@@ -136,7 +143,9 @@ export default async function ExplorePage({
   const regions = regionEnabled ? requestedRegions : [];
 
   let visible = items;
-  if (filter === "heart") {
+  if (filter === "udg") {
+    visible = items.filter((r) => hasUdgTag(r.tags));
+  } else if (filter === "heart") {
     visible = items.filter((r) => mine.has(r.id));
   } else if (filter === "loved") {
     visible = items.filter((r) => r.owner_loved);
@@ -146,10 +155,13 @@ export default async function ExplorePage({
   if (q) {
     visible = visible.filter((r) => matchesQuery(r, q));
   }
-  const catalogItems = visible.map((item) => ({
-    regions: item.regions,
-    released_at: item.released_at,
-  }));
+  const catalogItems = items
+    .filter((item) => matchesQuery(item, q))
+    .map((item) => ({
+      regions: item.regions,
+      released_at: item.released_at,
+      udg: hasUdgTag(item.tags),
+    }));
   visible = filterByCatalog(visible, regions, period);
   const hasCatalogFilters = regions.length > 0 || Boolean(period);
 
@@ -160,6 +172,7 @@ export default async function ExplorePage({
     needAuth?: boolean;
   }[] = [
     { key: "all", label: "全部", count: items.length },
+    { key: "udg", label: "UDG 专区", count: udgCount },
     {
       key: "heart",
       label: "我的红心",
@@ -170,14 +183,20 @@ export default async function ExplorePage({
     { key: "friend", label: "友情", count: friendCount },
   ];
 
-  const filterLabel =
-    browse.find((b) => b.key === filter)?.label ?? "全部";
+  const filterLabel = browse.find((b) => b.key === filter)?.label ?? "全部";
   const sortLabel =
     SORT_OPTIONS.find((s) => s.key === sort)?.label ?? "推荐先后";
 
   const submitHref = session?.user
     ? "/explore/submit"
     : "/login?callbackUrl=/explore/submit";
+  const interactionsEnabled = Boolean(
+    session?.user &&
+    canUseCommunityInteractions(
+      session.user.role,
+      session.user.interactionBeta,
+    ),
+  );
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col text-white md:flex-row">
@@ -214,7 +233,7 @@ export default async function ExplorePage({
                   优质发行
                 </h1>
                 <p className="mt-1 hidden text-sm leading-relaxed text-white/55 sm:mt-2 sm:block">
-                  听专、荐专、红心与口碑。
+                  听专、荐专，把喜欢的放进红心。
                 </p>
               </header>
               {/* 搜索略靠左；与登录/头像拉开间距 */}
@@ -246,124 +265,124 @@ export default async function ExplorePage({
 
           <div className="mt-3 grid grid-cols-1 gap-4 sm:mt-4 sm:gap-6 lg:grid-cols-12 lg:gap-8 xl:gap-10">
             <ExploreSidebar>
-                {/* 操作入口保持并列，避免侧栏顶部占用两行高度 */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  <Link
-                    href="/explore/today"
-                    className="glass-btn min-w-0 touch-manipulation px-2.5 py-2 text-center text-[12px] font-medium lg:rounded-xl"
-                  >
-                    专辑盲盒
-                  </Link>
-                  <Link
-                    href={submitHref}
-                    className="glass-btn min-w-0 touch-manipulation px-2.5 py-2 text-center text-[12px] font-medium lg:rounded-xl"
-                  >
-                    推荐专辑
-                  </Link>
-                </div>
-
-                <section aria-labelledby="browse-heading">
-                  <h2
-                    id="browse-heading"
-                    className="hidden text-[12px] font-medium text-white/50 lg:block"
-                  >
-                    浏览
-                  </h2>
-                  <nav
-                    className="scrollbar-none mt-1.5 -mx-3 flex gap-2 overflow-x-auto px-3 pb-0.5 lg:mx-0 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:px-0 lg:pb-0"
-                    aria-label="浏览筛选"
-                  >
-                    {browse.map((item) => {
-                      const active = filter === item.key;
-                      const href =
-                        item.needAuth && !session?.user
-                          ? `/login?callbackUrl=${encodeURIComponent(exploreHref(item.key, sort, q, regions, period))}`
-                          : exploreHref(item.key, sort, q, regions, period);
-                      return (
-                        <Link
-                          key={item.key}
-                          href={href}
-                          className={
-                            active
-                              ? "shrink-0 touch-manipulation rounded-full bg-white/12 px-3.5 py-2 text-[13px] font-medium text-white ring-1 ring-white/20 lg:rounded-lg lg:px-2.5 lg:py-1.5"
-                              : "shrink-0 touch-manipulation rounded-full border border-white/12 px-3.5 py-2 text-[13px] text-white/55 transition active:bg-white/8 hover:border-white/25 hover:text-white/80 lg:rounded-lg lg:px-2.5 lg:py-1.5"
-                          }
-                        >
-                          {item.label}
-                          {typeof item.count === "number" ? (
-                            <span
-                              className={
-                                active
-                                  ? "ml-1.5 tabular-nums text-white/50"
-                                  : "ml-1.5 tabular-nums text-white/35"
-                              }
-                            >
-                              {item.count}
-                            </span>
-                          ) : null}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </section>
-
-                <Suspense
-                  fallback={
-                    <div className="h-11 rounded-xl border border-white/10 bg-white/[0.03]" />
-                  }
+              {/* 操作入口保持并列，避免侧栏顶部占用两行高度 */}
+              <div className="grid grid-cols-2 gap-1.5">
+                <Link
+                  href="/explore/today"
+                  className="glass-btn min-w-0 touch-manipulation px-2.5 py-2 text-center text-[12px] font-medium lg:rounded-xl"
                 >
-                  <CatalogFilters
-                    selectedRegions={regions}
-                    selectedPeriod={period}
-                    regionCounts={catalogStats.regionCounts}
-                    periodCounts={catalogStats.periodCounts}
-                    regionEnabled={regionEnabled}
-                    regionCoverage={catalogStats.regionCoverage}
-                    catalogItems={catalogItems}
-                  />
-                </Suspense>
-
-                {/* 排序：桌面侧栏；手机在列表上方 chips */}
-                <section
-                  className="hidden lg:block"
-                  aria-labelledby="sort-heading"
+                  专辑盲盒
+                </Link>
+                <Link
+                  href={submitHref}
+                  className="glass-btn min-w-0 touch-manipulation px-2.5 py-2 text-center text-[12px] font-medium lg:rounded-xl"
                 >
-                  <h2
-                    id="sort-heading"
-                    className="text-[12px] font-medium text-white/50"
-                  >
-                    排序
-                  </h2>
-                  <nav
-                    className="mt-1.5 flex flex-col gap-1.5"
-                    aria-label="排序方式"
-                  >
-                    {SORT_OPTIONS.map((opt) => {
-                      const active = sort === opt.key;
-                      return (
-                        <Link
-                          key={opt.key}
-                          href={exploreHref(filter, opt.key, q, regions, period)}
-                          className={
-                            active
-                              ? "rounded-lg bg-[#ff6b9e]/18 px-2.5 py-1.5 text-[13px] font-medium text-[#ffc2d6] ring-1 ring-[#ff6b9e]/35"
-                              : "rounded-lg border border-white/12 px-2.5 py-1.5 text-[13px] text-white/55 transition hover:border-white/25 hover:text-white/80"
-                          }
-                        >
-                          {opt.label}
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </section>
+                  推荐专辑
+                </Link>
+              </div>
 
-                <p className="hidden border-t border-white/10 pt-3 text-[11px] leading-relaxed text-white/35 lg:mt-1 lg:block">
-                  当前：{filterLabel}
-                  {sort !== "rec" ? ` · ${sortLabel}` : ""}
-                  {q ? ` · 「${q}」` : ""}
-                  {regions.length > 0 ? ` · 地区 ${regions.length}` : ""}
-                  {period ? " · 已选年代" : ""}
-                </p>
+              <section aria-labelledby="browse-heading">
+                <h2
+                  id="browse-heading"
+                  className="hidden text-[12px] font-medium text-white/50 lg:block"
+                >
+                  浏览
+                </h2>
+                <nav
+                  className="scrollbar-none mt-1.5 -mx-3 flex gap-2 overflow-x-auto px-3 pb-0.5 lg:mx-0 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:px-0 lg:pb-0"
+                  aria-label="浏览筛选"
+                >
+                  {browse.map((item) => {
+                    const active = filter === item.key;
+                    const href =
+                      item.needAuth && !session?.user
+                        ? `/login?callbackUrl=${encodeURIComponent(exploreHref(item.key, sort, q, regions, period))}`
+                        : exploreHref(item.key, sort, q, regions, period);
+                    return (
+                      <Link
+                        key={item.key}
+                        href={href}
+                        className={
+                          active
+                            ? "shrink-0 touch-manipulation rounded-full bg-white/12 px-3.5 py-2 text-[13px] font-medium text-white ring-1 ring-white/20 lg:rounded-lg lg:px-2.5 lg:py-1.5"
+                            : "shrink-0 touch-manipulation rounded-full border border-white/12 px-3.5 py-2 text-[13px] text-white/55 transition active:bg-white/8 hover:border-white/25 hover:text-white/80 lg:rounded-lg lg:px-2.5 lg:py-1.5"
+                        }
+                      >
+                        {item.label}
+                        {typeof item.count === "number" ? (
+                          <span
+                            className={
+                              active
+                                ? "ml-1.5 tabular-nums text-white/50"
+                                : "ml-1.5 tabular-nums text-white/35"
+                            }
+                          >
+                            {item.count}
+                          </span>
+                        ) : null}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </section>
+
+              <Suspense
+                fallback={
+                  <div className="h-11 rounded-xl border border-white/10 bg-white/[0.03]" />
+                }
+              >
+                <CatalogFilters
+                  selectedRegions={regions}
+                  selectedPeriod={period}
+                  regionCounts={catalogStats.regionCounts}
+                  periodCounts={catalogStats.periodCounts}
+                  regionEnabled={regionEnabled}
+                  regionCoverage={catalogStats.regionCoverage}
+                  catalogItems={catalogItems}
+                />
+              </Suspense>
+
+              {/* 排序：桌面侧栏；手机在列表上方 chips */}
+              <section
+                className="hidden lg:block"
+                aria-labelledby="sort-heading"
+              >
+                <h2
+                  id="sort-heading"
+                  className="text-[12px] font-medium text-white/50"
+                >
+                  排序
+                </h2>
+                <nav
+                  className="mt-1.5 flex flex-col gap-1.5"
+                  aria-label="排序方式"
+                >
+                  {SORT_OPTIONS.map((opt) => {
+                    const active = sort === opt.key;
+                    return (
+                      <Link
+                        key={opt.key}
+                        href={exploreHref(filter, opt.key, q, regions, period)}
+                        className={
+                          active
+                            ? "rounded-lg bg-[#ff6b9e]/18 px-2.5 py-1.5 text-[13px] font-medium text-[#ffc2d6] ring-1 ring-[#ff6b9e]/35"
+                            : "rounded-lg border border-white/12 px-2.5 py-1.5 text-[13px] text-white/55 transition hover:border-white/25 hover:text-white/80"
+                        }
+                      >
+                        {opt.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </section>
+
+              <p className="hidden border-t border-white/10 pt-3 text-[11px] leading-relaxed text-white/35 lg:mt-1 lg:block">
+                当前：{filterLabel}
+                {sort !== "rec" ? ` · ${sortLabel}` : ""}
+                {q ? ` · 「${q}」` : ""}
+                {regions.length > 0 ? ` · 地区 ${regions.length}` : ""}
+                {period ? " · 已选年代" : ""}
+              </p>
             </ExploreSidebar>
 
             <section className="min-w-0 lg:col-span-9 xl:col-span-10">
@@ -410,7 +429,9 @@ export default async function ExplorePage({
                 </div>
               ) : filter === "heart" && !session?.user ? (
                 <div className="rounded-2xl border border-dashed border-white/15 px-4 py-16 text-center">
-                  <p className="text-sm text-white/55">登录后可查看收藏的专辑</p>
+                  <p className="text-sm text-white/55">
+                    登录后可查看收藏的专辑
+                  </p>
                   <Link
                     href={`/login?callbackUrl=${encodeURIComponent(exploreHref("heart", sort, q, regions, period))}`}
                     className="mt-4 inline-block text-sm text-[#ff8fb3] hover:underline"
@@ -424,12 +445,12 @@ export default async function ExplorePage({
                     {hasCatalogFilters
                       ? "没有符合这些分类条件的专辑"
                       : q
-                      ? `没有匹配「${q}」的专辑`
-                      : filter === "heart"
-                        ? "还没有收藏。点专辑卡片上的红心即可加入。"
-                        : filter === "all"
-                          ? "暂无专辑"
-                          : `暂无「${filterLabel}」专辑`}
+                        ? `没有匹配「${q}」的专辑`
+                        : filter === "heart"
+                          ? "还没有收藏。点专辑卡片上的红心即可加入。"
+                          : filter === "all"
+                            ? "暂无专辑"
+                            : `暂无「${filterLabel}」专辑`}
                   </p>
                   {hasCatalogFilters ? (
                     <Link
@@ -440,14 +461,26 @@ export default async function ExplorePage({
                     </Link>
                   ) : q ? (
                     <Link
-                      href={exploreHref(filter, sort, undefined, regions, period)}
+                      href={exploreHref(
+                        filter,
+                        sort,
+                        undefined,
+                        regions,
+                        period,
+                      )}
                       className="mt-4 inline-block text-sm text-[#ff8fb3] hover:underline"
                     >
                       清除搜索 →
                     </Link>
                   ) : filter !== "all" ? (
                     <Link
-                      href={exploreHref("all", sort, undefined, regions, period)}
+                      href={exploreHref(
+                        "all",
+                        sort,
+                        undefined,
+                        regions,
+                        period,
+                      )}
                       className="mt-4 inline-block text-sm text-[#ff8fb3] hover:underline"
                     >
                       查看全部 →
@@ -468,10 +501,13 @@ export default async function ExplorePage({
               ) : (
                 <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                   {visible.map((r) => (
-                    <li key={r.id}>
+                    <li
+                      key={`${r.id}:${mine.has(r.id)}:${myScores.get(r.id) ?? ""}:${r.owner_loved}:${r.rating_avg ?? ""}:${r.rating_count ?? 0}`}
+                    >
                       <ReleaseCard
                         release={r}
                         loggedIn={Boolean(session?.user)}
+                        interactionsEnabled={interactionsEnabled}
                         initialFavorited={mine.has(r.id)}
                         initialMineScore={myScores.get(r.id) ?? null}
                       />

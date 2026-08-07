@@ -25,7 +25,7 @@ export default async function AdminUsersPage() {
   return (
     <AdminShell
       title="账号与角色"
-      subtitle="站主可将信任用户设为「管理」，协助审核。勿随意给陌生人开管理。"
+      subtitle="管理账号角色，并按用户开放评分与评论内测。"
       isOwner
       active="users"
       pending={pending}

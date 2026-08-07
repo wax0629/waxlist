@@ -6,10 +6,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useRef, useState } from "react";
 import { AppRail } from "@/components/app-rail";
 import { BackLink } from "@/components/back-link";
-import {
-  CATALOG_REGIONS,
-  type CatalogRegion,
-} from "@/lib/releases/catalog";
+import { CATALOG_REGIONS, type CatalogRegion } from "@/lib/releases/catalog";
 import {
   formatSelectedTracks,
   TrackSelectList,
@@ -40,6 +37,7 @@ export default function SubmitReleasePage() {
   const [selectedTrackIdx, setSelectedTrackIdx] = useState<number[]>([]);
   const [type, setType] = useState<ReleaseType>("album");
   const [regions, setRegions] = useState<CatalogRegion[]>([]);
+  const [udg, setUdg] = useState(false);
   const [meta, setMeta] = useState<ResolvedMeta | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [resolving, setResolving] = useState(false);
@@ -120,6 +118,7 @@ export default function SubmitReleasePage() {
           reason,
           tracks: formatSelectedTracks(trackList, selectedTrackIdx),
           regions,
+          udg,
           ...(isOwner && friend ? { friend: true } : {}),
         }),
       });
@@ -143,6 +142,7 @@ export default function SubmitReleasePage() {
       setSelectedTrackIdx([]);
       setFriend(false);
       setRegions([]);
+      setUdg(false);
       setMeta(null);
       lastResolved.current = "";
     } catch (err) {
@@ -254,7 +254,9 @@ export default function SubmitReleasePage() {
                   <p className="mt-1 text-xs text-white/35">{meta.company}</p>
                 ) : null}
                 {resolving ? (
-                  <p className="mt-1 text-xs text-[#ff8fb3]">正在拉取网易云信息…</p>
+                  <p className="mt-1 text-xs text-[#ff8fb3]">
+                    正在拉取网易云信息…
+                  </p>
                 ) : meta ? (
                   <p className="mt-1 text-xs text-emerald-300/80">
                     已自动填充，可改字段后提交
@@ -336,17 +338,37 @@ export default function SubmitReleasePage() {
               目前网易云数据没有稳定的地区字段，无法可靠判断时请留空，由后台补录。
             </p>
           </fieldset>
+          <fieldset className="block text-sm text-white/70">
+            <legend>风格（可选）</legend>
+            <button
+              type="button"
+              aria-pressed={udg}
+              onClick={() => setUdg((current) => !current)}
+              className={
+                udg
+                  ? "mt-2 min-h-11 rounded-xl bg-[#ff6b9e]/18 px-4 text-[13px] font-medium text-[#ffc2d6] ring-1 ring-[#ff6b9e]/35"
+                  : "mt-2 min-h-11 rounded-xl border border-white/15 px-4 text-[13px] text-white/60 hover:border-white/30 hover:text-white"
+              }
+            >
+              UDG
+            </button>
+            <p className="mt-2 text-[12px] leading-relaxed text-white/40">
+              勾选后，这张专辑上架时会同时进入 UDG 专区。
+            </p>
+          </fieldset>
           <label className="block text-sm text-white/70">
-            推荐理由
+            推荐理由（可选）
             <textarea
-              required
-              minLength={4}
               rows={4}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="为什么值得听？"
+              placeholder="想说的话可以写在这里，也可以留空"
+              maxLength={2000}
               className={`${inputCls} resize-y`}
             />
+            <span className="mt-1.5 block text-[12px] leading-relaxed text-white/40">
+              不填写也能正常推荐。
+            </span>
           </label>
 
           <div className="block text-sm text-white/70">

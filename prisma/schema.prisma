@@ -11,25 +11,27 @@ datasource db {
 }
 
 model User {
-  id           String   @id
+  id              String   @id
   /// 邮箱登录；与 phone 至少填一个
-  email        String?  @unique
+  email           String?  @unique
   /// 手机号（国内 11 位规范化存储）
-  phone        String?  @unique
-  name         String
+  phone           String?  @unique
+  name            String
   /// 可选：旧版密码登录遗留字段，新流程不再使用
-  passwordHash String?  @map("password_hash")
+  passwordHash    String?  @map("password_hash")
   /// owner | admin | user
-  role         String   @default("user")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  role            String   @default("user")
+  /// 小范围开放评分 / 评论；站主始终可用
+  interactionBeta Boolean  @default(false) @map("interaction_beta")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-  releases         Release[]         @relation("ReleaseCreator")
-  favorites        Favorite[]
-  recommendations  Recommendation[]
-  trackRecs        TrackRecommendation[]
-  ratings          Rating[]
-  comments         ReleaseComment[]
+  releases        Release[]             @relation("ReleaseCreator")
+  favorites       Favorite[]
+  recommendations Recommendation[]
+  trackRecs       TrackRecommendation[]
+  ratings         Rating[]
+  comments        ReleaseComment[]
 
   @@map("users")
 }
@@ -52,38 +54,38 @@ model AuthOtp {
 }
 
 model Release {
-  id              String   @id
+  id              String                @id
   title           String
   artists         String[]
   /// single | ep | album | other
-  type            String   @default("album")
-  neteaseId       String?  @map("netease_id")
-  neteaseUrl      String?  @map("netease_url")
-  coverUrl        String?  @map("cover_url")
-  tags            String[] @default([])
+  type            String                @default("album")
+  neteaseId       String?               @map("netease_id")
+  neteaseUrl      String?               @map("netease_url")
+  coverUrl        String?               @map("cover_url")
+  tags            String[]              @default([])
   /// cn | jp | western | other; empty means not classified yet
-  regions         String[] @default([])
+  regions         String[]              @default([])
   description     String?
-  curatorialNote  String?  @map("curatorial_note")
+  curatorialNote  String?               @map("curatorial_note")
   /// owner | community — who first added the entry
   source          String
   /// draft | pending | published | rejected
-  status          String   @default("draft")
+  status          String                @default("draft")
   /// 站主是否点过红心（缓存：任一 owner 用户收藏时为 true，用于标签与排序）
-  ownerLoved      Boolean  @default(false) @map("owner_loved")
+  ownerLoved      Boolean               @default(false) @map("owner_loved")
   /// [{ label, url }]
-  links           Json     @default("[]")
-  sortOrder       Int?     @map("sort_order")
-  createdById     String?  @map("created_by")
-  createdBy       User?    @relation("ReleaseCreator", fields: [createdById], references: [id])
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  ratingAvg       Float?   @map("rating_avg")
-  ratingCount     Int      @default(0) @map("rating_count")
+  links           Json                  @default("[]")
+  sortOrder       Int?                  @map("sort_order")
+  createdById     String?               @map("created_by")
+  createdBy       User?                 @relation("ReleaseCreator", fields: [createdById], references: [id])
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  ratingAvg       Float?                @map("rating_avg")
+  ratingCount     Int                   @default(0) @map("rating_count")
   /// 曲目名列表（解析网易云时缓存）
-  tracklist       String[] @default([])
+  tracklist       String[]              @default([])
   /// 专辑/发行日期（网易云 publishTime 等）
-  releasedAt      DateTime? @map("released_at")
+  releasedAt      DateTime?             @map("released_at")
   favorites       Favorite[]
   recommendations Recommendation[]
   trackRecs       TrackRecommendation[]
@@ -133,23 +135,23 @@ model Rating {
   @@map("ratings")
 }
 
-/// 用户推荐：首推理由 + 可选曲目；后续可再推
+/// 用户推荐：可选推荐理由 + 可选曲目；后续可再推
 model Recommendation {
-  id          String   @id
-  releaseId   String   @map("release_id")
-  userId      String   @map("user_id")
-  /// 推荐理由（必填）
-  reason      String
+  id        String   @id
+  releaseId String   @map("release_id")
+  userId    String   @map("user_id")
+  /// 推荐理由（可留空；保留非空字段以兼容历史数据）
+  reason    String
   /// 推荐曲目，换行或逗号分隔曲名
-  tracks      String?
+  tracks    String?
   /// 是否该发行的首条推荐
-  isFirst     Boolean  @default(false) @map("is_first")
+  isFirst   Boolean  @default(false) @map("is_first")
   /// pending | published | rejected
-  status      String   @default("pending")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  release   Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([releaseId, status])
   @@index([userId])

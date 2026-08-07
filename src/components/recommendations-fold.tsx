@@ -32,9 +32,13 @@ export function RecommendationsFold({
               {new Date(first.created_at).toLocaleDateString("zh-CN")}
             </time>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-white/85">
-            {first.reason}
-          </p>
+          {first.reason.trim() ? (
+            <p className="mt-2 text-sm leading-relaxed text-white/85">
+              {first.reason}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-white/50">推荐了这张专辑</p>
+          )}
           {first.tracks ? (
             <p className="mt-2 text-xs text-white/50">
               推荐曲目：{first.tracks.replace(/\n/g, "、")}
@@ -43,7 +47,7 @@ export function RecommendationsFold({
         </article>
       ) : (
         <p className="px-4 py-3 text-sm text-white/50">
-          还没有推荐理由，来当第一位吧。
+          还没有人推荐，来当第一位吧。
         </p>
       )}
 
@@ -74,9 +78,15 @@ export function RecommendationsFold({
                       {new Date(rec.created_at).toLocaleDateString("zh-CN")}
                     </time>
                   </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-white/80">
-                    {rec.reason}
-                  </p>
+                  {rec.reason.trim() ? (
+                    <p className="mt-1.5 text-sm leading-relaxed text-white/80">
+                      {rec.reason}
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-sm text-white/45">
+                      推荐了这张专辑
+                    </p>
+                  )}
                   {rec.tracks ? (
                     <p className="mt-1 text-xs text-white/45">
                       推荐曲目：{rec.tracks.replace(/\n/g, "、")}

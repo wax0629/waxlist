@@ -3,6 +3,7 @@ import { AppRail } from "@/components/app-rail";
 import { BackLink } from "@/components/back-link";
 import { DailyPickExperience } from "@/components/daily-pick-experience";
 import { auth } from "@/lib/auth";
+import { canUseCommunityInteractions } from "@/lib/auth/roles";
 import { isFavorited } from "@/lib/favorites/store";
 import { getUserRating } from "@/lib/ratings/store";
 import { getDailyPick } from "@/lib/releases/daily-pick";
@@ -15,10 +16,19 @@ export default async function TodayPickPage() {
 
   let favorited = false;
   let myRating: number | null = null;
+  const interactionsEnabled = Boolean(
+    session?.user &&
+      canUseCommunityInteractions(
+        session.user.role,
+        session.user.interactionBeta,
+      ),
+  );
   if (session?.user?.id && pick) {
     [favorited, myRating] = await Promise.all([
       isFavorited(session.user.id, pick.release.id),
-      getUserRating(pick.release.id, session.user.id),
+      interactionsEnabled
+        ? getUserRating(pick.release.id, session.user.id)
+        : Promise.resolve(null),
     ]);
   }
 
@@ -35,6 +45,7 @@ export default async function TodayPickPage() {
             <DailyPickExperience
               initial={pick}
               loggedIn={Boolean(session?.user)}
+              interactionsEnabled={interactionsEnabled}
               initialFavorited={favorited}
               initialMineScore={myRating}
             />

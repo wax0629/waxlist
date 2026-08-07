@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { canUseCommunityInteractions } from "@/lib/auth/roles";
 import { getUserRating, setRating } from "@/lib/ratings/store";
 import { z } from "zod";
 
@@ -27,6 +28,17 @@ export async function POST(req: Request, ctx: Ctx) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "请先登录" }, { status: 401 });
+  }
+  if (
+    !canUseCommunityInteractions(
+      session.user.role,
+      session.user.interactionBeta,
+    )
+  ) {
+    return NextResponse.json(
+      { error: "评分功能暂未向当前账号开放" },
+      { status: 403 },
+    );
   }
   const { id } = await ctx.params;
   try {

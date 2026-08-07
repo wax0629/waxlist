@@ -11,7 +11,7 @@ import { z } from "zod";
 export const runtime = "nodejs";
 
 const SubmitBody = z.object({
-  reason: z.string().min(4).max(2000),
+  reason: z.string().max(2000).optional().default(""),
   tracks: z.string().max(2000).optional(),
   release_id: z.string().optional(),
   netease_url: z.string().optional(),
@@ -23,6 +23,8 @@ const SubmitBody = z.object({
   regions: z.array(z.enum(CATALOG_REGION_KEYS)).max(4).optional(),
   /** Owner-only: pink「友情」badge */
   friend: z.boolean().optional(),
+  /** UDG style / section classification; available to all submitters. */
+  udg: z.boolean().optional(),
 });
 
 /** Submit a recommendation (login required). */
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
       tags: body.tags,
       regions: body.regions,
       friend: body.friend,
+      udg: body.udg,
     });
     return NextResponse.json(
       {

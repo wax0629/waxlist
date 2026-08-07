@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import {
@@ -15,11 +14,13 @@ export function CommentSection({
   initialComments,
   initialMineScore,
   loggedIn,
+  canComment = true,
 }: {
   releaseId: string;
   initialComments: CommentPublic[];
   initialMineScore?: number | null;
   loggedIn: boolean;
+  canComment?: boolean;
 }) {
   const router = useRouter();
   const [comments, setComments] = useState(initialComments);
@@ -74,7 +75,7 @@ export function CommentSection({
         ) : null}
       </h2>
 
-      {loggedIn ? (
+      {canComment ? (
         <form onSubmit={onSubmit} className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-xs text-white/50">你的评分</span>
@@ -113,14 +114,8 @@ export function CommentSection({
           </button>
         </form>
       ) : (
-        <p className="mt-4 text-sm text-white/55">
-          <Link
-            href={`/login?callbackUrl=/explore/${releaseId}`}
-            className="text-[#ff8fb3] hover:underline"
-          >
-            登录
-          </Link>
-          后评论
+        <p className="mt-4 text-sm text-white/45">
+          评论发布暂未向当前账号开放，你仍可以查看已有评论。
         </p>
       )}
 

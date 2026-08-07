@@ -53,7 +53,7 @@ npm run db:push-schema-prod  # 仅结构 → Neon（需 DATABASE_URL_PROD）
 |------|------|
 | `owner` | 站主：爱听库、最高权限 |
 | `admin` | 管理：浏览近期荐专、事后下架、运营工具 |
-| `user` | 普通用户：推荐、打分 |
+| `user` | 普通用户：查看评分评论、推荐、红心；发布评分/评论由站主按账号开放内测 |
 
 登录页：`/login`（邮箱 + 密码）。注册页：`/register`（邮箱 + 密码）。精选：`/explore`。
 

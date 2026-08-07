@@ -11,6 +11,7 @@ export interface StoredUser {
   name: string;
   password_hash?: string;
   role: UserRole;
+  interaction_beta: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +25,7 @@ function toStored(u: {
   name: string;
   passwordHash: string | null;
   role: string;
+  interactionBeta: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): StoredUser {
@@ -34,14 +36,23 @@ function toStored(u: {
     name: u.name,
     password_hash: u.passwordHash ?? undefined,
     role: u.role as UserRole,
+    interaction_beta: u.interactionBeta,
     created_at: u.createdAt.toISOString(),
     updated_at: u.updatedAt.toISOString(),
   };
 }
 
 function toPublic(u: StoredUser): PublicUser {
-  const { password_hash: _, ...rest } = u;
-  return rest;
+  return {
+    id: u.id,
+    email: u.email,
+    phone: u.phone,
+    name: u.name,
+    role: u.role,
+    interaction_beta: u.interaction_beta,
+    created_at: u.created_at,
+    updated_at: u.updated_at,
+  };
 }
 
 export async function listUsers(): Promise<PublicUser[]> {
@@ -247,6 +258,23 @@ export async function setUserRole(
   const row = await prisma.user.update({
     where: { id: userId },
     data: { role },
+  });
+  return toPublic(toStored(row));
+}
+
+export async function setUserInteractionBeta(
+  userId: string,
+  enabled: boolean,
+  actorRole: UserRole,
+): Promise<PublicUser> {
+  if (actorRole !== "owner") {
+    throw new Error("仅站主可调整互动内测权限");
+  }
+  const user = await findUserById(userId);
+  if (!user) throw new Error("用户不存在");
+  const row = await prisma.user.update({
+    where: { id: userId },
+    data: { interactionBeta: enabled },
   });
   return toPublic(toStored(row));
 }

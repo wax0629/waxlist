@@ -10,6 +10,7 @@ export function RatingPanel({
   initialCount,
   initialMine,
   loggedIn,
+  canRate = true,
   callbackUrl,
   compact = false,
 }: {
@@ -18,6 +19,7 @@ export function RatingPanel({
   initialCount?: number;
   initialMine?: number | null;
   loggedIn: boolean;
+  canRate?: boolean;
   callbackUrl?: string;
   compact?: boolean;
 }) {
@@ -69,16 +71,22 @@ export function RatingPanel({
     return (
       <div>
         <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
-          <StarsPicker
-            value={mine}
-            hover={hover}
-            onHover={setHover}
-            onPick={(s) => void pick(s)}
-            disabled={busy}
-            size={20}
-          />
+          {canRate ? (
+            <StarsPicker
+              value={mine}
+              hover={hover}
+              onHover={setHover}
+              onPick={(s) => void pick(s)}
+              disabled={busy}
+              size={20}
+            />
+          ) : (
+            <StarsDisplay score={avg != null && count > 0 ? avg : 0} size={20} />
+          )}
           <span className="shrink-0 text-[11px] tabular-nums text-amber-100/80">
-            {hover != null
+            {!canRate
+              ? "评分暂未开放"
+              : hover != null
               ? `${hover} 分`
               : mine != null
                 ? `我的 ${mine} 分`
@@ -107,23 +115,29 @@ export function RatingPanel({
         ) : null}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-3">
-        <StarsPicker
-          value={mine}
-          hover={hover}
-          onHover={setHover}
-          onPick={(s) => void pick(s)}
-          disabled={busy}
-          size={28}
-        />
-        {hover != null || mine != null ? (
-          <span className="text-xs tabular-nums text-white/50">
-            {hover != null
-              ? `${hoverStars?.toFixed(1)} 星`
-              : `${scoreToStars(mine).toFixed(1)} 星`}
-          </span>
-        ) : null}
-      </div>
+      {canRate ? (
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <StarsPicker
+            value={mine}
+            hover={hover}
+            onHover={setHover}
+            onPick={(s) => void pick(s)}
+            disabled={busy}
+            size={28}
+          />
+          {hover != null || mine != null ? (
+            <span className="text-xs tabular-nums text-white/50">
+              {hover != null
+                ? `${hoverStars?.toFixed(1)} 星`
+                : `${scoreToStars(mine).toFixed(1)} 星`}
+            </span>
+          ) : null}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-white/40">
+          评分发布暂未向当前账号开放
+        </p>
+      )}
       {error ? <p className="mt-1.5 text-xs text-rose-300">{error}</p> : null}
     </div>
   );

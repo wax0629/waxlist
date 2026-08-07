@@ -12,11 +12,13 @@ import { formatReleasedAt } from "@/lib/releases/format";
 export function DailyPickExperience({
   initial,
   loggedIn,
+  interactionsEnabled,
   initialFavorited,
   initialMineScore,
 }: {
   initial: DailyPickPayload;
   loggedIn: boolean;
+  interactionsEnabled: boolean;
   initialFavorited: boolean;
   initialMineScore: number | null;
 }) {
@@ -51,7 +53,9 @@ export function DailyPickExperience({
       if (loggedIn) {
         const [favoriteRes, ratingRes] = await Promise.all([
           fetch(`/api/releases/${data.release.id}/favorite`),
-          fetch(`/api/releases/${data.release.id}/rate`),
+          interactionsEnabled
+            ? fetch(`/api/releases/${data.release.id}/rate`)
+            : Promise.resolve(null),
         ]);
         if (favoriteRes.ok) {
           const favoriteData = (await favoriteRes.json()) as {
@@ -59,7 +63,7 @@ export function DailyPickExperience({
           };
           nextFavorited = Boolean(favoriteData.favorited);
         }
-        if (ratingRes.ok) {
+        if (ratingRes?.ok) {
           const ratingData = (await ratingRes.json()) as {
             score?: number | null;
           };
@@ -83,7 +87,7 @@ export function DailyPickExperience({
     } finally {
       setBusyNext(false);
     }
-  }, [loggedIn, seen]);
+  }, [interactionsEnabled, loggedIn, seen]);
 
   async function toggleHeart() {
     if (busyHeart) return;
@@ -268,7 +272,7 @@ export function DailyPickExperience({
                 <div className="mt-5 border-t border-white/10 pt-4">
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <p className="text-[11px] font-medium text-white/70">
-                      给这张专辑打分
+                      {interactionsEnabled ? "给这张专辑打分" : "专辑评分"}
                     </p>
                     <span className="text-[10px] text-white/40">1–10 分</span>
                   </div>
@@ -279,6 +283,7 @@ export function DailyPickExperience({
                     initialCount={r.rating_count ?? 0}
                     initialMine={mineScore}
                     loggedIn={loggedIn}
+                    canRate={interactionsEnabled}
                     callbackUrl="/explore/today"
                     compact
                   />

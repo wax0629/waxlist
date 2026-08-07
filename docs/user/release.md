@@ -26,25 +26,21 @@ bash -n scripts/deploy-prod.sh
 git diff --check
 ```
 
-全量 `npm run lint` 当前仍有存量问题，数量与范围见根目录
-[HANDOFF.md](../../HANDOFF.md)。本次改动涉及的文件必须单独通过 ESLint。
+本次改动文件的定向 ESLint 与 production build 必须通过。全量 `npm run lint`
+当前仍会命中旧页面的 React 19 严格规则，清单见 `HANDOFF.md`；清零前不能把
+“全量 lint 通过”写进发版结果。
 
 ### 2. GitHub 留痕
 
 ```bash
-git switch -c codex/<简短主题>
+git switch main
 git add <本次文件>
 git commit -m "<说明改动>"
-git push -u origin codex/<简短主题>
+git push origin main
 ```
 
-在 GitHub 创建 PR，写明改动、验证结果、风险与回滚方式。确认后合并到
-`main`，再同步本地：
-
-```bash
-git switch main
-git pull --ff-only origin main
-```
+这是个人项目，日常小版本可以直接提交到 `main`；重要的是让代码、文档与部署
+提交保持一致。需要多人评审时再使用 PR，不作为部署脚本的强制前置条件。
 
 ### 3. 部署生产
 
@@ -74,9 +70,11 @@ git rev-parse origin/main
 
 1. `/explore` 可打开，封面与 favicon 正常。
 2. `/explore/today` 可开盒；桌面端为等宽书页布局，移动端上下排列。
-3. 盲盒显示发行日期，评分和红心可交互。
+3. 盲盒显示发行日期、公开评分和红心；只有站主或互动内测账号可发布评分。
 4. `/login` 可登录，刷新后会话仍在。
 5. `/about` 可提交反馈。
+6. 普通账号能查看均分与评论但不能发布；站主可在 `/admin/users` 开关“互动内测”，目标账号重新登录后获得发布能力。
+7. `/explore?filter=udg` 只显示带 `UDG` 标签的专辑；普通账号荐专时也能选择该风格。
 
 ## 回滚
 

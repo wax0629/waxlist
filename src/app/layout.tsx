@@ -25,7 +25,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Waxlist",
   description:
-    "听专、荐专与口碑 · 站内 Beat Hunter 帮你找可试听伴奏",
+    "听专、荐专与红心 · 站内 Beat Hunter 帮你找可试听伴奏",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

@@ -10,7 +10,11 @@ import {
   type CSSProperties,
 } from "react";
 import { HeartIcon } from "@/components/action-icons";
-import { StarsPicker, scoreToStars } from "@/components/star-rating";
+import {
+  scoreToStars,
+  StarsDisplay,
+  StarsPicker,
+} from "@/components/star-rating";
 import { formatReleasedAt } from "@/lib/releases/format";
 import { hasFriendTag } from "@/lib/releases/friend-tag";
 import type { Release } from "@/lib/releases/types";
@@ -26,7 +30,7 @@ function ScrollTitle({ text }: { text: string }) {
     const el = textRef.current;
     if (!wrap || !el) return;
     setOverflow(Math.max(0, el.scrollWidth - wrap.clientWidth));
-  }, [text]);
+  }, []);
 
   useEffect(() => {
     measure();
@@ -38,7 +42,7 @@ function ScrollTitle({ text }: { text: string }) {
     const ro = new ResizeObserver(() => measure());
     ro.observe(wrap);
     return () => ro.disconnect();
-  }, [measure]);
+  }, [measure, text]);
 
   const durationSec =
     overflow > 0 ? Math.min(14, Math.max(2.5, overflow / 28)) : 0.2;
@@ -70,14 +74,17 @@ export function ReleaseCard({
   release,
   /** 当前用户是否已收藏 */
   initialFavorited = false,
-  /** 是否已登录（未登录点红心/评分去登录） */
+  /** 是否已登录（未登录点红心去登录） */
   loggedIn = false,
+  /** 当前账号是否在评分 / 评论内测范围 */
+  interactionsEnabled = false,
   /** 我的评分 1–10，未评 null */
   initialMineScore = null,
 }: {
   release: Release;
   initialFavorited?: boolean;
   loggedIn?: boolean;
+  interactionsEnabled?: boolean;
   initialMineScore?: number | null;
 }) {
   const router = useRouter();
@@ -94,24 +101,6 @@ export function ReleaseCard({
   const [mine, setMine] = useState<number | null>(initialMineScore);
   const [hover, setHover] = useState<number | null>(null);
   const [rateBusy, setRateBusy] = useState(false);
-
-  useEffect(() => {
-    setFavorited(initialFavorited);
-  }, [initialFavorited]);
-
-  useEffect(() => {
-    setMine(initialMineScore);
-  }, [initialMineScore]);
-
-  useEffect(() => {
-    setOwnerLoved(release.owner_loved);
-    setAvg(
-      release.rating_count && release.rating_avg != null
-        ? release.rating_avg
-        : null,
-    );
-    setCount(release.rating_count ?? 0);
-  }, [release.owner_loved, release.rating_avg, release.rating_count]);
 
   async function toggleHeart(e: React.MouseEvent) {
     e.preventDefault();
@@ -263,33 +252,53 @@ export function ReleaseCard({
               {dateText || "\u00a0"}
             </p>
           </Link>
-          <div
-            className="mt-1 flex h-4 min-w-0 items-center gap-1"
-            role="group"
-            aria-label="评分"
-            title={scoreTitle}
-          >
-            <StarsPicker
-              value={mine}
-              hover={hover}
-              onHover={setHover}
-              onPick={(s) => void rate(s)}
-              disabled={rateBusy}
-              size={14}
-            />
-            <span
-              className={[
-                "shrink-0 text-[10px] tabular-nums leading-none",
-                hover != null || mine != null
-                  ? "text-amber-200/90"
-                  : scoreLabel === "0.0"
-                    ? "text-white/35"
-                    : "text-white/45",
-              ].join(" ")}
+          {interactionsEnabled ? (
+            <div
+              className="mt-1 flex h-4 min-w-0 items-center gap-1"
+              role="group"
+              aria-label="评分"
+              title={scoreTitle}
             >
-              {scoreLabel}
-            </span>
-          </div>
+              <StarsPicker
+                value={mine}
+                hover={hover}
+                onHover={setHover}
+                onPick={(s) => void rate(s)}
+                disabled={rateBusy}
+                size={14}
+              />
+              <span
+                className={[
+                  "shrink-0 text-[10px] tabular-nums leading-none",
+                  hover != null || mine != null
+                    ? "text-amber-200/90"
+                    : scoreLabel === "0.0"
+                      ? "text-white/35"
+                      : "text-white/45",
+                ].join(" ")}
+              >
+                {scoreLabel}
+              </span>
+            </div>
+          ) : (
+            <div
+              className="mt-1 flex h-4 min-w-0 items-center gap-1"
+              aria-label={
+                count > 0 && avg != null
+                  ? `均分 ${avg.toFixed(1)}，${count} 人评分`
+                  : "暂无评分"
+              }
+            >
+              <StarsDisplay
+                score={count > 0 && avg != null ? avg : 0}
+                size={14}
+                className="text-amber-300/75"
+              />
+              <span className="shrink-0 text-[10px] tabular-nums leading-none text-white/45">
+                {count > 0 && avg != null ? avg.toFixed(1) : "0.0"}
+              </span>
+            </div>
+          )}
         </div>
         <button
           type="button"

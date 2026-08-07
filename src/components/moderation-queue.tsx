@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { PendingReleaseRow } from "@/lib/recommendations/types";
 
 export function ModerationQueue({
@@ -15,10 +15,6 @@ export function ModerationQueue({
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    setItems(initialItems);
-  }, [initialItems]);
 
   async function act(
     id: string,
@@ -206,7 +202,7 @@ export function ModerationQueue({
                           </span>
                         </p>
                         <p className="mt-1.5 text-sm leading-relaxed text-white/82">
-                          {rec.reason}
+                          {rec.reason.trim() || "未填写推荐理由"}
                         </p>
                       </div>
                     ))

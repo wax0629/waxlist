@@ -25,6 +25,7 @@ export default function OwnerReleasesPage() {
   );
   const [sortOrder, setSortOrder] = useState("0");
   const [friend, setFriend] = useState(false);
+  const [udg, setUdg] = useState(false);
 
   const isOwner = session?.user?.role === "owner";
 
@@ -66,7 +67,11 @@ export default function OwnerReleasesPage() {
               .map((s) => s.trim())
               .filter(Boolean);
             if (friend && !base.includes("友情")) base.push("友情");
-            return base;
+            const withoutUdg = base.filter(
+              (tag) => tag.toLocaleLowerCase() !== "udg",
+            );
+            if (udg) withoutUdg.push("UDG");
+            return withoutUdg;
           })(),
           sort_order: Number(sortOrder) || 0,
         }),
@@ -81,6 +86,7 @@ export default function OwnerReleasesPage() {
       setNeteaseUrl("");
       setTags("");
       setFriend(false);
+      setUdg(false);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");
@@ -103,7 +109,10 @@ export default function OwnerReleasesPage() {
         <AppRail />
         <main className="mx-auto max-w-md flex-1 px-4 py-16 text-center">
           <p>请先以站主账号登录。</p>
-          <Link href="/login?callbackUrl=/owner/releases" className="mt-4 inline-block text-[#ff8fb3]">
+          <Link
+            href="/login?callbackUrl=/owner/releases"
+            className="mt-4 inline-block text-[#ff8fb3]"
+          >
             去登录 →
           </Link>
         </main>
@@ -169,9 +178,7 @@ export default function OwnerReleasesPage() {
             <Field label="类型">
               <select
                 value={type}
-                onChange={(e) =>
-                  setType(e.target.value as typeof type)
-                }
+                onChange={(e) => setType(e.target.value as typeof type)}
                 className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#121212] px-3 py-2.5 text-white outline-none focus:border-white/35"
               >
                 <option value="album">专辑</option>
@@ -195,6 +202,23 @@ export default function OwnerReleasesPage() {
               placeholder="underground, trap"
               className="mt-1.5 w-full rounded-xl border border-white/15 bg-transparent px-3 py-2.5 text-white outline-none focus:border-white/35"
             />
+          </Field>
+          <Field label="风格（可选）">
+            <button
+              type="button"
+              aria-pressed={udg}
+              onClick={() => setUdg((current) => !current)}
+              className={
+                udg
+                  ? "mt-1.5 min-h-11 rounded-xl bg-[#ff6b9e]/18 px-4 text-[13px] font-medium text-[#ffc2d6] ring-1 ring-[#ff6b9e]/35"
+                  : "mt-1.5 min-h-11 rounded-xl border border-white/15 px-4 text-[13px] text-white/60 hover:border-white/30 hover:text-white"
+              }
+            >
+              UDG
+            </button>
+            <span className="mt-1.5 block text-[12px] text-white/40">
+              勾选后进入 UDG 专区。
+            </span>
           </Field>
           <Field label="我为什么爱听 *">
             <textarea
@@ -243,7 +267,10 @@ export default function OwnerReleasesPage() {
               >
                 <span className="truncate">
                   {r.title}
-                  <span className="text-white/40"> · {r.artists.join("/")}</span>
+                  <span className="text-white/40">
+                    {" "}
+                    · {r.artists.join("/")}
+                  </span>
                 </span>
                 <Link
                   href={`/explore/${r.id}`}

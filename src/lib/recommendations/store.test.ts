@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   recommendation: {
     count: vi.fn(),
+    findMany: vi.fn(),
     findFirst: vi.fn(),
     create: vi.fn(),
     updateMany: vi.fn(),
@@ -82,6 +83,47 @@ describe("recommendation publishing", () => {
       is_new_release: true,
       status: "published",
     });
+  });
+
+  it("lets an ordinary user classify a submission as UDG", async () => {
+    mocks.createRelease.mockResolvedValue({ id: "release-udg" });
+
+    await submitRecommendation({
+      userId: "user-udg",
+      role: "user",
+      netease_url: "https://music.163.com/album?id=789",
+      title: "UDG Album",
+      artists: ["Test Artist"],
+      tags: ["udg", "independent"],
+      udg: true,
+    });
+
+    expect(mocks.createRelease).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tags: ["independent", "UDG"],
+      }),
+    );
+  });
+
+  it("publishes when the optional recommendation reason is empty", async () => {
+    mocks.createRelease.mockResolvedValue({ id: "release-without-reason" });
+
+    const result = await submitRecommendation({
+      userId: "user-without-reason",
+      role: "user",
+      netease_url: "https://music.163.com/album?id=456",
+      title: "Quiet Recommendation",
+      artists: ["Test Artist"],
+    });
+
+    expect(mocks.recommendation.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        releaseId: "release-without-reason",
+        reason: "",
+        status: "published",
+      }),
+    });
+    expect(result.status).toBe("published");
   });
 
   it("promotes a legacy pending release when it is recommended again", async () => {

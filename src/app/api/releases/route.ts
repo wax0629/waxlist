@@ -4,6 +4,7 @@ import { canModerate } from "@/lib/auth/roles";
 import { parseNeteaseUrl } from "@/lib/netease/parse";
 import { CATALOG_REGION_KEYS } from "@/lib/releases/catalog";
 import { createRelease, listReleases } from "@/lib/releases/store";
+import { hasUdgTag, mergeUdgFlag } from "@/lib/releases/udg";
 import type { ReleaseSource, ReleaseStatus } from "@/lib/releases/types";
 import { z } from "zod";
 
@@ -90,7 +91,7 @@ export async function POST(req: Request) {
       netease_id,
       netease_url,
       cover_url: body.cover_url?.trim() || undefined,
-      tags: body.tags,
+      tags: mergeUdgFlag(body.tags, hasUdgTag(body.tags)),
       regions: body.regions,
       description: body.description,
       curatorial_note: body.curatorial_note,
@@ -98,9 +99,7 @@ export async function POST(req: Request) {
       status,
       sort_order: body.sort_order,
       created_by: session.user.id,
-      links: netease_url
-        ? [{ label: "网易云", url: netease_url }]
-        : [],
+      links: netease_url ? [{ label: "网易云", url: netease_url }] : [],
     });
     return NextResponse.json({ release }, { status: 201 });
   } catch (err) {

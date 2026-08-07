@@ -268,7 +268,7 @@ git pull --ff-only origin main
 
 1. `https://你的域名/explore` 能打开  
 2. 注册 / 登录  
-3. 荐专、红心、评分  
+3. 荐专、红心；站主或互动内测账号可评分、评论
 4. `/chat` 找伴奏（有 `YOUTUBE_API_KEY` 时）  
 5. 登录态刷新后还在（检查 `AUTH_URL` / `AUTH_SECRET`）
 

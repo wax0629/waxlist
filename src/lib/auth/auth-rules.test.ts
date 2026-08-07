@@ -9,6 +9,7 @@ import {
   canManageOwnerContent,
   canModerate,
   canParticipate,
+  canUseCommunityInteractions,
   isOwner,
   isStaff,
   type UserRole,
@@ -92,5 +93,15 @@ describe("role permissions", () => {
     expect(canManageOwnerContent(undefined)).toBe(false);
     expect(canModerate(null)).toBe(false);
     expect(canParticipate(undefined)).toBe(false);
+  });
+
+  it("limits rating and comments to owners or explicitly selected beta users", () => {
+    expect(canUseCommunityInteractions("owner", false)).toBe(true);
+    expect(canUseCommunityInteractions("owner", true)).toBe(true);
+    expect(canUseCommunityInteractions("admin", true)).toBe(true);
+    expect(canUseCommunityInteractions("user", true)).toBe(true);
+    expect(canUseCommunityInteractions("admin", false)).toBe(false);
+    expect(canUseCommunityInteractions("user", false)).toBe(false);
+    expect(canUseCommunityInteractions(undefined, true)).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ export function RecommendAgainForm({
   const [reason, setReason] = useState("");
   const [trackList, setTrackList] = useState<string[]>([]);
   const [selectedTrackIdx, setSelectedTrackIdx] = useState<number[]>([]);
-  const [tracksLoading, setTracksLoading] = useState(false);
+  const [tracksLoading, setTracksLoading] = useState(Boolean(neteaseUrl));
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,6 @@ export function RecommendAgainForm({
   useEffect(() => {
     if (!neteaseUrl) return;
     let cancelled = false;
-    setTracksLoading(true);
     void (async () => {
       try {
         const res = await fetch("/api/netease/resolve", {
@@ -83,12 +82,11 @@ export function RecommendAgainForm({
   return (
     <form onSubmit={onSubmit} className="space-y-3">
       <textarea
-        required
-        minLength={4}
         rows={3}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        placeholder="推荐理由"
+        placeholder="推荐理由（可选，可留空）"
+        maxLength={2000}
         className="w-full resize-y rounded-xl border border-white/28 bg-transparent px-3 py-2 text-sm text-white outline-none focus:border-white/40"
       />
 

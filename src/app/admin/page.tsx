@@ -184,7 +184,7 @@ export default async function AdminHomePage() {
             </li>
             <li>
               <strong className="text-white/90">用户</strong>
-              ：荐专默认上架、红心、评分、评论
+              ：荐专默认上架、红心；评分和评论需站主开放互动内测
             </li>
           </ul>
           <p className="mt-3 text-[12px] text-white/40">

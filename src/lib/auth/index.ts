@@ -39,6 +39,7 @@ declare module "next-auth" {
   interface User {
     role?: UserRole;
     phone?: string | null;
+    interactionBeta?: boolean;
   }
   interface Session {
     user: {
@@ -47,12 +48,14 @@ declare module "next-auth" {
       phone?: string | null;
       name?: string | null;
       role: UserRole;
+      interactionBeta: boolean;
     };
   }
   interface JWT {
     id?: string;
     role?: UserRole;
     phone?: string | null;
+    interactionBeta?: boolean;
   }
 }
 
@@ -89,6 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             phone: user.phone ?? null,
             name: user.name,
             role: user.role,
+            interactionBeta: user.interaction_beta,
           };
         } catch (err) {
           if (err instanceof NeedPasswordSetup) throw err;
@@ -108,6 +112,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.role = user.role ?? "user";
         token.phone = user.phone ?? null;
+        token.interactionBeta = user.interactionBeta ?? false;
         token.email = user.email ?? null;
         token.name = user.name;
         token.userSyncedAt = Date.now();
@@ -135,6 +140,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.id = row.id;
           token.role = row.role;
           token.phone = row.phone ?? null;
+          token.interactionBeta = row.interaction_beta;
           token.email = row.email ?? null;
           token.name = row.name;
           token.userSyncedAt = Date.now();
@@ -152,6 +158,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = String(token.id ?? token.sub ?? "");
         session.user.role = (token.role as UserRole) ?? "user";
         session.user.phone = (token.phone as string | null) ?? null;
+        session.user.interactionBeta = token.interactionBeta === true;
         session.user.email =
           (token.email as string | null | undefined) ??
           session.user.email ??
@@ -172,6 +179,7 @@ export {
   canModerate,
   canManageOwnerContent,
   canParticipate,
+  canUseCommunityInteractions,
   isOwner,
   isStaff,
 } from "./roles";

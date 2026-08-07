@@ -25,7 +25,7 @@ const PILLARS = [
     key: "heart",
     label: "heart",
     title: "放进心里",
-    desc: "红心、评分、站主爱听与友情标记，让好专留下可回看的痕迹。",
+    desc: "红心、站主爱听与友情标记，让好专留下可回看的痕迹。",
   },
 ] as const;
 
@@ -70,7 +70,7 @@ export default function AboutPage() {
                   歌荒的时候，总希望有人把「这张真的值得听」递到面前。
                   <br className="hidden sm:block" />
                   Waxlist
-                  为此而建：听专、荐专、红心与口碑——让好发行被看见。
+                  为此而建：听专、荐专与红心——让好发行被看见。
                 </p>
                 <p className="mt-3 font-mono text-[12px] tracking-[0.14em] text-white/65">
                   find · rec · heart
@@ -184,13 +184,13 @@ export default function AboutPage() {
                     在黑胶与厂牌语境里，wax 也常指唱片、那层被刻下纹路的蜡：
                     不是一闪而过的单曲流，而是一张可以反复翻开的「片」。于是有了{" "}
                     <strong className="font-medium text-white">Waxlist</strong>
-                    ——wax + list：一份好发行的清单，一块慢慢攒起来的听单与口碑地。
+                    ——wax + list：一份好发行的清单，一块慢慢攒起来的听单。
                   </p>
                   <p>
                     做这个站的起点很朴素。很多时候不是不爱听，而是不知道下一张该听什么——
                     算法还在推脸熟的歌，扎实、有态度的发行却散落各处。我们想在歌荒时仍能遇见{" "}
                     <strong className="font-medium text-white">优质发行</strong>
-                    ：有人推、有人写为什么推、有人打分、有人红心——让「好听」留下痕迹。
+                    ：有人推、有人愿意写下为什么推、有人点红心——让「好听」留下痕迹。
                     也对创作者开放：独立音乐人可以把作品递上来，让更多人听到、留下一句认真的话。
                     它首先是交流与发现的场，不是排行榜竞赛。
                   </p>
@@ -217,7 +217,7 @@ export default function AboutPage() {
                   <p>
                     主线是{" "}
                     <strong className="font-medium text-white">优质发行</strong>
-                    ：浏览封面与详情、红心与「站主爱听」、荐专与评分评论；一期优先网易云外链。
+                    ：浏览封面与详情、红心与「站主爱听」、荐专；评分和评论公开可读，发布仅向小范围内测账号开放。一期优先网易云外链。
                     还有专辑盲盒，随手开一张今天的专。find · rec ·
                     heart，比堆数量更重要。
                   </p>

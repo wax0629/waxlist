@@ -84,7 +84,7 @@ DATABASE_URL='你的Neon连接串' npx prisma db push
 3. 确认账号旁是 **站主**（`OWNER_EMAILS` 或首个用户）  
 4. `/explore/submit` 推一张专  
 5. 确认荐专默认上架；管理员可在 `/moderation` 查看并下架
-6. 详情页：评分、红心、曲目点赞  
+6. 详情页：红心、曲目点赞；站主或后台开放互动内测的账号可评分、评论
 7. `/chat` 找伴奏（有 YouTube key 时）
 
 ---

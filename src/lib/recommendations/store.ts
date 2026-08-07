@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { resolveNeteaseMeta } from "@/lib/netease/fetch-meta";
 import { parseNeteaseUrl } from "@/lib/netease/parse";
 import { mergeFriendFlag } from "@/lib/releases/friend-tag";
+import { mergeUdgFlag, withUdgTag } from "@/lib/releases/udg";
 import type { CatalogRegion } from "@/lib/releases/catalog";
 import {
   createRelease,
@@ -12,10 +13,7 @@ import {
   getRelease,
   updateRelease,
 } from "@/lib/releases/store";
-import type {
-  PendingReleaseRow,
-  RecommendationPublic,
-} from "./types";
+import type { PendingReleaseRow, RecommendationPublic } from "./types";
 
 function mapRec(r: {
   id: string;
@@ -178,7 +176,7 @@ export async function submitRecommendation(opts: {
   userId: string;
   /** Session role; owner skips moderation */
   role?: UserRole | null;
-  reason: string;
+  reason?: string;
   tracks?: string;
   /** Recommend existing release */
   releaseId?: string;
@@ -193,19 +191,22 @@ export async function submitRecommendation(opts: {
   regions?: CatalogRegion[];
   /** Owner-only: attach pink「友情」badge (e.g. mixing clients). */
   friend?: boolean;
+  /** Classify this release into the UDG section. Available to every user. */
+  udg?: boolean;
 }): Promise<{
   release_id: string;
   recommendation_id: string;
   is_new_release: boolean;
   status: "pending" | "published";
 }> {
-  const reason = opts.reason.trim();
-  if (reason.length < 4) {
-    throw new Error("推荐理由至少 4 个字");
+  const reason = opts.reason?.trim() ?? "";
+  if (reason.length > 2000) {
+    throw new Error("推荐理由过长");
   }
 
   // 正常荐专默认上架；友情标签仍仅站主
   const wantFriend = Boolean(opts.friend) && isOwner(opts.role);
+  const wantUdg = Boolean(opts.udg);
   let releaseId = opts.releaseId;
   let isNew = false;
   const recStatus = "published" as const;
@@ -220,9 +221,11 @@ export async function submitRecommendation(opts: {
     if (existing.status !== "published") {
       releaseNeedsPublish = true;
     }
-    if (wantFriend) {
+    if (wantFriend || wantUdg) {
+      let tags = mergeFriendFlag(existing.tags, wantFriend);
+      if (wantUdg) tags = withUdgTag(tags);
       await updateRelease(existing.id, {
-        tags: mergeFriendFlag(existing.tags, true),
+        tags,
       });
     }
   } else {
@@ -255,7 +258,8 @@ export async function submitRecommendation(opts: {
     }
 
     if (!title) throw new Error("请填写标题，或粘贴可解析的网易云链接");
-    if (!artists.length) throw new Error("请填写艺人，或粘贴可解析的网易云链接");
+    if (!artists.length)
+      throw new Error("请填写艺人，或粘贴可解析的网易云链接");
 
     if (neteaseId) {
       const dup = await findByNeteaseId(neteaseId);
@@ -275,6 +279,9 @@ export async function submitRecommendation(opts: {
         if (wantFriend) {
           patch.tags = mergeFriendFlag(dup.tags, true);
         }
+        if (wantUdg) {
+          patch.tags = withUdgTag(patch.tags ?? dup.tags);
+        }
         if (releasedAt && !dup.released_at) {
           patch.released_at = releasedAt;
         }
@@ -288,12 +295,11 @@ export async function submitRecommendation(opts: {
     }
 
     if (!releaseId) {
-      const releaseType =
-        type ??
-        (parsed.kind === "song" ? "single" : "album");
-      const tags = wantFriend
-        ? mergeFriendFlag(opts.tags, true)
-        : opts.tags ?? [];
+      const releaseType = type ?? (parsed.kind === "song" ? "single" : "album");
+      const tags = mergeUdgFlag(
+        mergeFriendFlag(opts.tags, wantFriend),
+        wantUdg,
+      );
       const created = await createRelease({
         title,
         artists,
