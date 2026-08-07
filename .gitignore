@@ -50,6 +50,8 @@ next-env.d.ts
 !/docs/user/**
 !/docs/archive/
 !/docs/archive/**
+!/docs/assets/
+!/docs/assets/waxlist-preview.jpg
 
 # Neon prod URL for local scripts only
 .env.neon.local

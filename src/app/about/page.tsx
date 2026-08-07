@@ -310,6 +310,24 @@ export default function AboutPage() {
                   </div>
                 </section>
 
+                <section className="rounded-2xl border border-[#ff6b9e]/35 bg-[#ff6b9e]/[0.09] px-5 py-5">
+                  <h2 className="font-display text-lg font-semibold text-white">
+                    让更多同好看见
+                  </h2>
+                  <p className="mt-2 text-[13px] leading-relaxed text-white/80">
+                    如果 Waxlist 帮你遇见了一张好专，欢迎在 GitHub
+                    点一个 Star。这个小动作会让项目更容易被更多独立音乐听众发现。
+                  </p>
+                  <a
+                    href="https://github.com/wax0629/waxlist"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition hover:bg-[#ffe3ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    在 GitHub 上支持 Waxlist ↗
+                  </a>
+                </section>
+
                 <section className="rounded-2xl border border-[#ff6b9e]/30 bg-[#ff6b9e]/[0.08] px-5 py-5">
                   <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#ffc2d6]">
                     Contact
