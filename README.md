@@ -10,50 +10,59 @@
 </p>
 
 <p align="center">
-  <a href="https://waxlist-nu.vercel.app"><strong>在线体验</strong></a>
+  <a href="https://waxlist.cn"><strong>打开站点</strong></a>
   ·
-  <a href="https://waxlist-nu.vercel.app/explore/today">开一张专辑盲盒</a>
+  <a href="https://waxlist.cn/explore/today">开一张专辑盲盒</a>
   ·
-  <a href="https://waxlist-nu.vercel.app/explore/submit">推荐一张专辑</a>
+  <a href="https://waxlist.cn/explore/submit">推荐一张专辑</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/wax0629/waxlist/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/wax0629/waxlist?style=flat&color=ff6b9e" /></a>
-  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111111?style=flat&logo=nextdotjs" />
   <img alt="内测" src="https://img.shields.io/badge/status-内测-9b51e0?style=flat" />
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111111?style=flat&logo=nextdotjs" />
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-111111?style=flat" />
 </p>
 
 ![Waxlist 优质发行页面](./docs/assets/waxlist-preview.jpg)
 
-> 如果 Waxlist 帮你遇见了一张好专，欢迎点一个 **Star**。这会帮助更多独立音乐听众发现它。
+## 这是什么
 
-## 为什么做 Waxlist
+流媒体很会继续播放，却不总把一张值得完整听完的发行认真递给你。Waxlist 补这块：
 
-流媒体很擅长继续播放，却不总擅长把一张值得完整听完的发行认真递给你。Waxlist 想补上这块：
+- **有人推**：听众和创作者都可以提交网易云专辑，写下为什么值得听。
+- **能留下**：红心、评分、评论、站主爱听，推荐不是刷过去就没了。
+- **还能逛**：搜索、筛选、UDG 专区、专辑盲盒。歌荒时随手开一张。
+- **不越界**：只链回官方试听，不提供未授权下载。
 
-- **有人推荐**：听众与创作者都可以提交作品，不只依赖算法曝光。
-- **有迹可循**：红心、评分、评论、站主爱听与友情标记，让推荐不是一次性信息流。
-- **能继续发现**：搜索、地区 / 年代 / 风格筛选、专辑盲盒与 UDG 专区，把歌荒变成探索。
-- **保持克制**：链接回官方试听平台，不提供未授权下载。
+现在是内测。站点：[https://waxlist.cn](https://waxlist.cn)
 
-## 已有功能
+## 先这样用
 
-| 功能 | 入口 | 说明 |
-| --- | --- | --- |
-| 优质发行 | [`/explore`](https://waxlist-nu.vercel.app/explore) | 浏览、搜索、筛选、排序、评分与红心 |
-| UDG 专区 | [`?filter=udg`](https://waxlist-nu.vercel.app/explore?filter=udg) | 集中发现地下与独立发行 |
-| 专辑盲盒 | [`/explore/today`](https://waxlist-nu.vercel.app/explore/today) | 加权随机开一张今天的专辑 |
-| 推荐专辑 | [`/explore/submit`](https://waxlist-nu.vercel.app/explore/submit) | 登录后提交网易云专辑链接 |
-| 我的红心 | [`?filter=heart`](https://waxlist-nu.vercel.app/explore?filter=heart) | 回看自己收藏的发行 |
-| Beat Hunter | [`/chat`](https://waxlist-nu.vercel.app/chat) | 用自然语言找可试听伴奏（Beta） |
+1. 打开 [优质发行](https://waxlist.cn/explore)，找一张想听完的。
+2. 点进封面，去网易云把整张听完。
+3. 觉得值，就 [登录后推上来](https://waxlist.cn/explore/submit)，或先点红心。
+4. 没目标时，去 [开一张盲盒](https://waxlist.cn/explore/today)。
 
-## 技术栈
+独立音乐人可以把作品递上来，让更多人听到、留下一句认真的话。
 
-- Next.js 16 App Router、React 19、TypeScript
-- Tailwind CSS 4、Framer Motion
-- PostgreSQL、Prisma
-- NextAuth、Vitest
+| 你想做什么 | 去哪 |
+| --- | --- |
+| 逛专辑 | [https://waxlist.cn/explore](https://waxlist.cn/explore) |
+| 地下 / 独立发行 | [UDG 专区](https://waxlist.cn/explore?filter=udg) |
+| 随便开一张 | [专辑盲盒](https://waxlist.cn/explore/today) |
+| 推荐自己听过的 | [荐专](https://waxlist.cn/explore/submit) |
+| 说说这个站 | [关于与反馈](https://waxlist.cn/about) |
+
+找伴奏 [Beat Hunter](https://waxlist.cn/chat) 仍是 Beta，和听专分开，不抢主线。
+
+## 反馈
+
+内测阶段功能会改，欢迎直接说哪里卡住、想听什么。
+
+- 站内：关于页的反馈表单
+- 微信：**Wackox**（备注 Waxlist）
+- 邮箱：xux9278@gmail.com
+- 可复现的缺陷：[GitHub Issues](https://github.com/wax0629/waxlist/issues/new)
 
 ## 本地运行
 
@@ -69,9 +78,7 @@ npm run db:push
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。环境变量与数据库说明见[使用与运维文档](./docs/user/README.md)。
-
-## 检查
+打开 [http://localhost:3000](http://localhost:3000)。环境变量与数据库见 [使用与运维](./docs/user/README.md)。
 
 ```bash
 npm test
@@ -79,32 +86,21 @@ npm run lint
 npm run build
 ```
 
-## 项目状态
-
-Waxlist 当前为 `v0.1.0` 内测版，接口与数据结构仍可能调整。生产现在跑在 Vercel，可打开 [https://waxlist-nu.vercel.app](https://waxlist-nu.vercel.app)。`waxlist.cn` 正在从过期香港机切回 Vercel。近期重点是：
-
-- 让真实听众和独立音乐人把专推上来
-- 提高荐专、评分与评论体验
-- 完善地区、年代、风格分类和索引
-- 继续打磨 Beat Hunter 的检索质量
-
-发现问题或有产品建议，可以[提交 Issue](https://github.com/wax0629/waxlist/issues/new)。想参与开发，欢迎先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md) 与 [HANDOFF.md](./HANDOFF.md)。
+技术栈：Next.js 16、React 19、PostgreSQL、Prisma、NextAuth。参与开发见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
 ## 文档
 
 | 文档 | 说明 |
 | --- | --- |
-| [HANDOFF.md](./HANDOFF.md) | 项目结构、现状与交接入口 |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | 如何试用、报缺陷与提交代码 |
-| [使用与运维](./docs/user/README.md) | 环境变量、数据库、部署与运维 |
-| [增长计划](./docs/ops/growth-plan.md) | 100 Star 与真实用户 |
+| [HANDOFF.md](./HANDOFF.md) | 项目结构与现状 |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | 试用、报缺陷、提交代码 |
+| [使用与运维](./docs/user/README.md) | 环境变量、数据库、部署 |
 | [日常发版](./docs/user/release.md) | 发版、验收与回滚 |
-| [内测计划](./docs/user/beta-and-dev.md) | 当前阶段与邀请计划 |
-| [历史设计归档](./docs/archive/) | 旧构思与决策记录 |
+| [内测计划](./docs/user/beta-and-dev.md) | 当前阶段 |
+| [增长计划](./docs/ops/growth-plan.md) | 用户积累（内部） |
 
 ---
 
 <p align="center">
-  认真听完一张专，也认真把它推荐给下一个人。<br />
-  <a href="https://github.com/wax0629/waxlist">觉得这个方向值得继续，就给 Waxlist 一个 Star。</a>
+  认真听完一张专，也认真把它推荐给下一个人。
 </p>

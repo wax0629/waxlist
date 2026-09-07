@@ -1,7 +1,7 @@
-# Waxlist 增长计划（100 Star + 真实用户）
+# Waxlist 增长计划
 
 > 更新：2026-09-07
-> 原则：不买星、不互赞群、不刷量。先让人听完一张专，再请他们 Star。
+> 原则：先攒真实听众和荐专。100 个 GitHub Star 只是顺带结果，不作为对外话术，不买星、不互赞、不刷量。
 
 ## 当前水位
 
@@ -11,17 +11,16 @@
 | 上架专辑 | 133（全部 published，含 31 张 UDG） |
 | 注册用户 | 17 |
 | 评分 / 红心 / 评论 | 49 / 24 / 2 |
-| 当前可访问生产 | https://waxlist-nu.vercel.app |
-| 自定义域名 | `waxlist.cn` 已绑 Vercel，DNS 仍指向过期香港机 |
+| 生产 | https://waxlist.cn |
 
 ## 30 天节奏
 
 ### 第 1 周：能打开、能分享、能讲清楚
 
 - [x] 站点迁回 Vercel + Neon 新加坡
-- [ ] 阿里云把 `waxlist.cn` A 记录改到 Vercel
-- [ ] README / 关于页只放当前能打开的 URL
-- [ ] `/health`、Open Graph、sitemap、LICENSE
+- [x] 阿里云把 `waxlist.cn` A 记录改到 Vercel，HTTPS 已通
+- [x] README / 关于页只放当前能打开的 URL
+- [x] `/health`、Open Graph、sitemap、LICENSE
 - [ ] 关 #45（仓库主页转化代码已合，运营观察继续）
 - [ ] 站主再铺 10 张有推荐理由的专，优先可完整听完
 
@@ -47,7 +46,7 @@
 ## 邀请话术
 
 > 做了个听专/荐专小站 Waxlist，现在能打开：
-> https://waxlist-nu.vercel.app
+> https://waxlist.cn
 > 可以逛专辑、开盲盒、推一张你觉得值得完整听完的。
 > 代码开源：https://github.com/wax0629/waxlist
 > 如果帮你遇见一张好专，点个 Star 就很好。微信 Wackox，备注 Waxlist。
@@ -56,4 +55,4 @@
 
 - 买星、互赞、刷评论
 - 把 Beat Hunter 当主推
-- 在还打不开的 `waxlist.cn` 上做投放
+- 买量投放、承诺完整分类体系

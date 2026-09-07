@@ -312,20 +312,28 @@ export default function AboutPage() {
 
                 <section className="rounded-2xl border border-[#ff6b9e]/35 bg-[#ff6b9e]/[0.09] px-5 py-5">
                   <h2 className="font-display text-lg font-semibold text-white">
-                    让更多同好看见
+                    一起把好专递出去
                   </h2>
                   <p className="mt-2 text-[13px] leading-relaxed text-white/80">
-                    如果 Waxlist 帮你遇见了一张好专，欢迎在 GitHub
-                    点一个 Star。这个小动作会让项目更容易被更多独立音乐听众发现。
+                    听完一张觉得值，就推上来或点红心。独立音乐人也可以把自己的发行递到这里。
+                    代码开源，需要改站或报缺陷再去 GitHub。
                   </p>
-                  <a
-                    href="https://github.com/wax0629/waxlist"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition hover:bg-[#ffe3ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  >
-                    在 GitHub 上支持 Waxlist ↗
-                  </a>
+                  <div className="mt-4 flex flex-wrap gap-2.5">
+                    <Link
+                      href="/explore/submit"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition hover:bg-[#ffe3ed] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                      推荐一张专辑
+                    </Link>
+                    <a
+                      href="https://github.com/wax0629/waxlist"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/28 bg-white/[0.06] px-5 py-2.5 text-[13px] font-medium text-white/90 transition hover:border-white/40 hover:bg-white/[0.1]"
+                    >
+                      源码 ↗
+                    </a>
+                  </div>
                 </section>
 
                 <section className="rounded-2xl border border-[#ff6b9e]/30 bg-[#ff6b9e]/[0.08] px-5 py-5">
