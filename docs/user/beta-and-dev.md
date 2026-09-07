@@ -1,8 +1,9 @@
 # 内测计划与后续开发模式
 
-> 生产：`https://waxlist.cn`（腾讯云香港 + Nginx + pm2 + Neon）  
-> 日常开发：本机 `localhost:3000` + 本地 Postgres  
-> 原则：**先内测攒真反馈，正式上线后功能在本地做，版本成熟再推生产**
+> 生产：`https://waxlist-nu.vercel.app`（Vercel + Neon 新加坡）
+> 目标域名：`https://waxlist.cn`（DNS 待切）
+> 日常开发：本机 `localhost:3000` + 本地 Postgres
+> 原则：**先让人能打开并听完一张专，再请 Star；功能在本地做，版本成熟再推生产**
 
 ---
 
@@ -47,9 +48,9 @@
 
 ### 3. 邀请话术（可改）
 
-> 做了个听专/荐专的小站 Waxlist，内测中。  
-> 地址：https://waxlist.cn  
-> 可以逛专辑、点红心、推一张你觉得值得听的。  
+> 做了个听专/荐专的小站 Waxlist，内测中。
+> 地址：https://waxlist.cn
+> 可以逛专辑、点红心、推一张你觉得值得听的。
 > 有问题或想加微信反馈：Wackox（备注 Waxlist）
 
 ### 4. 验收清单（发邀请前）

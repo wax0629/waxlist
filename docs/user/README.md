@@ -53,8 +53,9 @@ npm run dev
 
 ## 生产
 
-- 域名：https://waxlist.cn
-- 发版：GitHub `main` → `./scripts/deploy-prod.sh`，见 [release.md](./release.md)
+- 当前可访问：https://waxlist-nu.vercel.app
+- 目标域名：https://waxlist.cn（DNS 从过期香港机切到 Vercel）
+- 发版：GitHub `main` 自动部署到 Vercel，见 [release.md](./release.md)
 - 健康：`/health`
 - 登录：邮箱 + 密码；OTP 暂未接入当前登录页
 

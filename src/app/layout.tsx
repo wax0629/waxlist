@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 import { AuroraPerf } from "@/components/aurora-perf";
 import { Providers } from "@/components/providers";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  publicSiteUrl,
+} from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,14 +28,44 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+const siteUrl = publicSiteUrl();
+
 export const metadata: Metadata = {
-  title: "Waxlist",
-  description:
-    "听专、荐专与红心 · 站内 Beat Hunter 帮你找可试听伴奏",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "专辑推荐",
+    "独立音乐",
+    "UDG",
+    "中文 Hip-Hop",
+    "网易云专辑",
+    "music discovery",
+  ],
+  authors: [{ name: "Wackox", url: "https://github.com/wax0629" }],
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    url: siteUrl,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: [{ url: "/og.jpg", width: 1772, height: 893, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    images: ["/og.jpg"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Waxlist",
+    title: SITE_NAME,
   },
   formatDetection: {
     telephone: false,

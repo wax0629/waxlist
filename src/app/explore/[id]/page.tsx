@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppRail } from "@/components/app-rail";
@@ -27,11 +28,37 @@ import {
 } from "@/lib/releases/friend-tag";
 import { formatReleasedAt } from "@/lib/releases/format";
 import { getRelease } from "@/lib/releases/store";
+import { publicSiteUrl, SITE_NAME } from "@/lib/site";
 import { listTracksWithStats } from "@/lib/tracks/store";
 
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const release = await getRelease(id).catch(() => null);
+  if (!release || release.status !== "published") {
+    return { title: "专辑未找到" };
+  }
+  const artists = release.artists.join(" / ");
+  const title = `${release.title} · ${artists}`;
+  const description =
+    release.curatorial_note ||
+    release.description ||
+    `${artists} 的专辑，在 ${SITE_NAME} 被认真推荐。`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${publicSiteUrl()}/explore/${id}`,
+      type: "music.album",
+      images: release.cover_url ? [{ url: release.cover_url }] : ["/og.jpg"],
+    },
+  };
+}
 
 function isNeteaseLink(label: string, url: string): boolean {
   const l = label.toLowerCase();

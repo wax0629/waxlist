@@ -1,9 +1,8 @@
-# 历史 / 海外备选部署（Vercel + Neon）
+# 当前生产部署（Vercel + Neon）
 
-适合 **海外可访问** 的小流量内测。全程约 30–60 分钟。
-
-> 这不是 Waxlist 当前生产方案。当前生产使用腾讯云香港机，并从本机运行 `./scripts/deploy-prod.sh`。
-> 仅在需要独立的海外备选环境时使用本文；香港机参考见 [deploy-aliyun-hk.md](./deploy-aliyun-hk.md)。
+> 2026-09-07 起，香港轻量机已不可达。生产改回 Vercel 项目 `waxlist`，GitHub `main` 自动部署。
+> 当前对外地址：https://waxlist-nu.vercel.app
+> `waxlist.cn` 已在 Vercel 绑定，需在万网把 A 记录从 `43.161.255.64` 改到 Vercel。
 
 ## 0. 本地准备
 

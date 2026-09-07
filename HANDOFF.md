@@ -1,7 +1,8 @@
 # Waxlist 项目交接
 
-> 最后更新：2026-08-07 · 版本 **v0.1.0** · 阶段 **内测**
-> 生产：**https://waxlist.cn**
+> 最后更新：2026-09-07 · 版本 **v0.1.0** · 阶段 **内测**
+> 当前可访问生产：**https://waxlist-nu.vercel.app**
+> 自定义域名 `https://waxlist.cn` 已绑 Vercel，DNS 仍指向过期香港机，待万网解析切换
 
 ---
 
@@ -31,11 +32,10 @@
 ```
 用户浏览器
     ↓ HTTPS
-腾讯云香港 43.161.255.64
-    Nginx (443) → Next.js 16 (pm2: waxlist) :3000
-                      ↓
-              Neon Postgres（新加坡 ap-southeast-1）
-              pm2: waxlist-db-keepalive（防 Neon 休眠）
+Vercel（waxlist-nu.vercel.app，待绑 waxlist.cn）
+    Next.js 16
+        ↓
+Neon Postgres（新加坡 ap-southeast-1）
 ```
 
 | 层     | 选型                                                                               |
@@ -44,7 +44,7 @@
 | 鉴权   | Auth.js (NextAuth v5) JWT · 当前入口为邮箱密码；OTP 后端能力保留、未接入当前登录页 |
 | 数据库 | Prisma 6 + Postgres（本地 Docker / 生产 Neon）                                     |
 | 邮件   | Resend（生产已配）；可选 SMTP                                                      |
-| 部署   | `scripts/deploy-prod.sh` → rsync + `npm ci` + `prisma db push` + build + pm2       |
+| 部署   | GitHub `main` → Vercel 自动构建；旧香港机 `scripts/deploy-prod.sh` 仅作历史方案 |
 | 仓库   | `github.com:wax0629/waxlist.git`                                                   |
 
 **路径约定**
@@ -86,7 +86,7 @@
 2. **Explore SSR 仍偏慢**（约 1s 级）：Neon 冷启动 + 多查询；保活已缓解冷启动。
 3. **无站内播放**：只外链网易云。
 4. **Beat Hunter** 依赖 YouTube API / LLM，配额与延迟需单独看。
-5. 内容量仍少，内测靠站主铺专 + 熟人推。
+5. 专辑库已有 100+ 张上架，但真实用户、评论和站外传播仍少。
 6. **依赖审计待升级**：`npm audit --omit=dev` 当前报告 Next.js/PostCSS/Sharp 与 Auth.js/Nodemailer 链上的 6 个 high，自动修复会跨当前版本范围，需单独升级验证。
 7. **全量 ESLint 基线未清零**：`npm run lint` 会命中聊天页、搜索栏、用户菜单等旧组件的 React 19 `set-state-in-effect` / memoization 规则；当前发版以改动文件定向 ESLint、TypeScript、Vitest 和 production build 为硬门槛，后续应单独修复，避免混入产品功能提交。
 
@@ -96,15 +96,15 @@
 - 荐专：普通用户和员工提交后均**默认上架**；`/moderation` 用于浏览近期内容、事后下架，以及清理旧版遗留待审记录。
 - 推荐理由：字段名仍叫“推荐理由”，但可以留空；历史推荐理由不受影响。
 - 评分 / 评论：所有访客和用户都能查看均分与已有评论；站主默认可发布，其他账号写操作默认返回 403。站主在 `/admin/users` 开启“互动内测”后可写，权限最迟 15 分钟同步，重新登录可立即生效。
-- 发版：GitHub `main` 是唯一事实来源；当前生产机使用 `scripts/deploy-prod.sh` 从本机 **rsync**，不是在服务器执行 `git pull`。
-- 部署文档：香港机是当前生产方案；Vercel、Zeabur 文档仅供备选或历史参考。
+- 发版：GitHub `main` 是唯一事实来源；当前生产由 Vercel 在 push 后自动构建。香港机 `scripts/deploy-prod.sh` 仅作历史方案。
+- 对外链接在 `waxlist.cn` DNS 切完前使用 `https://waxlist-nu.vercel.app`。
 
 ### 建议下一步（产品）
 
-1. 小范围内测邀请（话术见 `docs/user/beta-and-dev.md`）
-2. 收集反馈（站内表单 / 微信 Wackox）
-3. 性能：列表缓存、减串行查库
-4. 在 `/admin/categories` 补录存量地区；覆盖率达到 90% 后前台自动开放
+1. 万网把 `waxlist.cn` A 记录改到 Vercel（见 `docs/ops/growth-plan.md`）
+2. 小范围内测邀请（话术见 `docs/ops/community-posts.md`）
+3. 收集反馈（站内表单 / 微信 Wackox）
+4. 性能：列表缓存、减串行查库
 5. Resend 域名或 SMTP，反馈可抄送 QQ
 
 ---
@@ -113,12 +113,12 @@
 
 | 项       | 值                                                             |
 | -------- | -------------------------------------------------------------- |
-| 生产域名 | https://waxlist.cn                                             |
-| SSH      | `ubuntu@43.161.255.64`                                         |
-| 应用目录 | `/var/www/waxlist`                                             |
-| 进程     | `pm2 list` → `waxlist` + `waxlist-db-keepalive`                |
-| 数据库   | Neon Singapore pooler（连接串在服务器 `.env`，**勿提交 Git**） |
-| 发版     | `./scripts/deploy-prod.sh`（rsync **排除** `.env`）            |
+| 当前生产 | https://waxlist-nu.vercel.app                                  |
+| 目标域名 | https://waxlist.cn（DNS 待切）                                 |
+| 平台     | Vercel 项目 `waxlist`，GitHub `main` 自动部署                  |
+| 数据库   | Neon Singapore pooler（连接串在 Vercel env，**勿提交 Git**）   |
+| 发版     | `git push origin main`（或 `vercel deploy --prod`）            |
+| 旧主机   | `ubuntu@43.161.255.64` 已不可达，勿再 rsync                    |
 
 ### 常用命令
 
@@ -126,17 +126,10 @@
 # 本地
 npm run db:up && npm run db:push && npm run dev
 
-# 生产发版（先提交并推送 GitHub main）
+# 生产发版
 git switch main && git pull --ff-only origin main
-./scripts/deploy-prod.sh
-
-# 仅用于首次启用 UDG 时补标存量站主内容；幂等，可重复执行
-ssh ubuntu@43.161.255.64 'cd /var/www/waxlist && node scripts/tag-owner-releases-udg.mjs'
-
-# 服务器
-ssh ubuntu@43.161.255.64
-cd /var/www/waxlist && pm2 logs waxlist --lines 50
-curl -sS https://waxlist.cn/health
+git push origin main
+curl -sS https://waxlist-nu.vercel.app/health
 ```
 
 ### 环境变量（生产必有）
@@ -144,7 +137,7 @@ curl -sS https://waxlist.cn/health
 见 `docs/user/environment.md` 与 `.env.example`。关键：
 
 - `DATABASE_URL` — Neon
-- `AUTH_SECRET` / `AUTH_URL=https://waxlist.cn`
+- `AUTH_SECRET` / `AUTH_URL`（DNS 切完前为 `https://waxlist-nu.vercel.app`）
 - `RESEND_API_KEY` / `EMAIL_FROM`
 - `FEEDBACK_TO` — 反馈收件
 - `OWNER_EMAILS` — 站主邮箱
@@ -175,9 +168,10 @@ curl -sS https://waxlist.cn/health
 | `docs/user/beta-and-dev.md`          | 内测节奏                                  |
 | `docs/user/database-workflow.md`     | Neon × 本地、迁区                         |
 | `docs/user/release.md`               | **日常发版、线上验收与回滚**              |
-| `docs/user/deploy-aliyun-hk.md`      | 香港机部署参考（当前生产类型）            |
+| `docs/user/deploy.md`                | **当前生产：Vercel + Neon**               |
+| `docs/ops/growth-plan.md`            | 100 Star / 真实用户增长计划               |
+| `docs/user/deploy-aliyun-hk.md`      | 过期香港机部署参考                        |
 | `docs/user/deploy-zeabur.md`         | Zeabur 备选试用                           |
-| `docs/user/deploy.md`                | Vercel 历史 / 海外备选                    |
 | `docs/user/email-auth.md`            | 可选 OTP / 邮件发送（当前登录页不用 OTP） |
 | `docs/user/environment.md`           | 环境变量表                                |
 | `docs/user/admin-accounts.md`        | 角色分发                                  |

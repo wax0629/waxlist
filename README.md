@@ -10,17 +10,18 @@
 </p>
 
 <p align="center">
-  <a href="https://waxlist.cn"><strong>在线体验</strong></a>
+  <a href="https://waxlist-nu.vercel.app"><strong>在线体验</strong></a>
   ·
-  <a href="https://waxlist.cn/explore/today">开一张专辑盲盒</a>
+  <a href="https://waxlist-nu.vercel.app/explore/today">开一张专辑盲盒</a>
   ·
-  <a href="https://waxlist.cn/explore/submit">推荐一张专辑</a>
+  <a href="https://waxlist-nu.vercel.app/explore/submit">推荐一张专辑</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/wax0629/waxlist/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/wax0629/waxlist?style=flat&color=ff6b9e" /></a>
   <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111111?style=flat&logo=nextdotjs" />
   <img alt="内测" src="https://img.shields.io/badge/status-内测-9b51e0?style=flat" />
+  <img alt="MIT" src="https://img.shields.io/badge/license-MIT-111111?style=flat" />
 </p>
 
 ![Waxlist 优质发行页面](./docs/assets/waxlist-preview.jpg)
@@ -40,12 +41,12 @@
 
 | 功能 | 入口 | 说明 |
 | --- | --- | --- |
-| 优质发行 | [`/explore`](https://waxlist.cn/explore) | 浏览、搜索、筛选、排序、评分与红心 |
-| UDG 专区 | [`?filter=udg`](https://waxlist.cn/explore?filter=udg) | 集中发现地下与独立发行 |
-| 专辑盲盒 | [`/explore/today`](https://waxlist.cn/explore/today) | 加权随机开一张今天的专辑 |
-| 推荐专辑 | [`/explore/submit`](https://waxlist.cn/explore/submit) | 登录后提交网易云专辑链接 |
-| 我的红心 | [`?filter=heart`](https://waxlist.cn/explore?filter=heart) | 回看自己收藏的发行 |
-| Beat Hunter | [`/chat`](https://waxlist.cn/chat) | 用自然语言找可试听伴奏（Beta） |
+| 优质发行 | [`/explore`](https://waxlist-nu.vercel.app/explore) | 浏览、搜索、筛选、排序、评分与红心 |
+| UDG 专区 | [`?filter=udg`](https://waxlist-nu.vercel.app/explore?filter=udg) | 集中发现地下与独立发行 |
+| 专辑盲盒 | [`/explore/today`](https://waxlist-nu.vercel.app/explore/today) | 加权随机开一张今天的专辑 |
+| 推荐专辑 | [`/explore/submit`](https://waxlist-nu.vercel.app/explore/submit) | 登录后提交网易云专辑链接 |
+| 我的红心 | [`?filter=heart`](https://waxlist-nu.vercel.app/explore?filter=heart) | 回看自己收藏的发行 |
+| Beat Hunter | [`/chat`](https://waxlist-nu.vercel.app/chat) | 用自然语言找可试听伴奏（Beta） |
 
 ## 技术栈
 
@@ -80,21 +81,23 @@ npm run build
 
 ## 项目状态
 
-Waxlist 当前为 `v0.1.0` 内测版，接口与数据结构仍可能调整。近期重点是：
+Waxlist 当前为 `v0.1.0` 内测版，接口与数据结构仍可能调整。生产现在跑在 Vercel，可打开 [https://waxlist-nu.vercel.app](https://waxlist-nu.vercel.app)。`waxlist.cn` 正在从过期香港机切回 Vercel。近期重点是：
 
+- 让真实听众和独立音乐人把专推上来
 - 提高荐专、评分与评论体验
 - 完善地区、年代、风格分类和索引
 - 继续打磨 Beat Hunter 的检索质量
-- 为贡献者补齐更友好的开发与数据导入流程
 
-发现问题或有产品建议，可以[提交 Issue](https://github.com/wax0629/waxlist/issues/new)。想参与开发，欢迎先阅读 [HANDOFF.md](./HANDOFF.md) 与[文档索引](./docs/user/README.md)。
+发现问题或有产品建议，可以[提交 Issue](https://github.com/wax0629/waxlist/issues/new)。想参与开发，欢迎先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md) 与 [HANDOFF.md](./HANDOFF.md)。
 
 ## 文档
 
 | 文档 | 说明 |
 | --- | --- |
 | [HANDOFF.md](./HANDOFF.md) | 项目结构、现状与交接入口 |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | 如何试用、报缺陷与提交代码 |
 | [使用与运维](./docs/user/README.md) | 环境变量、数据库、部署与运维 |
+| [增长计划](./docs/ops/growth-plan.md) | 100 Star 与真实用户 |
 | [日常发版](./docs/user/release.md) | 发版、验收与回滚 |
 | [内测计划](./docs/user/beta-and-dev.md) | 当前阶段与邀请计划 |
 | [历史设计归档](./docs/archive/) | 旧构思与决策记录 |
